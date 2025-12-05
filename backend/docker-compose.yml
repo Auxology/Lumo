@@ -1,0 +1,22 @@
+services:
+  seq:
+    image: datalust/seq:2025.2
+    container_name: lumo-seq
+    restart: unless-stopped
+    environment:
+      - ACCEPT_EULA=Y
+    ports:
+      - 5341:80
+      - 5342:5342
+    volumes:
+      - seq-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  seq-data:
+    driver: local
