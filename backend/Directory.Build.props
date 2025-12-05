@@ -34,8 +34,7 @@
         <PackageReference Include="Serilog.Sinks.Console" />
         <PackageReference Include="UAParser" />
     </ItemGroup>
-
-
+    
     <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.Api'))">
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>
