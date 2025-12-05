@@ -1,6 +1,6 @@
 services:
   seq:
-    image: detalust/seq:2025.2
+    image: datalust/seq:2025.2
     container_name: lumo-seq
     restart: unless-stopped
     environment:
