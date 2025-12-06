@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using Auth.Domain.Constants;
 using Auth.Domain.Errors;
 using Auth.Domain.ValueObjects;
+using SharedKernel.Authentication;
 using SharedKernel.Domain;
 using SharedKernel.ResultPattern;
 using SharedKernel.Time;
@@ -49,7 +50,16 @@ public sealed class UserToken : Entity<int>
         ExpiresAt = utcNow.AddMinutes(UserConstants.TokenExpirationMinutes);
         UsedAt = null;
     }
+    
+    internal bool IsUsed => UsedAt is not null;
+    
+    internal bool IsExpired(IDateTimeProvider dateTimeProvider)
+    {
+        DateTimeOffset utcNow = dateTimeProvider.UtcNow;
 
+        return utcNow >= ExpiresAt;
+    }
+    
     internal static Result<UserToken> Create
     (
         UserId userId,
@@ -60,8 +70,6 @@ public sealed class UserToken : Entity<int>
         IDateTimeProvider dateTimeProvider
     )
     {
-        ArgumentNullException.ThrowIfNull(dateTimeProvider);
-        
         if (userId.IsEmpty())
             return UserTokenErrors.UserIdRequired;
         
@@ -84,5 +92,36 @@ public sealed class UserToken : Entity<int>
         );
         
         return userToken;
+    }
+    
+    private void MarkAsUsed(IDateTimeProvider dateTimeProvider)
+    {
+        UsedAt = dateTimeProvider.UtcNow;
+    }
+
+    internal Result Verify
+    (
+        string? otpToken,
+        string? magicLinkToken,
+        ISecretHasher secretHasher,
+        IDateTimeProvider dateTimeProvider
+    )
+    {
+        if (IsUsed)
+            return UserTokenErrors.AlreadyUsed;
+
+        if (IsExpired(dateTimeProvider))
+            return UserTokenErrors.Expired;
+
+        bool otpValid = !string.IsNullOrWhiteSpace(otpToken) && secretHasher.Verify(otpToken, OtpTokenHash);
+
+        bool magicLinkValid = !string.IsNullOrWhiteSpace(magicLinkToken) && secretHasher.Verify(magicLinkToken, MagicLinkTokenHash);
+
+        if (!otpValid && !magicLinkValid)
+            return UserTokenErrors.InvalidToken;
+
+        MarkAsUsed(dateTimeProvider);
+
+        return Result.Success();
     }
 }

@@ -4,6 +4,7 @@ using Auth.Domain.Entities;
 using Auth.Domain.Errors;
 using Auth.Domain.Events.User;
 using Auth.Domain.ValueObjects;
+using SharedKernel.Authentication;
 using SharedKernel.Constants;
 using SharedKernel.Domain;
 using SharedKernel.ResultPattern;
@@ -137,10 +138,10 @@ public sealed class User : AggregateRoot<UserId>
         ArgumentNullException.ThrowIfNull(dateTimeProvider);
 
         if (string.IsNullOrWhiteSpace(otpToken))
-            return UserTokenErrors.OtpTokenRequired;
+            return UserErrors.OtpTokenRequired;
 
         if (string.IsNullOrWhiteSpace(magicLinkToken))
-            return UserTokenErrors.MagicLinkTokenRequired;
+            return UserErrors.MagicLinkTokenRequired;
 
         string finalIpAddress = string.IsNullOrWhiteSpace(ipAddress)
             ? RequestConstants.IpAddressFallback
@@ -177,6 +178,39 @@ public sealed class User : AggregateRoot<UserId>
         );
         
         AddDomainEvent(domainEvent);
+        
+        return Result.Success();
+    }
+
+    public Result VerifyLogin
+    (
+        string? otpToken,
+        string? magicLinkToken,
+        ISecretHasher secretHasher,
+        IDateTimeProvider dateTimeProvider
+    )
+    {
+        ArgumentNullException.ThrowIfNull(secretHasher);
+        ArgumentNullException.ThrowIfNull(dateTimeProvider);
+        
+        UserToken? latestToken = _userTokens
+            .Where(ut => !ut.IsUsed && !ut.IsExpired(dateTimeProvider))
+            .OrderByDescending(ut => ut.CreatedAt)
+            .FirstOrDefault();
+
+        if (latestToken is null)
+            return UserErrors.TokenNotFoundOrExpired;
+
+        Result verifyResult = latestToken.Verify
+        (
+            otpToken: otpToken,
+            magicLinkToken: magicLinkToken,
+            secretHasher: secretHasher,
+            dateTimeProvider: dateTimeProvider
+        );
+        
+        if (verifyResult.IsFailure)
+            return verifyResult.Error;
         
         return Result.Success();
     }

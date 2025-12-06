@@ -21,16 +21,22 @@ public static class UserTokenErrors
         title: "UserToken.MagicLinkTokenHashRequired",
         detail: "Magic link token hash is required to create a user token."
     );
-
-    public static Error OtpTokenRequired => Error.Validation
+    
+    public static Error AlreadyUsed => Error.Conflict
     (
-        title: "User.OtpTokenRequired",
-        detail: "OTP token is required to request login."
+        title: "UserToken.AlreadyUsed",
+        detail: "The token has already been used."
     );
 
-    public static Error MagicLinkTokenRequired => Error.Validation
+    public static Error Expired => Error.Validation
     (
-        title: "User.MagicLinkTokenRequired",
-        detail: "Magic link token is required to request login."
+        title: "UserToken.Expired",
+        detail: "The token has expired and is no longer valid."
+    );
+    
+    public static Error InvalidToken => Error.Validation
+    (
+        title: "UserToken.InvalidToken",
+        detail: "The provided token is invalid."
     );
 }
