@@ -49,6 +49,8 @@ public readonly record struct EmailAddress
     private static string Normalize(string email) => email.Trim().ToLowerInvariant();
 
     public override string ToString() => Value;
+    
+    public bool IsEmpty() => string.IsNullOrEmpty(Value);
 }
 
 internal static class EmailAddressErrors
