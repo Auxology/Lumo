@@ -1,13 +1,14 @@
 using System.Diagnostics.CodeAnalysis;
 using Auth.Domain.Constants;
 using Auth.Domain.Errors;
+using Auth.Domain.Events.Session;
 using Auth.Domain.ValueObjects;
 using SharedKernel.Constants;
 using SharedKernel.Domain;
 using SharedKernel.ResultPattern;
 using SharedKernel.Time;
 
-namespace Auth.Domain.Aggregates.Session;
+namespace Auth.Domain.Aggregates.SessionAggregate;
 
 public sealed class Session : AggregateRoot<SessionId>
 {
@@ -25,7 +26,11 @@ public sealed class Session : AggregateRoot<SessionId>
     
     public DateTimeOffset ExpiresAt { get; private set; }
     
+    public DateTimeOffset AbsoluteExpiresAt { get; private set; }
+    
     public DateTimeOffset? RevokedAt { get; private set; }
+    
+    public DateTimeOffset? LastRefreshedAt { get; private set; }
     
     private Session() { } // For EF Core
     
@@ -47,7 +52,9 @@ public sealed class Session : AggregateRoot<SessionId>
         Version = 1;
         CreatedAt = utcNow;
         ExpiresAt = utcNow.AddDays(SessionConstants.ExpirationDays);
+        AbsoluteExpiresAt = utcNow.AddDays(SessionConstants.AbsoluteExpirationDays);
         RevokedAt = null;
+        LastRefreshedAt = null;
     }
 
     public bool IsRevoked => RevokedAt is not null;
@@ -56,7 +63,9 @@ public sealed class Session : AggregateRoot<SessionId>
     {
         ArgumentNullException.ThrowIfNull(dateTimeProvider);
         
-        return dateTimeProvider.UtcNow >= ExpiresAt;
+        DateTimeOffset utcNow = dateTimeProvider.UtcNow;
+        
+        return utcNow >= ExpiresAt || utcNow >= AbsoluteExpiresAt;
     }
 
     public bool IsValid(IDateTimeProvider dateTimeProvider)
@@ -99,6 +108,17 @@ public sealed class Session : AggregateRoot<SessionId>
             userAgent: userAgent,
             utcNow: utcNow
         );
+
+        SessionCreatedDomainEvent domainEvent = new
+        (
+            SessionId: session.Id.Value,
+            UserId: session.UserId.Value,
+            IpAddress: session.IpAddress,
+            UserAgent: session.UserAgent,
+            OccurredOn: utcNow
+        );
+        
+        session.AddDomainEvent(domainEvent);
         
         return session;
     }
@@ -113,26 +133,54 @@ public sealed class Session : AggregateRoot<SessionId>
         
         DateTimeOffset utcNow = dateTimeProvider.UtcNow;
         RevokedAt = utcNow;
+
+        SessionRevokedDomainEvent domainEvent = new
+        (
+            SessionId: Id.Value,
+            UserId: UserId.Value,
+            Reason: SessionConstants.RevokedByUser,
+            OccurredOn: utcNow
+        );
+        
+        AddDomainEvent(domainEvent);
         
         return Result.Success();
     }
 
-    public Result Refresh(string newHashedRefreshToken, IDateTimeProvider dateTimeProvider)
+    public Result Refresh
+    (
+        string newHashedRefreshToken,
+        string? ipAddress,
+        string? userAgent,
+        IDateTimeProvider dateTimeProvider
+    )
     {
         ArgumentNullException.ThrowIfNull(dateTimeProvider);
-        
+
         if (string.IsNullOrWhiteSpace(newHashedRefreshToken))
             return SessionErrors.HashedRefreshTokenRequired;
-        
+
         if (!IsValid(dateTimeProvider))
             return SessionErrors.Invalid;
-        
+
         DateTimeOffset utcNow = dateTimeProvider.UtcNow;
         
         HashedRefreshToken = newHashedRefreshToken;
         ExpiresAt = utcNow.AddDays(SessionConstants.ExpirationDays);
+        LastRefreshedAt = utcNow;
         Version += 1;
-        
+
+        SessionRefreshedDomainEvent domainEvent = new
+        (
+            SessionId: Id.Value,
+            UserId: UserId.Value,
+            NewVersion: Version,
+            OccurredOn: utcNow,
+            NewExpiresAt: ExpiresAt
+        );
+
+        AddDomainEvent(domainEvent);
+
         return Result.Success();
     }
 }
