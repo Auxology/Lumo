@@ -63,21 +63,25 @@ public sealed class UserToken : Entity<int>
     internal static Result<UserToken> Create
     (
         UserId userId,
-        string otpTokenHash,
-        string magicLinkTokenHash,
+        string otpToken,
+        string magicLinkToken,
         string ipAddress,
         string userAgent,
+        ISecretHasher secretHasher,
         IDateTimeProvider dateTimeProvider
     )
     {
         if (userId.IsEmpty())
             return UserTokenErrors.UserIdRequired;
         
-        if (string.IsNullOrWhiteSpace(otpTokenHash))
-            return UserTokenErrors.OtpTokenHashRequired;
+        if (string.IsNullOrWhiteSpace(otpToken))
+            return UserTokenErrors.OtpTokenRequired;
         
-        if (string.IsNullOrWhiteSpace(magicLinkTokenHash))
-            return UserTokenErrors.MagicLinkTokenHashRequired;
+        if (string.IsNullOrWhiteSpace(magicLinkToken))
+            return UserTokenErrors.MagicLinkTokenRequired;
+        
+        string otpTokenHash = secretHasher.Hash(otpToken);
+        string magicLinkTokenHash = secretHasher.Hash(magicLinkToken);
         
         DateTimeOffset utcNow = dateTimeProvider.UtcNow;
 

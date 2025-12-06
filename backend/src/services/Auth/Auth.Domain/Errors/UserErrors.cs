@@ -23,21 +23,16 @@ public static class UserErrors
         detail: "Email address is required."
     );
     
-    public static Error OtpTokenRequired => Error.Validation
-    (
-        title: "User.OtpTokenRequired",
-        detail: "OTP token is required to request login."
-    );
-
-    public static Error MagicLinkTokenRequired => Error.Validation
-    (
-        title: "User.MagicLinkTokenRequired",
-        detail: "Magic link token is required to request login."
-    );
     
     public static Error TokenNotFoundOrExpired => Error.NotFound
     (
         title: "User.TokenNotFoundOrExpired",
         detail: "The token was not found or has expired."
+    );
+    
+    public static Error AvatarKeyRequired => Error.Validation
+    (
+        title: "User.AvatarKeyRequired",
+        detail: "Avatar key is required when setting an avatar."
     );
 }

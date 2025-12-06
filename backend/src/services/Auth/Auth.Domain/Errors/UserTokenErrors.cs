@@ -10,16 +10,16 @@ public static class UserTokenErrors
         detail: "UserId is required to create a user token."
     );
     
-    public static Error OtpTokenHashRequired => Error.Validation
+    public static Error OtpTokenRequired => Error.Validation
     (
-        title: "UserToken.OtpTokenHashRequired",
-        detail: "OTP token hash is required to create a user token."
+        title: "UserToken.OtpTokenRequired",
+        detail: "OTP token is required to create a user token."
     );
     
-    public static Error MagicLinkTokenHashRequired => Error.Validation
+    public static Error MagicLinkTokenRequired => Error.Validation
     (
-        title: "UserToken.MagicLinkTokenHashRequired",
-        detail: "Magic link token hash is required to create a user token."
+        title: "UserToken.MagicLinkTokenRequired",
+        detail: "Magic link token is required to create a user token."
     );
     
     public static Error AlreadyUsed => Error.Conflict

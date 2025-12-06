@@ -20,7 +20,7 @@ public sealed class User : AggregateRoot<UserId>
     
     public EmailAddress EmailAddress { get; private set; }
     
-    public string? Avatar { get; private set; }
+    public string? AvatarKey { get; private set; }
     
     public bool EmailVerified { get; private set; }
     
@@ -43,7 +43,7 @@ public sealed class User : AggregateRoot<UserId>
         Id = UserId.New();
         DisplayName = displayName;
         EmailAddress = emailAddress;
-        Avatar = null;
+        AvatarKey = null;
         EmailVerified = false;
         CreatedAt = utcNow;
         UpdatedAt = null;
@@ -124,25 +124,34 @@ public sealed class User : AggregateRoot<UserId>
         return Result.Success();
     }
 
+    public Result SetAvatar(string avatarKey, IDateTimeProvider dateTimeProvider)
+    {
+        ArgumentNullException.ThrowIfNull(dateTimeProvider);
+        
+        if (string.IsNullOrWhiteSpace(avatarKey))
+            return UserErrors.AvatarKeyRequired;
+        
+        DateTimeOffset utcNow = dateTimeProvider.UtcNow;
+        
+        AvatarKey = avatarKey;
+        UpdatedAt = utcNow;
+
+        return Result.Success();
+    }
+
     public Result RequestLogin
     (
         string otpToken,
-        string otpTokenHash,
         string magicLinkToken,
-        string magicLinkTokenHash,
         string? ipAddress,
         string? userAgent,
+        ISecretHasher secretHasher,
         IDateTimeProvider dateTimeProvider
     )
     {
+        ArgumentNullException.ThrowIfNull(secretHasher);
         ArgumentNullException.ThrowIfNull(dateTimeProvider);
-
-        if (string.IsNullOrWhiteSpace(otpToken))
-            return UserErrors.OtpTokenRequired;
-
-        if (string.IsNullOrWhiteSpace(magicLinkToken))
-            return UserErrors.MagicLinkTokenRequired;
-
+        
         string finalIpAddress = string.IsNullOrWhiteSpace(ipAddress)
             ? RequestConstants.IpAddressFallback
             : ipAddress;
@@ -154,17 +163,24 @@ public sealed class User : AggregateRoot<UserId>
         Result<UserToken> userTokenResult = UserToken.Create
         (
             userId: Id,
-            otpTokenHash: otpTokenHash,
+            otpToken: otpToken,
             ipAddress: finalIpAddress,
             userAgent: finalUserAgent,
-            magicLinkTokenHash: magicLinkTokenHash,
+            magicLinkToken: magicLinkToken,
+            secretHasher: secretHasher,
             dateTimeProvider: dateTimeProvider
         );
 
         if (userTokenResult.IsFailure)
             return userTokenResult.Error;
         
+        CleanupTokens(dateTimeProvider);
+        
         _userTokens.Add(userTokenResult.Value);
+        
+        DateTimeOffset utcNow = dateTimeProvider.UtcNow;
+        
+        UpdatedAt = utcNow;
         
         UserLoginRequestedDomainEvent domainEvent = new
         (
@@ -174,7 +190,7 @@ public sealed class User : AggregateRoot<UserId>
             MagicLinkToken: magicLinkToken,
             IpAddress: finalIpAddress,
             UserAgent: finalUserAgent,
-            OccurredOn: dateTimeProvider.UtcNow
+            OccurredOn: utcNow
         );
         
         AddDomainEvent(domainEvent);
@@ -192,11 +208,8 @@ public sealed class User : AggregateRoot<UserId>
     {
         ArgumentNullException.ThrowIfNull(secretHasher);
         ArgumentNullException.ThrowIfNull(dateTimeProvider);
-        
-        UserToken? latestToken = _userTokens
-            .Where(ut => !ut.IsUsed && !ut.IsExpired(dateTimeProvider))
-            .OrderByDescending(ut => ut.CreatedAt)
-            .FirstOrDefault();
+
+        UserToken? latestToken = GetLatestValidToken(dateTimeProvider);
 
         if (latestToken is null)
             return UserErrors.TokenNotFoundOrExpired;
@@ -211,7 +224,59 @@ public sealed class User : AggregateRoot<UserId>
         
         if (verifyResult.IsFailure)
             return verifyResult.Error;
+
+        if (!EmailVerified)
+            EmailVerified = true;
+        
+        DateTimeOffset utcNow = dateTimeProvider.UtcNow;
+        
+        string verificationMethod = DetermineVerificationMethod(otpToken);
+
+        UserLoginVerifiedDomainEvent domainEvent = new
+        (
+            UserId: Id.Value,
+            EmailAddress: EmailAddress.Value,
+            IpAddress: latestToken.IpAddress,
+            UserAgent: latestToken.UserAgent,
+            VerificationMethod: verificationMethod,
+            OccurredOn: utcNow
+        );
+        
+        AddDomainEvent(domainEvent);
         
         return Result.Success();
+    }
+
+    private UserToken? GetLatestValidToken(IDateTimeProvider dateTimeProvider)
+    {
+        return _userTokens
+            .Where(ut => !ut.IsUsed && !ut.IsExpired(dateTimeProvider))
+            .OrderByDescending(ut => ut.CreatedAt)
+            .FirstOrDefault();
+    }
+
+    private void CleanupTokens(IDateTimeProvider dateTimeProvider)
+    {
+        DateTimeOffset cutoffTime = dateTimeProvider.UtcNow
+            .AddMinutes(-UserConstants.TokenExpirationMinutes);
+
+        _userTokens.RemoveAll(ut => ut.CreatedAt < cutoffTime);
+
+        if (_userTokens.Count > UserConstants.MaxActiveTokens)
+        {
+            HashSet<UserToken> tokensToKeep = _userTokens
+                .OrderByDescending(ut => ut.CreatedAt)
+                .Take(UserConstants.MaxActiveTokens)
+                .ToHashSet();
+
+            _userTokens.RemoveAll(ut => !tokensToKeep.Contains(ut));
+        }
+    }
+    
+    private static string DetermineVerificationMethod(string? otpToken)
+    {
+        return !string.IsNullOrWhiteSpace(otpToken)
+            ? UserConstants.OtpVerificationMethod
+            : UserConstants.MagicLinkVerificationMethod;
     }
 }
