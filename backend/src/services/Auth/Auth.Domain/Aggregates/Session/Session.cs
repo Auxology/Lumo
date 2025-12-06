@@ -12,12 +12,14 @@ namespace Auth.Domain.Aggregates.Session;
 public sealed class Session : AggregateRoot<SessionId>
 {
     public UserId UserId { get; private set; }
+
+    public string HashedRefreshToken { get; private set; } = null!;
+
+    public string IpAddress { get; private set; } = null!;
+
+    public string UserAgent { get; private set; } = null!;
     
-    public string HashedRefreshToken { get; private set; }
-    
-    public string IpAddress { get; private set; }
-    
-    public string UserAgent { get; private set; }
+    public int Version { get; private set; }
     
     public DateTimeOffset CreatedAt { get; private set; }
     
@@ -26,7 +28,7 @@ public sealed class Session : AggregateRoot<SessionId>
     public DateTimeOffset? RevokedAt { get; private set; }
     
     private Session() { } // For EF Core
-
+    
     [SetsRequiredMembers]
     private Session
     (
@@ -42,9 +44,26 @@ public sealed class Session : AggregateRoot<SessionId>
         HashedRefreshToken = hashedRefreshToken;
         IpAddress = ipAddress;
         UserAgent = userAgent;
+        Version = 1;
         CreatedAt = utcNow;
         ExpiresAt = utcNow.AddDays(SessionConstants.ExpirationDays);
         RevokedAt = null;
+    }
+
+    public bool IsRevoked => RevokedAt is not null;
+
+    public bool IsExpired(IDateTimeProvider dateTimeProvider)
+    {
+        ArgumentNullException.ThrowIfNull(dateTimeProvider);
+        
+        return dateTimeProvider.UtcNow >= ExpiresAt;
+    }
+
+    public bool IsValid(IDateTimeProvider dateTimeProvider)
+    {
+        ArgumentNullException.ThrowIfNull(dateTimeProvider);
+        
+        return !IsRevoked && !IsExpired(dateTimeProvider);
     }
 
     public static Result<Session> Create
@@ -82,5 +101,38 @@ public sealed class Session : AggregateRoot<SessionId>
         );
         
         return session;
+    }
+
+    public Result Revoke(IDateTimeProvider dateTimeProvider)
+    {
+        if (IsRevoked)
+            return SessionErrors.AlreadyRevoked;
+
+        if (IsExpired(dateTimeProvider))
+            return Result.Success();
+        
+        DateTimeOffset utcNow = dateTimeProvider.UtcNow;
+        RevokedAt = utcNow;
+        
+        return Result.Success();
+    }
+
+    public Result Refresh(string newHashedRefreshToken, IDateTimeProvider dateTimeProvider)
+    {
+        ArgumentNullException.ThrowIfNull(dateTimeProvider);
+        
+        if (string.IsNullOrWhiteSpace(newHashedRefreshToken))
+            return SessionErrors.HashedRefreshTokenRequired;
+        
+        if (!IsValid(dateTimeProvider))
+            return SessionErrors.Invalid;
+        
+        DateTimeOffset utcNow = dateTimeProvider.UtcNow;
+        
+        HashedRefreshToken = newHashedRefreshToken;
+        ExpiresAt = utcNow.AddDays(SessionConstants.ExpirationDays);
+        Version += 1;
+        
+        return Result.Success();
     }
 }
