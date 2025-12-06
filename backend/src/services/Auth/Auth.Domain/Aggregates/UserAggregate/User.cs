@@ -1,8 +1,10 @@
 using System.Diagnostics.CodeAnalysis;
 using Auth.Domain.Constants;
+using Auth.Domain.Entities;
 using Auth.Domain.Errors;
 using Auth.Domain.Events.User;
 using Auth.Domain.ValueObjects;
+using SharedKernel.Constants;
 using SharedKernel.Domain;
 using SharedKernel.ResultPattern;
 using SharedKernel.Time;
@@ -11,6 +13,8 @@ namespace Auth.Domain.Aggregates.UserAggregate;
 
 public sealed class User : AggregateRoot<UserId>
 {
+    private readonly List<UserToken> _userTokens = [];
+    
     public string DisplayName { get; private set; } = null!;
     
     public EmailAddress EmailAddress { get; private set; }
@@ -22,6 +26,8 @@ public sealed class User : AggregateRoot<UserId>
     public DateTimeOffset CreatedAt { get; private set; }
     
     public DateTimeOffset? UpdatedAt { get; private set; }
+    
+    public IReadOnlyCollection<UserToken> UserTokens => _userTokens;
     
     private User() { } // For EF Core
 
@@ -112,6 +118,64 @@ public sealed class User : AggregateRoot<UserId>
             OccurredOn: utcNow
         );
 
+        AddDomainEvent(domainEvent);
+        
+        return Result.Success();
+    }
+
+    public Result RequestLogin
+    (
+        string otpToken,
+        string otpTokenHash,
+        string magicLinkToken,
+        string magicLinkTokenHash,
+        string? ipAddress,
+        string? userAgent,
+        IDateTimeProvider dateTimeProvider
+    )
+    {
+        ArgumentNullException.ThrowIfNull(dateTimeProvider);
+
+        if (string.IsNullOrWhiteSpace(otpToken))
+            return UserTokenErrors.OtpTokenRequired;
+
+        if (string.IsNullOrWhiteSpace(magicLinkToken))
+            return UserTokenErrors.MagicLinkTokenRequired;
+
+        string finalIpAddress = string.IsNullOrWhiteSpace(ipAddress)
+            ? RequestConstants.IpAddressFallback
+            : ipAddress;
+
+        string finalUserAgent = string.IsNullOrWhiteSpace(userAgent)
+            ? RequestConstants.UserAgentFallback
+            : userAgent;
+
+        Result<UserToken> userTokenResult = UserToken.Create
+        (
+            userId: Id,
+            otpTokenHash: otpTokenHash,
+            ipAddress: finalIpAddress,
+            userAgent: finalUserAgent,
+            magicLinkTokenHash: magicLinkTokenHash,
+            dateTimeProvider: dateTimeProvider
+        );
+
+        if (userTokenResult.IsFailure)
+            return userTokenResult.Error;
+        
+        _userTokens.Add(userTokenResult.Value);
+        
+        UserLoginRequestedDomainEvent domainEvent = new
+        (
+            UserId: Id.Value,
+            EmailAddress: EmailAddress.Value,
+            OtpToken: otpToken,
+            MagicLinkToken: magicLinkToken,
+            IpAddress: finalIpAddress,
+            UserAgent: finalUserAgent,
+            OccurredOn: dateTimeProvider.UtcNow
+        );
+        
         AddDomainEvent(domainEvent);
         
         return Result.Success();

@@ -92,11 +92,13 @@ public sealed class Session : AggregateRoot<SessionId>
         if (string.IsNullOrWhiteSpace(hashedRefreshToken))
             return SessionErrors.HashedRefreshTokenRequired;
 
-        if (string.IsNullOrWhiteSpace(ipAddress))
-            ipAddress = RequestConstants.IpAddressFallback;
+        string finalIpAddress = string.IsNullOrWhiteSpace(ipAddress)
+            ? RequestConstants.IpAddressFallback
+            : ipAddress;
         
-        if (string.IsNullOrWhiteSpace(userAgent))
-            userAgent = RequestConstants.UserAgentFallback;
+        string finalUserAgent = string.IsNullOrWhiteSpace(userAgent)
+            ? RequestConstants.UserAgentFallback
+            : userAgent;
         
         DateTimeOffset utcNow = dateTimeProvider.UtcNow;
         
@@ -104,8 +106,8 @@ public sealed class Session : AggregateRoot<SessionId>
         (
             userId: userId,
             hashedRefreshToken: hashedRefreshToken,
-            ipAddress: ipAddress,
-            userAgent: userAgent,
+            ipAddress: finalIpAddress,
+            userAgent: finalUserAgent,
             utcNow: utcNow
         );
 
