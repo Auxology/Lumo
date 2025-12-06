@@ -16,6 +16,8 @@ public sealed class User : AggregateRoot<UserId>
 {
     private readonly List<UserToken> _userTokens = [];
     
+    private readonly List<UserRecoveryCode> _userRecoveryCodes = [];
+    
     public string DisplayName { get; private set; } = null!;
     
     public EmailAddress EmailAddress { get; private set; }
@@ -29,6 +31,8 @@ public sealed class User : AggregateRoot<UserId>
     public DateTimeOffset? UpdatedAt { get; private set; }
     
     public IReadOnlyCollection<UserToken> UserTokens => _userTokens;
+    
+    public IReadOnlyCollection<UserRecoveryCode> UserRecoveryCodes => _userRecoveryCodes;
     
     private User() { } // For EF Core
 
@@ -138,7 +142,7 @@ public sealed class User : AggregateRoot<UserId>
 
         return Result.Success();
     }
-
+    
     public Result RequestLogin
     (
         string otpToken,
@@ -245,6 +249,14 @@ public sealed class User : AggregateRoot<UserId>
         AddDomainEvent(domainEvent);
         
         return Result.Success();
+    }
+
+    private void RevokeUnusedRecoveryCodes()
+    {
+        foreach (UserRecoveryCode userRecoveryCode in _userRecoveryCodes.Where(urc => urc.IsValid))
+        {
+            userRecoveryCode.Revoke();
+        }
     }
 
     private UserToken? GetLatestValidToken(IDateTimeProvider dateTimeProvider)
