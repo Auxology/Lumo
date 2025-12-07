@@ -453,7 +453,7 @@ public sealed class UserTests
 
         result.IsFailure.ShouldBeTrue();
         
-        result.Error.ShouldBe(UserErrors.InvalidCodeCount);
+        result.Error.ShouldBe(UserErrors.InvalidRecoveryCodeCount);
     }
 
     [Fact]
