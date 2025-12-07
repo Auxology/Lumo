@@ -1,4 +1,4 @@
-namespace SharedKernel.Application.Authentication;
+namespace Auth.Application.Abstractions.Authentication;
 
 public interface IRecoveryCodeGenerator
 {

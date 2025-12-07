@@ -1,3 +1,4 @@
+using Auth.Application.Abstractions.Authentication;
 using Auth.Application.Abstractions.Data;
 using Auth.Application.Errors;
 using Auth.Domain.Aggregates.UserAggregate;
@@ -10,10 +11,10 @@ using SharedKernel.Authentication;
 using SharedKernel.ResultPattern;
 using SharedKernel.Time;
 
-namespace Auth.Application.Users;
+namespace Auth.Application.Users.SignUp;
 
 internal sealed class SignUpCommandHandler(
-    IAuthDbContext context,
+    IAuthDbContext dbContext,
     IRecoveryCodeGenerator recoveryCodeGenerator,
     ISecretHasher secretHasher,
     IDateTimeProvider dateTimeProvider) : ICommandHandler<SignUpCommand, SignUpResponse>
@@ -27,7 +28,7 @@ internal sealed class SignUpCommandHandler(
         
         EmailAddress emailAddress = emailResult.Value;
         
-        bool emailExists = await context.Users
+        bool emailExists = await dbContext.Users
             .AnyAsync(u => u.EmailAddress == emailAddress, cancellationToken);
         
         if (emailExists)
@@ -61,9 +62,9 @@ internal sealed class SignUpCommandHandler(
         if (addRecoveryCodesResult.IsFailure)
             return addRecoveryCodesResult.Error;
         
-        await context.Users.AddAsync(user, cancellationToken);
+        await dbContext.Users.AddAsync(user, cancellationToken);
         
-        await context.SaveChangesAsync(cancellationToken);
+        await dbContext.SaveChangesAsync(cancellationToken);
         
         SignUpResponse response = new
         (
