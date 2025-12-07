@@ -13,7 +13,7 @@ public sealed class UserRecoveryCode : Entity<int>
 {
     public UserId UserId { get; private set; }
     
-    public string CodeHash { get; private set; } = null!;
+    public string RecoveryCodeHash { get; private set; } = null!;
     
     public bool IsRevoked { get; private set; }
     
@@ -27,13 +27,13 @@ public sealed class UserRecoveryCode : Entity<int>
     private UserRecoveryCode
     (
         UserId userId,
-        string codeHash,
+        string recoveryCodeHash,
         DateTimeOffset utcNow
     )
     {
         Id = 0;
         UserId = userId;
-        CodeHash = codeHash;
+        RecoveryCodeHash = recoveryCodeHash;
         IsRevoked = false;
         CreatedAt = utcNow;
         UsedAt = null;
@@ -46,7 +46,7 @@ public sealed class UserRecoveryCode : Entity<int>
     internal static Result<UserRecoveryCode> Create
     (
         UserId userId,
-        string code,
+        string recoveryCode,
         ISecretHasher secretHasher,
         IDateTimeProvider dateTimeProvider
     )
@@ -54,20 +54,20 @@ public sealed class UserRecoveryCode : Entity<int>
         if (userId.IsEmpty())
             return RecoveryCodeErrors.UserIdRequired;
         
-        if (string.IsNullOrWhiteSpace(code))
+        if (string.IsNullOrWhiteSpace(recoveryCode))
             return RecoveryCodeErrors.CodeRequired;
         
-        if (code.Length > RecoveryCodeConstants.CodeLength)
+        if (recoveryCode.Length > RecoveryCodeConstants.CodeLength)
             return RecoveryCodeErrors.InvalidCodeLength;
         
-        string codeHash = secretHasher.Hash(code);
+        string codeHash = secretHasher.Hash(recoveryCode);
         
         DateTimeOffset utcNow = dateTimeProvider.UtcNow;
 
         UserRecoveryCode userRecoveryCode = new
         (
             userId: userId,
-            codeHash: codeHash,
+            recoveryCodeHash: codeHash,
             utcNow: utcNow
         );
         
@@ -76,21 +76,21 @@ public sealed class UserRecoveryCode : Entity<int>
 
     internal Result Use
     (
-        string code,
+        string recoveryCode,
         ISecretHasher secretHasher,
         IDateTimeProvider dateTimeProvider
     )
     {
         if (IsUsed)
             return RecoveryCodeErrors.AlreadyUsed;
-        
+
         if (IsRevoked)
             return RecoveryCodeErrors.Revoked;
-        
-        if (string.IsNullOrWhiteSpace(code))
+
+        if (string.IsNullOrWhiteSpace(recoveryCode))
             return RecoveryCodeErrors.CodeRequired;
-        
-        bool isValid = secretHasher.Verify(code, CodeHash);
+
+        bool isValid = secretHasher.Verify(recoveryCode, RecoveryCodeHash);
         
         if (!isValid)
             return RecoveryCodeErrors.InvalidCode;

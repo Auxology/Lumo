@@ -2,7 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using Auth.Domain.Constants;
 using Auth.Domain.Entities;
 using Auth.Domain.Errors;
-using Auth.Domain.Events.User;
+using Auth.Domain.Events.UserEvents;
 using Auth.Domain.ValueObjects;
 using SharedKernel.Authentication;
 using SharedKernel.Constants;
@@ -93,7 +93,7 @@ public sealed class User : AggregateRoot<UserId>
         return user;
     }
 
-    public Result ChangeName
+    public Result ChangeDisplayName
     (
         string newDisplayName,
         IDateTimeProvider dateTimeProvider
@@ -145,28 +145,28 @@ public sealed class User : AggregateRoot<UserId>
 
     public Result AddRecoveryCodes
     (
-        IReadOnlyList<string> codes,
+        IReadOnlyList<string> recoveryCodes,
         ISecretHasher secretHasher,
         IDateTimeProvider dateTimeProvider
     )
     {
-        ArgumentNullException.ThrowIfNull(codes);
+        ArgumentNullException.ThrowIfNull(recoveryCodes);
         ArgumentNullException.ThrowIfNull(secretHasher);
         ArgumentNullException.ThrowIfNull(dateTimeProvider);
         
-        if (codes.Count != RecoveryCodeConstants.CodesPerUser)
-            return UserErrors.InvalidCodeCount;
+        if (recoveryCodes.Count != RecoveryCodeConstants.CodesPerUser)
+            return UserErrors.InvalidRecoveryCodeCount;
 
         DateTimeOffset utcNow = dateTimeProvider.UtcNow;
 
         List<UserRecoveryCode> newRecoveryCodes = [];
 
-        foreach (string code in codes)
+        foreach (string recoveryCode in recoveryCodes)
         {
             Result<UserRecoveryCode> recoveryCodeResult = UserRecoveryCode.Create
             (
                 userId: Id,
-                code: code,
+                recoveryCode: recoveryCode,
                 secretHasher: secretHasher,
                 dateTimeProvider: dateTimeProvider
             );

@@ -1,6 +1,6 @@
 using SharedKernel.Domain;
 
-namespace Auth.Domain.Events.Session;
+namespace Auth.Domain.Events.SessionEvents;
 
 public sealed record SessionRevokedDomainEvent
 (
