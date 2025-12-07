@@ -23,6 +23,7 @@
     <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.Application'))">
         <PackageReference Include="MediatR" />
         <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" />
     </ItemGroup>
 
     <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.Infrastructure'))">
