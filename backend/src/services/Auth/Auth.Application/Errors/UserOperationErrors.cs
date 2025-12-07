@@ -9,4 +9,10 @@ public static class UserOperationErrors
         title: "User.EmailAlreadyExists",
         detail: "A user with the provided email address already exists."
     );
+    
+    public static Error UserNotFound => Error.NotFound
+    (
+        title: "User.NotFound",
+        detail: "The specified user was not found."
+    );
 }

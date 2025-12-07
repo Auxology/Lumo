@@ -93,7 +93,7 @@ public sealed class User : AggregateRoot<UserId>
         return user;
     }
 
-    public Result ChangeName
+    public Result ChangeDisplayName
     (
         string newDisplayName,
         IDateTimeProvider dateTimeProvider
