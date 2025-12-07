@@ -35,4 +35,10 @@ public static class UserErrors
         title: "User.AvatarKeyRequired",
         detail: "Avatar key is required when setting an avatar."
     );
+    
+    public static readonly Error InvalidCodeCount = Error.Validation
+    (
+        title: "User.InvalidCodeCount",
+        detail: $"Exactly {RecoveryCodeConstants.CodesPerUser} recovery codes are required."
+    );
 }

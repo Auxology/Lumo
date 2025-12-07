@@ -142,6 +142,49 @@ public sealed class User : AggregateRoot<UserId>
 
         return Result.Success();
     }
+
+    public Result AddRecoveryCodes
+    (
+        IReadOnlyList<string> codes,
+        ISecretHasher secretHasher,
+        IDateTimeProvider dateTimeProvider
+    )
+    {
+        ArgumentNullException.ThrowIfNull(codes);
+        ArgumentNullException.ThrowIfNull(secretHasher);
+        ArgumentNullException.ThrowIfNull(dateTimeProvider);
+        
+        if (codes.Count != RecoveryCodeConstants.CodesPerUser)
+            return UserErrors.InvalidCodeCount;
+
+        DateTimeOffset utcNow = dateTimeProvider.UtcNow;
+
+        List<UserRecoveryCode> newRecoveryCodes = [];
+
+        foreach (string code in codes)
+        {
+            Result<UserRecoveryCode> recoveryCodeResult = UserRecoveryCode.Create
+            (
+                userId: Id,
+                code: code,
+                secretHasher: secretHasher,
+                dateTimeProvider: dateTimeProvider
+            );
+
+            if (recoveryCodeResult.IsFailure)
+                return recoveryCodeResult.Error;
+
+            newRecoveryCodes.Add(recoveryCodeResult.Value);
+        }
+
+        RevokeUnusedRecoveryCodes();
+        
+        _userRecoveryCodes.AddRange(newRecoveryCodes);
+        
+        UpdatedAt = utcNow;
+
+        return Result.Success();
+    }
     
     public Result RequestLogin
     (
