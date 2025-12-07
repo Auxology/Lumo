@@ -1,6 +1,6 @@
 using SharedKernel.Domain;
 
-namespace Auth.Domain.Events.User;
+namespace Auth.Domain.Events.UserEvents;
 
 public sealed record UserLoginRequestedDomainEvent
 (

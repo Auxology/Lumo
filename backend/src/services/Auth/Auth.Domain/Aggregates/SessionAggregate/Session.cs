@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Auth.Domain.Constants;
 using Auth.Domain.Errors;
-using Auth.Domain.Events.Session;
+using Auth.Domain.Events.SessionEvents;
 using Auth.Domain.ValueObjects;
 using SharedKernel.Constants;
 using SharedKernel.Domain;

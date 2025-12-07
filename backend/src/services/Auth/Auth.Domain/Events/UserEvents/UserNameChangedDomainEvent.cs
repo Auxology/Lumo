@@ -1,11 +1,11 @@
 using SharedKernel.Domain;
 
-namespace Auth.Domain.Events.User;
+namespace Auth.Domain.Events.UserEvents;
 
-public sealed record UserCreatedDomainEvent
+public sealed record UserNameChangedDomainEvent
 (
     Guid UserId,
-    string DisplayName,
+    string NewDisplayName,
     string EmailAddress,
     DateTimeOffset OccurredOn
 ) : IDomainEvent;

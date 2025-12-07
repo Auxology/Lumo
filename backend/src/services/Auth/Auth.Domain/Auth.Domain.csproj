@@ -10,4 +10,8 @@
     <ProjectReference Include="..\..\..\shared\SharedKernel\SharedKernel.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="Auth.Domain.Tests" />
+  </ItemGroup>
+
 </Project>

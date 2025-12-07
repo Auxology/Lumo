@@ -2,7 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using Auth.Domain.Constants;
 using Auth.Domain.Entities;
 using Auth.Domain.Errors;
-using Auth.Domain.Events.User;
+using Auth.Domain.Events.UserEvents;
 using Auth.Domain.ValueObjects;
 using SharedKernel.Authentication;
 using SharedKernel.Constants;
