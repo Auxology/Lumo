@@ -10,7 +10,7 @@
         <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
 
-        <NoWarn>NU1608,CA2007,CA1716,CA2225,CA1040,CA1848</NoWarn>
+        <NoWarn>NU1608,CA2007,CA1716,CA2225,CA1040,CA1848,CA1308</NoWarn>
     </PropertyGroup>
 
     <ItemGroup Condition="'$(MSBuildProjectExtension)' != '.dcproj'">

@@ -1,4 +1,4 @@
-namespace SharedKernel.Application.Authentication;
+namespace SharedKernel.Authentication;
 
 public interface ISecretHasher
 {

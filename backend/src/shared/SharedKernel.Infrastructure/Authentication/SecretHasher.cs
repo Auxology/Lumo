@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using SharedKernel.Application.Authentication;
+using SharedKernel.Authentication;
 
 namespace SharedKernel.Infrastructure.Authentication;
 
