@@ -31,7 +31,8 @@ public static class DependencyInjection
             .AddInfraPipelines()
             .AddAuthDatabase(configuration)
             .AddHealthChecks(configuration)
-            .AddAuthenticationInternal(configuration);
+            .AddJwtAuthentication(configuration)
+            .AddAuthenticationInternal();
         
         return services;
     }
@@ -90,7 +91,9 @@ public static class DependencyInjection
         return services;
     }
     
+    #pragma warning disable S1172 // Unused method parameters should be removed
     private static IServiceCollection AddHealthChecks(this IServiceCollection services, IConfiguration configuration)
+    #pragma warning restore S1172
     {
         services.AddHealthChecks()
             .AddNpgSql
@@ -103,13 +106,15 @@ public static class DependencyInjection
         return services;
     }
     
-    private static IServiceCollection AddAuthenticationInternal(this IServiceCollection services, IConfiguration configuration)
+    private static IServiceCollection AddAuthenticationInternal(this IServiceCollection services)
     {
         services.AddScoped<IUserContext, UserContext>();
 
         services.AddSingleton<IRecoveryCodeGenerator, RecoveryCodeGenerator>();
         
         services.AddSingleton<IAuthTokenGenerator, AuthTokenGenerator>();
+        
+        services.AddSingleton<IJwtTokenProvider, JwtTokenProvider>();
         
         return services;
     }
