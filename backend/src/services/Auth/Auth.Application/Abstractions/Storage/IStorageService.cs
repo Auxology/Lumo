@@ -12,6 +12,10 @@ public interface IStorageService
         DateTimeOffset expiresAt,
         CancellationToken cancellationToken = default
     );
+    
+    Task<bool> FileExistsAsync(string fileKey, CancellationToken cancellationToken = default);
+    
+    bool ValidateKeyOwnership(string fileKey, Guid userId);
 }
 
 public sealed record PresignedUploadUrl(Uri Url);
