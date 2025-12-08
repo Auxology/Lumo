@@ -109,13 +109,13 @@ public sealed class UserTests
     #region ChangeName Tests
 
     [Fact]
-    public void ChangeName_WithValidName_ShouldSucceed()
+    public void ChangeDisplayName_WithValidName_ShouldSucceed()
     {
         var user = CreateValidUser();
         
         const string newName = "Jane Doe";
 
-        Result result = user.ChangeName(newName, _dateTimeProvider);
+        Result result = user.ChangeDisplayName(newName, _dateTimeProvider);
 
         result.IsSuccess.ShouldBeTrue();
         
@@ -125,7 +125,7 @@ public sealed class UserTests
     }
 
     [Fact]
-    public void ChangeName_ShouldRaiseNameChangedEvent()
+    public void ChangeDisplayName_ShouldRaiseNameChangedEvent()
     {
         User user = CreateValidUser();
         
@@ -133,7 +133,7 @@ public sealed class UserTests
         
         const string newName = "Jane Doe";
 
-        user.ChangeName(newName, _dateTimeProvider);
+        user.ChangeDisplayName(newName, _dateTimeProvider);
 
         IReadOnlyCollection<IDomainEvent> domainEvents = user.DomainEvents;
         
@@ -149,7 +149,7 @@ public sealed class UserTests
     }
 
     [Fact]
-    public void ChangeName_ToSameName_ShouldSucceedWithoutEvent()
+    public void ChangeDisplayName_ToSameName_ShouldSucceedWithoutEvent()
     {
         User user = CreateValidUser();
         
@@ -157,7 +157,7 @@ public sealed class UserTests
         
         string sameName = user.DisplayName;
 
-        Result result = user.ChangeName(sameName, _dateTimeProvider);
+        Result result = user.ChangeDisplayName(sameName, _dateTimeProvider);
 
         result.IsSuccess.ShouldBeTrue();
         
@@ -168,11 +168,11 @@ public sealed class UserTests
     [InlineData(null)]
     [InlineData("")]
     [InlineData("   ")]
-    public void ChangeName_WithEmptyName_ShouldFail(string? newName)
+    public void ChangeDisplayName_WithEmptyName_ShouldFail(string? newName)
     {
         User user = CreateValidUser();
 
-        Result result = user.ChangeName(newName!, _dateTimeProvider);
+        Result result = user.ChangeDisplayName(newName!, _dateTimeProvider);
 
         result.IsFailure.ShouldBeTrue();
         
