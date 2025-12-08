@@ -15,4 +15,10 @@ public static class UserOperationErrors
         title: "User.NotFound",
         detail: "The specified user was not found."
     );
+
+    public static Error InvalidCredentials => Error.Validation
+    (
+        title: "User.InvalidCredentials",
+        detail: "The provided credentials are invalid."
+    );
 }
