@@ -16,6 +16,7 @@
     <Project Path="tests/ArchitectureTests/ArchitectureTests.csproj" />
   </Folder>
   <Folder Name="/tests/Auth/">
+    <Project Path="tests/Auth/Auth.Application.Tests/Auth.Application.Tests.csproj" />
     <Project Path="tests/Auth/Auth.Domain.Tests/Auth.Domain.Tests.csproj" />
   </Folder>
 </Solution>

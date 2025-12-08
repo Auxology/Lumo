@@ -7,10 +7,13 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace SharedKernel.Api.Infrastructure;
 
-internal sealed class GlobalExceptionHandler(IProblemDetailsService problemDetailsService) : IExceptionHandler
+public sealed class GlobalExceptionHandler(IProblemDetailsService problemDetailsService) : IExceptionHandler
 {
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
+        ArgumentNullException.ThrowIfNull(httpContext);
+        ArgumentNullException.ThrowIfNull(exception);
+        
         httpContext.Response.StatusCode = exception switch
         {
             ValidationException => StatusCodes.Status400BadRequest,
