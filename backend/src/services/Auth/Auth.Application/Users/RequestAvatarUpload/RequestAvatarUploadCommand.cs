@@ -2,8 +2,8 @@ using SharedKernel.Application.Messaging;
 
 namespace Auth.Application.Users.RequestAvatarUpload;
 
-public sealed record RequestAvatarUploadQuery
+public sealed record RequestAvatarUploadCommand
 (
     string ContentType,
     long ContentLength
-) : IQuery<RequestAvatarUploadQuery>;
+) : ICommand<RequestAvatarUploadResponse>;

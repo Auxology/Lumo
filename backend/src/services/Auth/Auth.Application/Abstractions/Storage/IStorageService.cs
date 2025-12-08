@@ -4,7 +4,7 @@ public interface IStorageService
 {
     string GenerateFileKey(Guid userId);
 
-    Task<string> GeneratePresignedUploadUrlAsync
+    Task<PresignedUploadUrl> GeneratePresignedUploadUrlAsync
     (
         string fileKey,
         string contentType,
@@ -13,3 +13,5 @@ public interface IStorageService
         CancellationToken cancellationToken = default
     );
 }
+
+public sealed record PresignedUploadUrl(Uri Url);
