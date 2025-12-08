@@ -6,8 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Auth.Infrastructure.Data;
 
-internal sealed class AuthDbContext(DbContextOptions<AuthDbContext> options)
-    : DbContext(options), IAuthDbContext
+internal sealed class AuthDbContext(DbContextOptions<AuthDbContext> options) : DbContext(options), IAuthDbContext
 {
     public DbSet<User> Users { get; set; }
     

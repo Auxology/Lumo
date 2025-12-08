@@ -2,7 +2,7 @@ using SharedKernel.Domain;
 
 namespace SharedKernel.Infrastructure.DomainEvents;
 
-public interface IDomainEventDispatcher
+public interface IDomainEventsDispatcher
 {
     Task DispatchAsync(IDomainEvent domainEvent, CancellationToken cancellationToken = default);
     

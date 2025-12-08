@@ -50,7 +50,7 @@ public static class DependencyInjection
         
         services.AddSingleton<ISecretHasher, SecretHasher>();
 
-        services.AddTransient<IDomainEventDispatcher, DomainEventDispatcher>();
+        services.AddTransient<IDomainEventsDispatcher, DomainEventsDispatcher>();
 
         return services;
     }
@@ -77,7 +77,8 @@ public static class DependencyInjection
                         errorCodesToAdd: null
                     );
                 })
-                .UseSnakeCaseNamingConvention();
+                .UseSnakeCaseNamingConvention()
+                .AddDomainEventsInterceptor(sp);
 
             if (dbOptions.EnableSensitiveDataLogging)
             {

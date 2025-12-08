@@ -3,7 +3,7 @@ using SharedKernel.Domain;
 
 namespace SharedKernel.Infrastructure.DomainEvents;
 
-public sealed class DomainEventDispatcher(IPublisher publisher) : IDomainEventDispatcher
+public sealed class DomainEventsDispatcher(IPublisher publisher) : IDomainEventsDispatcher
 {
     public async Task DispatchAsync(IDomainEvent domainEvent, CancellationToken cancellationToken = default)
     {
