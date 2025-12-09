@@ -18,7 +18,7 @@ public static class LoggingServiceCollectionExtensions
 
         services.AddScoped<RequestContextEnricher>();
         services.AddScoped<UserContextEnricher>();
-
+        
         return services;
     }
 

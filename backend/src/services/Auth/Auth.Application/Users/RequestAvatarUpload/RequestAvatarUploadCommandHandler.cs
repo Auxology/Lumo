@@ -2,7 +2,6 @@ using Auth.Application.Abstractions.Data;
 using Auth.Application.Abstractions.Storage;
 using Auth.Application.Errors;
 using Auth.Domain.Aggregates.UserAggregate;
-using Auth.Domain.Constants;
 using Auth.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel.Application.Authentication;
@@ -38,7 +37,6 @@ internal sealed class RequestAvatarUploadCommandHandler(
             fileKey: avatarKey,
             contentType: request.ContentType,
             contentLength: request.ContentLength,
-            expiresAt: DateTimeOffset.UtcNow.AddMinutes(UserConstants.AvatarPresignedUrlExpirationMinutes),
             cancellationToken: cancellationToken
         );
         

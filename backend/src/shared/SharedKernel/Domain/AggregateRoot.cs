@@ -1,6 +1,6 @@
 namespace SharedKernel.Domain;
 
-public abstract class AggregateRoot<TId>
+public abstract class AggregateRoot<TId> : IHasDomainEvents
 {
     public required TId Id { get; set; }
 

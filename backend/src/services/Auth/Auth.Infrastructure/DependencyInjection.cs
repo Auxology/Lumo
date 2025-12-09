@@ -1,0 +1,150 @@
+using Amazon.S3;
+using Auth.Application.Abstractions.Authentication;
+using Auth.Application.Abstractions.Data;
+using Auth.Application.Abstractions.Storage;
+using Auth.Infrastructure.Authentication;
+using Auth.Infrastructure.Data;
+using Auth.Infrastructure.Options;
+using Auth.Infrastructure.Storage;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using SharedKernel.Application.Authentication;
+using SharedKernel.Authentication;
+using SharedKernel.Infrastructure.Authentication;
+using SharedKernel.Infrastructure.DomainEvents;
+using SharedKernel.Infrastructure.Logging;
+using SharedKernel.Infrastructure.Pipelines;
+using SharedKernel.Infrastructure.Time;
+using SharedKernel.Time;
+
+namespace Auth.Infrastructure;
+
+public static class DependencyInjection
+{
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    {
+        ArgumentNullException.ThrowIfNull(configuration);
+
+        services
+            .AddServices()
+            .AddLoggingInfrastructure()
+            .AddInfraPipelines()
+            .AddAuthDatabase(configuration)
+            .AddJwtAuthentication(configuration)
+            .AddAuthenticationInternal()
+            .AddStorageServices(configuration)
+            .AddHealthChecks(configuration);
+        
+        return services;
+    }
+    
+    private static IServiceCollection AddInfraPipelines(this IServiceCollection services)
+    {
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingPipelineBehavior<,>));
+        
+        return services;
+    }
+    
+    private static IServiceCollection AddServices(this IServiceCollection services)
+    {
+        services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
+        
+        services.AddSingleton<ISecretHasher, SecretHasher>();
+
+        services.AddTransient<IDomainEventsDispatcher, DomainEventsDispatcher>();
+
+        return services;
+    }
+
+    private static IServiceCollection AddAuthDatabase(this IServiceCollection services, IConfiguration configuration)
+    {
+        services
+            .AddOptions<AuthDatabaseOptions>()
+            .Bind(configuration.GetSection(AuthDatabaseOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+        
+        services.AddDbContext<AuthDbContext>((sp, options) =>
+        {
+            AuthDatabaseOptions dbOptions = sp.GetRequiredService<IOptions<AuthDatabaseOptions>>().Value;
+
+            options.UseNpgsql(dbOptions.ConnectionString, npgsqlOptions =>
+                {
+                    npgsqlOptions.CommandTimeout(dbOptions.CommandTimeout);
+                    npgsqlOptions.EnableRetryOnFailure
+                    (
+                        maxRetryCount: 3,
+                        maxRetryDelay: TimeSpan.FromSeconds(5),
+                        errorCodesToAdd: null
+                    );
+                })
+                .UseSnakeCaseNamingConvention()
+                .AddDomainEventsInterceptor(sp);
+
+            if (dbOptions.EnableSensitiveDataLogging)
+            {
+                options.EnableSensitiveDataLogging();
+                options.EnableDetailedErrors();
+            }
+        });
+
+        services.AddScoped<IAuthDbContext>(sp => sp.GetRequiredService<AuthDbContext>());
+
+        return services;
+    }
+    
+    #pragma warning disable S1172 // Unused method parameters should be removed
+    private static IServiceCollection AddHealthChecks(this IServiceCollection services, IConfiguration configuration)
+    #pragma warning restore S1172
+    {
+        services.AddHealthChecks()
+            .AddNpgSql
+            (
+                sp => sp.GetRequiredService<IOptions<AuthDatabaseOptions>>().Value.ConnectionString,
+                name: "auth-database",
+                tags: ["database", "auth"]
+            )
+            .AddS3
+            (
+                sp => sp.BucketName = 
+                    configuration.GetSection(S3StorageOptions.SectionName).Get<S3StorageOptions>()!.BucketName, 
+                name: "auth-s3-storage",
+                tags: ["storage", "s3", "auth"]
+            );
+
+        return services;
+    }
+    
+    private static IServiceCollection AddAuthenticationInternal(this IServiceCollection services)
+    {
+        services.AddScoped<IUserContext, UserContext>();
+
+        services.AddSingleton<IRecoveryCodeGenerator, RecoveryCodeGenerator>();
+        
+        services.AddSingleton<IAuthTokenGenerator, AuthTokenGenerator>();
+        
+        services.AddSingleton<IJwtTokenProvider, JwtTokenProvider>();
+        
+        return services;
+    }
+
+    private static IServiceCollection AddStorageServices(this IServiceCollection services, IConfiguration configuration)
+    {
+        services
+            .AddOptions<S3StorageOptions>()
+            .Bind(configuration.GetSection(S3StorageOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        services.AddAWSService<IAmazonS3>();
+        
+        services.AddDefaultAWSOptions(configuration.GetAWSOptions());
+        
+        services.AddSingleton<IStorageService, S3StorageService>();
+        
+        return services;
+    }
+}
