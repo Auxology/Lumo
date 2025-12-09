@@ -15,4 +15,10 @@
       <ProjectReference Include="..\Auth.Domain\Auth.Domain.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="AspNetCore.HealthChecks.Aws.S3" />
+      <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" />
+      <PackageReference Include="AWSSDK.S3" />
+    </ItemGroup>
+
 </Project>
