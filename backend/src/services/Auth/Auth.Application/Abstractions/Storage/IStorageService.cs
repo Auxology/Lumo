@@ -8,8 +8,7 @@ public interface IStorageService
     (
         string fileKey,
         string contentType,
-        long contentLength,
-        DateTimeOffset expiresAt,
+        long contentLength, 
         CancellationToken cancellationToken = default
     );
     

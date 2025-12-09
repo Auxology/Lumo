@@ -1,8 +1,11 @@
+using Amazon.S3;
 using Auth.Application.Abstractions.Authentication;
 using Auth.Application.Abstractions.Data;
+using Auth.Application.Abstractions.Storage;
 using Auth.Infrastructure.Authentication;
 using Auth.Infrastructure.Data;
 using Auth.Infrastructure.Options;
+using Auth.Infrastructure.Storage;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -30,9 +33,10 @@ public static class DependencyInjection
             .AddLoggingInfrastructure()
             .AddInfraPipelines()
             .AddAuthDatabase(configuration)
-            .AddHealthChecks(configuration)
             .AddJwtAuthentication(configuration)
-            .AddAuthenticationInternal();
+            .AddAuthenticationInternal()
+            .AddStorageServices(configuration)
+            .AddHealthChecks(configuration);
         
         return services;
     }
@@ -102,6 +106,13 @@ public static class DependencyInjection
                 sp => sp.GetRequiredService<IOptions<AuthDatabaseOptions>>().Value.ConnectionString,
                 name: "auth-database",
                 tags: ["database", "auth"]
+            )
+            .AddS3
+            (
+                sp => sp.BucketName = 
+                    configuration.GetSection(S3StorageOptions.SectionName).Get<S3StorageOptions>()!.BucketName, 
+                name: "auth-s3-storage",
+                tags: ["storage", "s3", "auth"]
             );
 
         return services;
@@ -116,6 +127,23 @@ public static class DependencyInjection
         services.AddSingleton<IAuthTokenGenerator, AuthTokenGenerator>();
         
         services.AddSingleton<IJwtTokenProvider, JwtTokenProvider>();
+        
+        return services;
+    }
+
+    private static IServiceCollection AddStorageServices(this IServiceCollection services, IConfiguration configuration)
+    {
+        services
+            .AddOptions<S3StorageOptions>()
+            .Bind(configuration.GetSection(S3StorageOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        services.AddAWSService<IAmazonS3>();
+        
+        services.AddDefaultAWSOptions(configuration.GetAWSOptions());
+        
+        services.AddSingleton<IStorageService, S3StorageService>();
         
         return services;
     }
