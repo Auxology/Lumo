@@ -10,7 +10,7 @@
         <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
 
-        <NoWarn>NU1608,CA2007,CA1716,CA2225,CA1040,CA1848,CA1308,CA1724</NoWarn>
+        <NoWarn>NU1608,CA2007,CA1716,CA2225,CA1040,CA1848,CA1308,CA1724,CA1812</NoWarn>
     </PropertyGroup>
 
     <ItemGroup Condition="'$(MSBuildProjectExtension)' != '.dcproj'">
@@ -42,7 +42,11 @@
     </ItemGroup>
     
     <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.Api'))">
-        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+        <PackageReference Include="AspNetCore.HealthChecks.UI.Client" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" />
+        <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" />
+        <PackageReference Include="Swashbuckle.AspNetCore" />
     </ItemGroup>
 
 </Project>

@@ -4,10 +4,11 @@ services:
     container_name: lumo-seq
     restart: unless-stopped
     environment:
-      - ACCEPT_EULA=Y
+      ACCEPT_EULA: "Y"
+      SEQ_FIRSTRUN_ADMINPASSWORD: ${SEQ_ADMIN_PASSWORD:-ChangeMe123!}
     ports:
-      - 5341:80
-      - 5342:5342
+      - "5341:80"
+      - "5342:5342"
     volumes:
       - seq-data:/data
     healthcheck:
@@ -16,28 +17,85 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
+    networks:
+      - observability
 
   auth-db:
     image: postgres:18-alpine
     container_name: lumo-auth-db
     restart: unless-stopped
     environment:
-      POSTGRES_USER: auth
-      POSTGRES_PASSWORD: auth_dev_password
-      POSTGRES_DB: auth
+      POSTGRES_USER: ${AUTH_DB_USER:-auth}
+      POSTGRES_PASSWORD: ${AUTH_DB_PASSWORD:-auth}
+      POSTGRES_DB: ${AUTH_DB_NAME:-auth}
     ports:
-      - 5432:5432
+      - "5432:5432"
     volumes:
       - auth-db-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U auth -d auth"]
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${AUTH_DB_USER:-auth} -d ${AUTH_DB_NAME:-auth}",
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 10s
+    networks:
+      - auth
+
+  auth.api:
+    build:
+      context: .
+      dockerfile: src/services/Auth/Auth.Api/Dockerfile
+    image: lumo-auth-api
+    container_name: lumo-auth-api
+    restart: unless-stopped
+    depends_on:
+      auth-db:
+        condition: service_healthy
+      seq:
+        condition: service_healthy
+    env_file:
+      - ./.env
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
+      ASPNETCORE_URLS: http://+:5100
+      AuthDatabase__ConnectionString: Host=auth-db;Port=5432;Username=${AUTH_DB_USER};Password=${AUTH_DB_PASSWORD};Database=${AUTH_DB_NAME};
+      AuthDatabase__EnableSensitiveDataLogging: ${AUTH_DB_ENABLE_SENSITIVE:-false}
+      AuthDatabase__CommandTimeout: ${AUTH_DB_COMMAND_TIMEOUT:-30}
+      Jwt__Secret: ${JWT_SECRET}
+      Jwt__Issuer: ${JWT_ISSUER:-lumo-auth}
+      Jwt__Audience: ${JWT_AUDIENCE:-lumo-clients}
+      Jwt__RequireHttpsMetadata: ${JWT_REQUIRE_HTTPS_METADATA:-false}
+      S3Storage__BucketName: ${AUTH_S3_BUCKET_NAME}
+      S3Storage__Region: ${AUTH_S3_REGION}
+      S3Storage__AvatarKeyPrefix: ${AUTH_S3_AVATAR_PREFIX:-avatars}
+      AWS_REGION: ${AUTH_S3_REGION}
+      Seq__ServerUrl: ${SEQ_URL:-http://seq:80}
+      Seq__ApiKey: ${SEQ_API_KEY}
+      Seq__IsEnabled: ${SEQ_ENABLED:-true}
+    ports:
+      - "5100:5100"
+    networks:
+      - auth
+      - observability
+    healthcheck:
+      test: ["CMD-SHELL", "dotnet --info >/dev/null 2>&1"]
+      interval: 30s
+      timeout: 10s
+      retries: 2
+      start_period: 20s
 
 volumes:
   seq-data:
     driver: local
   auth-db-data:
     driver: local
+
+networks:
+  auth:
+    driver: bridge
+  observability:
+    driver: bridge

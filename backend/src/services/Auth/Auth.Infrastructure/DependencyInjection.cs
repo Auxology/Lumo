@@ -106,15 +106,8 @@ public static class DependencyInjection
                 sp => sp.GetRequiredService<IOptions<AuthDatabaseOptions>>().Value.ConnectionString,
                 name: "auth-database",
                 tags: ["database", "auth"]
-            )
-            .AddS3
-            (
-                sp => sp.BucketName = 
-                    configuration.GetSection(S3StorageOptions.SectionName).Get<S3StorageOptions>()!.BucketName, 
-                name: "auth-s3-storage",
-                tags: ["storage", "s3", "auth"]
             );
-
+        
         return services;
     }
     
