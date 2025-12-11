@@ -16,8 +16,8 @@ public static class LoggingServiceCollectionExtensions
 
         services.AddScoped<IRequestContext, RequestContext>();
 
-        services.AddScoped<RequestContextEnricher>();
-        services.AddScoped<UserContextEnricher>();
+        services.AddSingleton<RequestContextEnricher>();
+        services.AddSingleton<UserContextEnricher>();
         
         return services;
     }

@@ -17,7 +17,7 @@ public static class SerilogConfigurationExtensions
     )
     {
         ArgumentNullException.ThrowIfNull(configuration);
-        
+
         return configuration
             .MinimumLevel.Information()
             .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)

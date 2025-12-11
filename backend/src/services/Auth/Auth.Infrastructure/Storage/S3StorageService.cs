@@ -12,7 +12,7 @@ using SharedKernel.Time;
 namespace Auth.Infrastructure.Storage;
 
 internal sealed class S3StorageService(
-    AmazonS3Client s3Client,
+    IAmazonS3 s3Client,
     IOptions<S3StorageOptions> storageOptions,
     IDateTimeProvider dateTimeProvider,
     ILogger<S3StorageService> logger) : IStorageService

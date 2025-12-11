@@ -7,7 +7,7 @@ internal sealed class RequestLoginCommandValidator : AbstractValidator<RequestLo
 {
     public RequestLoginCommandValidator()
     {
-        RuleFor(x => x.emailAddress)
+        RuleFor(x => x.EmailAddress)
             .NotEmpty()
             .WithMessage("Email address is required.")
             .EmailAddress()

@@ -1,1 +1,21 @@
+root = true
 
+# All files
+[*]
+charset = utf-8
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Code files
+[*.{cs,csx,vb,vbx}]
+indent_size = 4
+indent_style = space
+
+# Suppress code analyzers for EF Core migration files
+[**/Migrations/*.cs]
+# Microsoft Code Analysis
+dotnet_diagnostic.CA1062.severity = none
+dotnet_diagnostic.CA1861.severity = none
+# SonarAnalyzer
+dotnet_diagnostic.S1186.severity = none
+generated_code = true

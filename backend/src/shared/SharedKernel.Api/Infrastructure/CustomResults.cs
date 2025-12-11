@@ -11,7 +11,7 @@ public static class CustomResults
     {
         ArgumentNullException.ThrowIfNull(result);
         ArgumentNullException.ThrowIfNull(httpContext);
-        
+
         if (result.IsSuccess)
             throw new InvalidOperationException("Cannot create a problem result from a successful result.");
 
@@ -22,7 +22,7 @@ public static class CustomResults
             detail: GetDetail(result.Error),
             instance: GetInstance(httpContext),
             statusCode: GetStatusCode(result.Error.Type),
-            extensions: GetExtensions(httpContext)
+            extensions: GetExtensions(httpContext, result.Error)
         );
 
         static string GetType(ErrorType errorType) =>
@@ -76,15 +76,24 @@ public static class CustomResults
                 _ => StatusCodes.Status500InternalServerError
             };
 
-        static Dictionary<string, object?> GetExtensions(HttpContext httpContext)
+        static Dictionary<string, object?> GetExtensions(HttpContext httpContext, Error error)
         {
             Activity? activity = httpContext.Features.Get<IHttpActivityFeature>()?.Activity;
 
-            return new Dictionary<string, object?>
+            var extensions = new Dictionary<string, object?>
             {
                 ["requestId"] = httpContext.TraceIdentifier,
                 ["traceId"] = activity?.Id
             };
+
+            if (error is ValidationError validationError)
+            {
+                extensions["errors"] = validationError.Errors
+                    .Select(e => new { code = e.Title, message = e.Detail })
+                    .ToArray();
+            }
+
+            return extensions;
         }
     }
 }
