@@ -12,9 +12,10 @@ internal sealed class ChangeNameEndpoint : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/users/me/name", HandleAsync)
+        app.MapPatch("/api/users/me/name", HandleAsync)
             .WithName("ChangeUserName")
             .WithTags(Tags.Users)
+            .RequireAuthorization()
             .AddOpenApiOperationTransformer((operation, context, ct) =>
             {
                 operation.Summary = "Update user display name";
@@ -27,7 +28,7 @@ internal sealed class ChangeNameEndpoint : IEndpoint
                                         - Display name must be between 2 and 50 characters
                                         - Display name cannot be empty or whitespace only
                                         """;
-                operation.Security = 
+                operation.Security =
                 [
                     new OpenApiSecurityRequirement
                     {
@@ -40,7 +41,7 @@ internal sealed class ChangeNameEndpoint : IEndpoint
             .ProducesValidationProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status401Unauthorized);
     }
-    
+
     private static async Task<IResult> HandleAsync
     (
         [FromBody] ChangeNameRequest request,
@@ -53,9 +54,9 @@ internal sealed class ChangeNameEndpoint : IEndpoint
         (
             NewDisplayName: request.NewDisplayName
         );
-        
+
         Result result = await sender.Send(command, cancellationToken);
-        
+
         return result.IsSuccess
             ? Results.NoContent()
             : CustomResults.Problem(result, httpContext);

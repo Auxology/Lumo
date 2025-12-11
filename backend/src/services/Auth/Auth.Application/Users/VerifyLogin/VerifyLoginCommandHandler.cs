@@ -27,17 +27,28 @@ internal sealed class VerifyLoginCommandHandler(
 
         if (emailResult.IsFailure)
             return emailResult.Error;
-        
+
         EmailAddress emailAddress = emailResult.Value;
-        
+
         User? user = await dbContext.Users
             .FirstOrDefaultAsync(u => u.EmailAddress == emailAddress, cancellationToken);
 
         if (user is null)
             return UserOperationErrors.InvalidCredentials;
 
+        Result verifyResult = user.VerifyLogin
+        (
+            otpToken: request.OtpToken,
+            magicLinkToken: request.MagicLinkToken,
+            secretHasher: secretHasher,
+            dateTimeProvider: dateTimeProvider
+        );
+
+        if (verifyResult.IsFailure)
+            return verifyResult.Error;
+
         string refreshToken = jwtTokenProvider.GenerateRefreshToken();
-        
+
         string hashedRefreshToken = secretHasher.Hash(refreshToken);
 
         Result<Session> sessionResult = Session.Create
@@ -48,14 +59,14 @@ internal sealed class VerifyLoginCommandHandler(
             userAgent: requestContext.UserAgent,
             dateTimeProvider: dateTimeProvider
         );
-        
+
         if (sessionResult.IsFailure)
             return sessionResult.Error;
-        
+
         Session session = sessionResult.Value;
-        
+
         await dbContext.Sessions.AddAsync(session, cancellationToken);
-        
+
         await dbContext.SaveChangesAsync(cancellationToken);
 
         TokenClaims tokenClaims = new
@@ -64,7 +75,7 @@ internal sealed class VerifyLoginCommandHandler(
             SessionId: session.Id.Value,
             EmailAddress: user.EmailAddress.Value
         );
-        
+
         string accessToken = jwtTokenProvider.CreateAccessToken(tokenClaims);
 
         VerifyLoginResponse response = new
