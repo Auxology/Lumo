@@ -24,6 +24,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\services\Auth\Auth.Application\Auth.Application.csproj" />
     <ProjectReference Include="..\..\..\src\services\Auth\Auth.Domain\Auth.Domain.csproj" />
+    <ProjectReference Include="..\Auth.Domain.Tests\Auth.Domain.Tests.csproj" />
   </ItemGroup>
 
 </Project>
