@@ -51,10 +51,12 @@ public static class DependencyInjection
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
-        
+
         services.AddSingleton<ISecretHasher, SecretHasher>();
 
         services.AddTransient<IDomainEventsDispatcher, DomainEventsDispatcher>();
+
+        services.AddScoped<DomainEventsInterceptor>();
 
         return services;
     }

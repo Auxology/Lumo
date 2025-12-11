@@ -9,10 +9,17 @@ namespace Auth.Infrastructure.Data;
 internal sealed class AuthDbContext(DbContextOptions<AuthDbContext> options) : DbContext(options), IAuthDbContext
 {
     public DbSet<User> Users { get; set; }
-    
+
     public DbSet<UserToken> UserTokens { get; set; }
-    
+
     public DbSet<UserRecoveryCode> UserRecoveryCodes { get; set; }
-    
+
     public DbSet<Session> Sessions { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(AuthDbContext).Assembly);
+
+        base.OnModelCreating(modelBuilder);
+    }
 }

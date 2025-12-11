@@ -20,7 +20,7 @@ internal sealed class RequestLoginCommandHandler(
 {
     public async Task<Result> Handle(RequestLoginCommand request, CancellationToken cancellationToken)
     {
-        Result<EmailAddress> emailResult = EmailAddress.Create(request.emailAddress);
+        Result<EmailAddress> emailResult = EmailAddress.Create(request.EmailAddress);
         
         if (emailResult.IsFailure)
             return emailResult.Error;
