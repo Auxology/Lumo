@@ -18,4 +18,11 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\shared\SharedKernel.Api\SharedKernel.Api.csproj" />
+    <ProjectReference Include="..\..\shared\SharedKernel.Application\SharedKernel.Application.csproj" />
+    <ProjectReference Include="..\..\shared\SharedKernel.Infrastructure\SharedKernel.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\shared\SharedKernel\SharedKernel.csproj" />
+  </ItemGroup>
+
 </Project>
