@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\services\Auth\Auth.Domain\Auth.Domain.csproj" />
     <ProjectReference Include="..\..\shared\Shared.Contracts\Shared.Contracts.csproj" />
     <ProjectReference Include="..\..\shared\SharedKernel.Api\SharedKernel.Api.csproj" />
     <ProjectReference Include="..\..\shared\SharedKernel.Application\SharedKernel.Application.csproj" />
