@@ -44,7 +44,7 @@ internal sealed class CreateSessionEndpoint : IEndpoint
             .ProducesProblem(StatusCodes.Status401Unauthorized)
             .ProducesProblem(StatusCodes.Status429TooManyRequests);
     }
-    
+
     private static async Task<IResult> HandleAsync
     (
         [FromBody] CreateSessionRequest request,
@@ -59,7 +59,7 @@ internal sealed class CreateSessionEndpoint : IEndpoint
                 OtpToken: request.OtpToken,
                 MagicLinkToken: request.MagicLinkToken
             );
-        
+
         Result<VerifyLoginResponse> result = await sender.Send(command, cancellationToken);
 
         return result.IsSuccess
@@ -67,10 +67,3 @@ internal sealed class CreateSessionEndpoint : IEndpoint
             : CustomResults.Problem(result, httpContext);
     }
 }
-
-internal sealed record CreateSessionRequest
-(
-    string EmailAddress,
-    string? OtpToken,
-    string? MagicLinkToken
-);

@@ -6,6 +6,7 @@ using Auth.Domain.Aggregates.UserAggregate;
 using Auth.Domain.Constants;
 using Auth.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
+using Shared.Contracts.Authentication;
 using SharedKernel.Application.Context;
 using SharedKernel.Application.Messaging;
 using SharedKernel.Authentication;

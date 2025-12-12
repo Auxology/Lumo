@@ -1,3 +1,4 @@
+using Shared.Contracts.Authentication;
 using SharedKernel.Application.Messaging;
 
 namespace Auth.Application.Users.RefreshToken;

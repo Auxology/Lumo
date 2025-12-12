@@ -1,4 +1,4 @@
-namespace Auth.Application.Users.RefreshToken;
+namespace Shared.Contracts.Authentication;
 
 public sealed record RefreshTokenResponse
 (
