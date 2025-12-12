@@ -27,7 +27,7 @@ internal sealed class JwtTokenProvider(IOptions<JwtOptions> jwtOptions) : IJwtTo
             new(JwtRegisteredClaimNames.Email, tokenClaims.EmailAddress),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         ];
-        
+
         SecurityTokenDescriptor tokenDescriptor = new()
         {
             Subject = new ClaimsIdentity(claims),
@@ -38,13 +38,13 @@ internal sealed class JwtTokenProvider(IOptions<JwtOptions> jwtOptions) : IJwtTo
         };
 
         JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
-        
+
         SecurityToken token = handler.CreateToken(tokenDescriptor);
 
         return handler.WriteToken(token);
     }
 
-    public string GenerateRefreshToken()
+    public string GenerateSecret()
     {
         byte[] randomBytes = RandomNumberGenerator.GetBytes(SessionConstants.RefreshTokenLength);
         return Convert.ToBase64String(randomBytes)

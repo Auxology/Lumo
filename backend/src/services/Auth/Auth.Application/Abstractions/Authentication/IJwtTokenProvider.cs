@@ -5,6 +5,6 @@ public sealed record TokenClaims(Guid UserId, Guid SessionId, string EmailAddres
 public interface IJwtTokenProvider
 {
     string CreateAccessToken(TokenClaims tokenClaims);
-    
-    string GenerateRefreshToken();
+
+    string GenerateSecret();
 }
