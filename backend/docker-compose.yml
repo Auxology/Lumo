@@ -20,6 +20,40 @@ services:
     networks:
       - observability
 
+  gateway.api:
+    build:
+      context: .
+      dockerfile: src/gateway/Gateway.Api/Dockerfile
+    image: lumo-gateway-api
+    container_name: lumo-gateway-api
+    restart: unless-stopped
+    depends_on:
+      seq:
+        condition: service_healthy
+      auth.api:
+        condition: service_healthy
+    env_file:
+      - ./.env
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
+      ASPNETCORE_URLS: http://+:5000
+      Seq__ServerUrl: ${SEQ_URL:-http://seq:80}
+      Seq__ApiKey: ${SEQ_API_KEY}
+      Seq__IsEnabled: ${SEQ_ENABLED:-true}
+      Gateway__AuthServiceUrl: ${GATEWAY_AUTH_SERVICE_URL:-http://auth.api:5100}
+    ports:
+      - "5000:5000"
+    networks:
+      - gateway
+      - auth
+      - observability
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
   auth-db:
     image: postgres:18-alpine
     container_name: lumo-auth-db
@@ -95,6 +129,8 @@ volumes:
     driver: local
 
 networks:
+  gateway:
+    driver: bridge
   auth:
     driver: bridge
   observability:
