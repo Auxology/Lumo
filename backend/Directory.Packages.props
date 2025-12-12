@@ -22,6 +22,7 @@
         <PackageVersion Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="10.0.1" />
         <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
         <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
+        <PackageVersion Include="RedisRateLimiting.AspNetCore" Version="1.2.0" />
 
         <!-- Auth Infrastructure Exclusive -->
         <PackageVersion Include="AWSSDK.S3" Version="4.0.14.2" />

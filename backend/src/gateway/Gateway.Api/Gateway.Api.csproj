@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="Yarp.ReverseProxy" />
+    <PackageReference Include="RedisRateLimiting.AspNetCore" />
   </ItemGroup>
 
   <ItemGroup>
