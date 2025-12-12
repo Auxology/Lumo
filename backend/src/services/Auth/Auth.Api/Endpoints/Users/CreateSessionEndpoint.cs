@@ -12,30 +12,60 @@ internal sealed class CreateSessionEndpoint : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/sessions", HandleAsync)
+        app.MapPost("/non-passing/api/sessions", HandleAsync)
             .WithName("CreateSession")
             .WithTags(Tags.Authentication)
+            .WithDescription("Internal endpoint for verifying passwordless authentication credentials")
+            .ExcludeFromDescription()
             .AddOpenApiOperationTransformer((operation, context, ct) =>
             {
-                operation.Summary = "Complete passwordless login";
+                operation.Summary = "[Internal] Verify login credentials and issue tokens";
                 operation.Description = """
-                                        Verifies the user's identity using either an OTP code or magic link token
-                                        and issues JWT access and refresh tokens.
+                                        **INTERNAL USE ONLY** - Called exclusively by the Gateway API during authentication flow.
 
-                                        **Authentication Options:**
-                                        - Provide `otpToken` for 6-digit code verification
-                                        - Provide `magicLinkToken` for magic link verification
-                                        - Only one token type is required
+                                        This endpoint handles the core authentication logic for passwordless login:
+                                        - Validates OTP codes or magic link tokens
+                                        - Verifies user identity and account status
+                                        - Generates JWT access and refresh token pair
+                                        - Returns tokens to Gateway for client session establishment
 
-                                        **Token Handling:**
-                                        - Tokens are managed by the API gateway
-                                        - Refresh token stored as HTTP-only cookie
-                                        - Access token cached and paired with refresh token
+                                        ## Service Responsibility
+                                        The Auth service is responsible for:
+                                        - Token validation (OTP/magic link)
+                                        - User verification and account status checks
+                                        - JWT token pair generation
+                                        - Failed attempt tracking and account lockout logic
+                                        - Token invalidation after successful verification
 
-                                        **Security:**
-                                        - Failed attempts are logged
-                                        - Account lockout after 5 failed attempts
-                                        - Tokens are invalidated after successful verification
+                                        ## Gateway Integration
+                                        The Gateway consumes this endpoint to:
+                                        1. Forward client authentication requests
+                                        2. Receive token pair (access + refresh)
+                                        3. Cache access token server-side
+                                        4. Set refresh token as HTTP-only cookie for client
+                                        5. Return session establishment response to client
+
+                                        ## Authentication Options
+                                        Provide **one** of the following:
+                                        - `otpToken`: 6-digit code for email-based verification
+                                        - `magicLinkToken`: Single-use token from magic link
+
+                                        ## Response
+                                        Returns `VerifyLoginResponse` containing:
+                                        - `accessToken`: Short-lived JWT for API authorization
+                                        - `refreshToken`: Long-lived token for access token renewal
+
+                                        ## Security Features
+                                        - Single-use tokens (invalidated after verification)
+                                        - Failed attempt logging per user
+                                        - Account lockout after 5 consecutive failures
+                                        - Token expiration validation
+                                        - Rate limiting enforcement
+
+                                        ## Error Responses
+                                        - `400 Bad Request`: Validation errors or malformed request
+                                        - `401 Unauthorized`: Invalid or expired credentials
+                                        - `429 Too Many Requests`: Rate limit exceeded
                                         """;
                 return Task.CompletedTask;
             })
