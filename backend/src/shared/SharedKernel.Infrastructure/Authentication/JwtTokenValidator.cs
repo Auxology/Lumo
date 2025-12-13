@@ -12,7 +12,7 @@ public sealed class JwtTokenValidator(IOptions<JwtOptions> options) : IJwtTokenV
 
     private static readonly JsonWebTokenHandler JsonWebTokenHandler = new();
 
-    public async Task<bool> IsValid(string accessToken, CancellationToken cancellationToken = default)
+    public async Task<bool> IsValidAsync(string accessToken, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(accessToken))
             return false;
