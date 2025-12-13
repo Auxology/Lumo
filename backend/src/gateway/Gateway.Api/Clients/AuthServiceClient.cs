@@ -37,7 +37,37 @@ internal sealed class AuthServiceClient(
 
         string content = await response.Content.ReadAsStringAsync(cancellationToken);
 
-        ApiErrorResponseDto? apiErrorResponseDto = JsonSerializer.Deserialize<ApiErrorResponseDto>(content, JsonSerializerOptions);
+        ApiErrorResponseDto? apiErrorResponseDto =
+            JsonSerializer.Deserialize<ApiErrorResponseDto>(content, JsonSerializerOptions);
+
+        if (apiErrorResponseDto is null)
+            throw new InvalidOperationException("Failed to deserialize the error response from Auth Service.");
+
+        return apiErrorResponseDto.ToError();
+    }
+
+    public async Task<Result<RefreshTokenResponse>> CallRefreshTokenAsync(RefreshSessionRequest request, CancellationToken cancellationToken = default)
+    {
+        HttpClient httpClient = httpClientFactory.CreateClient(_authServiceClientOptions.HttpClientName);
+
+        HttpResponseMessage response = await httpClient.PostAsJsonAsync(_authServiceClientOptions.RefreshTokenEndpoint,
+            request, cancellationToken);
+
+        if (response.IsSuccessStatusCode)
+        {
+            RefreshTokenResponse? refreshTokenResponse =
+                await response.Content.ReadFromJsonAsync<RefreshTokenResponse>(cancellationToken);
+
+            if (refreshTokenResponse is null)
+                throw new InvalidOperationException("Failed to deserialize the refresh token response.");
+
+            return refreshTokenResponse;
+        }
+
+        string content = await response.Content.ReadAsStringAsync(cancellationToken);
+
+        ApiErrorResponseDto? apiErrorResponseDto =
+            JsonSerializer.Deserialize<ApiErrorResponseDto>(content, JsonSerializerOptions);
 
         if (apiErrorResponseDto is null)
             throw new InvalidOperationException("Failed to deserialize the error response from Auth Service.");

@@ -14,4 +14,8 @@ internal sealed class AuthServiceClientOptions
     [Required(ErrorMessage = "Verify login endpoint is required.")]
     [MinLength(1, ErrorMessage = "Verify login endpoint cannot be empty.")]
     public string VerifyLoginEndpoint { get; init; } = string.Empty;
+
+    [Required(ErrorMessage = "Refresh token endpoint is required.")]
+    [MinLength(1, ErrorMessage = "Refresh token endpoint cannot be empty.")]
+    public string RefreshTokenEndpoint { get; init; } = string.Empty;
 }

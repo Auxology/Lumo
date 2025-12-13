@@ -75,6 +75,7 @@ services:
       Seq__IsEnabled: ${SEQ_ENABLED:-true}
       AuthServiceClient__BaseUrl: ${AUTH_SERVICE_CLIENT_BASE_URL}
       AuthServiceClient__VerifyLoginEndpoint: ${AUTH_SERVICE_CLIENT_VERIFY_LOGIN_ENDPOINT}
+      AuthServiceClient__RefreshTokenEndpoint: ${AUTH_SERVICE_CLIENT_REFRESH_TOKEN_ENDPOINT}
     ports:
       - "5000:5000"
     networks:
