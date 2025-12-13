@@ -3,6 +3,9 @@ using Gateway.Api.Clients;
 using Gateway.Api.Options;
 using Gateway.Api.Services;
 using Microsoft.Extensions.Options;
+using SharedKernel.Application.Authentication;
+using SharedKernel.Infrastructure.Authentication;
+using SharedKernel.Infrastructure.Options;
 using SharedKernel.Infrastructure.Time;
 using SharedKernel.Time;
 
@@ -17,16 +20,23 @@ internal static class DependencyInjection
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
+        services.AddOptions<JwtOptions>()
+            .BindConfiguration(JwtOptions.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
         services.AddHttpClient(AuthServiceClientOptions.SectionName, (sp, client) =>
         {
             AuthServiceClientOptions options = sp.GetRequiredService<IOptions<AuthServiceClientOptions>>().Value;
-            
+
             client.BaseAddress = options.BaseUrl;
         });
 
         services.AddScoped<IAuthServiceClient, AuthServiceClient>();
 
         services.AddScoped<IGatewayAuthService, GatewayAuthService>();
+
+        services.AddSingleton<IJwtTokenValidator, JwtTokenValidator>();
 
         services.AddSingleton<IAccessTokenCache, AccessTokenCache>();
 

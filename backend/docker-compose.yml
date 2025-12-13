@@ -76,6 +76,10 @@ services:
       AuthServiceClient__BaseUrl: ${AUTH_SERVICE_CLIENT_BASE_URL}
       AuthServiceClient__VerifyLoginEndpoint: ${AUTH_SERVICE_CLIENT_VERIFY_LOGIN_ENDPOINT}
       AuthServiceClient__RefreshTokenEndpoint: ${AUTH_SERVICE_CLIENT_REFRESH_TOKEN_ENDPOINT}
+      Jwt__Secret: ${JWT_SECRET}
+      Jwt__Issuer: ${JWT_ISSUER:-lumo-auth}
+      Jwt__Audience: ${JWT_AUDIENCE:-lumo-clients}
+      Jwt__RequireHttpsMetadata: ${JWT_REQUIRE_HTTPS_METADATA:-false}
     ports:
       - "5000:5000"
     networks:

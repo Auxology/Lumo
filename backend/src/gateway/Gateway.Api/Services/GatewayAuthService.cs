@@ -32,7 +32,7 @@ internal sealed class GatewayAuthService(
         return refreshToken;
     }
 
-    public async Task<Result<TokenPair>> RefreshTokensAsync(string refreshToken, CancellationToken cancellationToken = default)
+    public async Task<Result<TokenPair>> GetOrRefreshTokenAsync(string refreshToken, CancellationToken cancellationToken = default)
     {
         string? accessToken = await accessTokenCache.GetAccessTokenAsync(refreshToken, cancellationToken);
 
