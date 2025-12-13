@@ -12,7 +12,7 @@ internal sealed class AuthServiceClient(
 {
     private readonly AuthServiceClientOptions _authServiceClientOptions = authServiceClientOptions.Value;
 
-    private readonly JsonSerializerOptions _jsonSerializerOptions = new()
+    private static readonly JsonSerializerOptions JsonSerializerOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
     };
@@ -37,7 +37,7 @@ internal sealed class AuthServiceClient(
 
         string content = await response.Content.ReadAsStringAsync(cancellationToken);
 
-        ApiErrorResponseDto? apiErrorResponseDto = JsonSerializer.Deserialize<ApiErrorResponseDto>(content, _jsonSerializerOptions);
+        ApiErrorResponseDto? apiErrorResponseDto = JsonSerializer.Deserialize<ApiErrorResponseDto>(content, JsonSerializerOptions);
 
         if (apiErrorResponseDto is null)
             throw new InvalidOperationException("Failed to deserialize the error response from Auth Service.");
