@@ -3,6 +3,7 @@ using Auth.Application.Abstractions.Data;
 using Auth.Application.Errors;
 using Auth.Domain.Aggregates.SessionAggregate;
 using Auth.Domain.Aggregates.UserAggregate;
+using Auth.Domain.Constants;
 using Auth.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Shared.Contracts.Authentication;
@@ -47,14 +48,14 @@ internal sealed class VerifyLoginCommandHandler(
         if (verifyResult.IsFailure)
             return verifyResult.Error;
 
-        string refreshToken = jwtTokenProvider.GenerateRefreshToken();
+        string secret = jwtTokenProvider.GenerateSecret();
 
-        string hashedRefreshToken = secretHasher.Hash(refreshToken);
+        string hashedSecret = secretHasher.Hash(secret);
 
         Result<Session> sessionResult = Session.Create
         (
             userId: user.Id,
-            hashedRefreshToken: hashedRefreshToken,
+            hashedSecret: hashedSecret,
             ipAddress: requestContext.ClientIp,
             userAgent: requestContext.UserAgent,
             dateTimeProvider: dateTimeProvider
@@ -77,6 +78,8 @@ internal sealed class VerifyLoginCommandHandler(
         );
 
         string accessToken = jwtTokenProvider.CreateAccessToken(tokenClaims);
+
+        string refreshToken = $"{session.TokenId}{SessionConstants.RefreshTokenSeparator}{secret}";
 
         VerifyLoginResponse response = new
         (

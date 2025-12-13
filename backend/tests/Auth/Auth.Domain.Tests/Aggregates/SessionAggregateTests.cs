@@ -25,7 +25,7 @@ public sealed class SessionTests
         Result<Session> result = Session.Create
         (
             userId: userId,
-            hashedRefreshToken: hashedToken,
+            hashedSecret: hashedToken,
             ipAddress: "192.168.1.1",
             userAgent: "Mozilla/5.0",
             dateTimeProvider: _dateTimeProvider
@@ -37,7 +37,7 @@ public sealed class SessionTests
         
         session.UserId.ShouldBe(userId);
         
-        session.HashedRefreshToken.ShouldBe(hashedToken);
+        session.HashedSecret.ShouldBe(hashedToken);
         
         session.Version.ShouldBe(1);
         
@@ -52,7 +52,7 @@ public sealed class SessionTests
         Result<Session> result = Session.Create
         (
             userId: userId,
-            hashedRefreshToken: "token",
+            hashedSecret: "token",
             ipAddress: "192.168.1.1",
             userAgent: "Mozilla/5.0",
             dateTimeProvider: _dateTimeProvider
@@ -73,7 +73,7 @@ public sealed class SessionTests
         Result<Session> result = Session.Create
         (
             userId: userId,
-            hashedRefreshToken: "token",
+            hashedSecret: "token",
             ipAddress: "192.168.1.1",
             userAgent: "Mozilla/5.0",
             dateTimeProvider: _dateTimeProvider
@@ -100,7 +100,7 @@ public sealed class SessionTests
         Result<Session> result = Session.Create
         (
             userId: emptyUserId,
-            hashedRefreshToken: "token",
+            hashedSecret: "token",
             ipAddress: "192.168.1.1",
             userAgent: "Mozilla/5.0",
             dateTimeProvider: _dateTimeProvider
@@ -120,7 +120,7 @@ public sealed class SessionTests
         Result<Session> result = Session.Create
         (
             userId: UserId.New(),
-            hashedRefreshToken: hashedToken!,
+            hashedSecret: hashedToken!,
             ipAddress: "192.168.1.1",
             userAgent: "Mozilla/5.0",
             dateTimeProvider: _dateTimeProvider
@@ -128,7 +128,7 @@ public sealed class SessionTests
 
         result.IsFailure.ShouldBeTrue();
         
-        result.Error.ShouldBe(SessionErrors.HashedRefreshTokenRequired);
+        result.Error.ShouldBe(SessionErrors.HashedSecretRequired);
     }
 
     [Fact]
@@ -137,7 +137,7 @@ public sealed class SessionTests
         Result<Session> result = Session.Create
         (
             userId: UserId.New(),
-            hashedRefreshToken: "token",
+            hashedSecret: "token",
             ipAddress: null,
             userAgent: null,
             dateTimeProvider: _dateTimeProvider
@@ -296,7 +296,7 @@ public sealed class SessionTests
 
         var result = session.Refresh
         (
-            newHashedRefreshToken: newToken,
+            newHashedSecret: newToken,
             ipAddress: "10.0.0.1",
             userAgent: "Chrome",
             dateTimeProvider: _dateTimeProvider
@@ -304,7 +304,7 @@ public sealed class SessionTests
 
         result.IsSuccess.ShouldBeTrue();
         
-        session.HashedRefreshToken.ShouldBe(newToken);
+        session.HashedSecret.ShouldBe(newToken);
         
         session.Version.ShouldBe(2);
         
@@ -322,7 +322,7 @@ public sealed class SessionTests
 
         session.Refresh
         (
-            newHashedRefreshToken: "new-token",
+            newHashedSecret: "new-token",
             ipAddress: null,
             userAgent: null,
             dateTimeProvider: _dateTimeProvider
@@ -340,7 +340,7 @@ public sealed class SessionTests
 
         session.Refresh
         (
-            newHashedRefreshToken: "new-token",
+            newHashedSecret: "new-token",
             ipAddress: null,
             userAgent: null,
             dateTimeProvider: _dateTimeProvider
@@ -366,7 +366,7 @@ public sealed class SessionTests
 
         Result result = session.Refresh
         (
-            newHashedRefreshToken: "new-token",
+            newHashedSecret: "new-token",
             ipAddress: null,
             userAgent: null,
             dateTimeProvider: _dateTimeProvider
@@ -386,7 +386,7 @@ public sealed class SessionTests
 
         Result result = session.Refresh
         (
-            newHashedRefreshToken: "new-token",
+            newHashedSecret: "new-token",
             ipAddress: null,
             userAgent: null,
             dateTimeProvider: _dateTimeProvider
@@ -407,7 +407,7 @@ public sealed class SessionTests
 
         Result result = session.Refresh
         (
-            newHashedRefreshToken: newToken!,
+            newHashedSecret: newToken!,
             ipAddress: null,
             userAgent: null,
             dateTimeProvider: _dateTimeProvider
@@ -415,7 +415,7 @@ public sealed class SessionTests
         
         result.IsFailure.ShouldBeTrue();
         
-        result.Error.ShouldBe(SessionErrors.HashedRefreshTokenRequired);
+        result.Error.ShouldBe(SessionErrors.HashedSecretRequired);
     }
 
     #endregion
@@ -427,7 +427,7 @@ public sealed class SessionTests
         return Session.Create
         (
             userId: UserId.New(),
-            hashedRefreshToken: "hashed-token",
+            hashedSecret: "hashed-token",
             ipAddress: "192.168.1.1",
             userAgent: "Mozilla/5.0",
             dateTimeProvider: _dateTimeProvider

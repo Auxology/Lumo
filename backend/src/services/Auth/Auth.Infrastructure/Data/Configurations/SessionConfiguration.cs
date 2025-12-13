@@ -25,7 +25,12 @@ internal sealed class SessionConfiguration : IEntityTypeConfiguration<Session>
               .HasColumnType("uuid")
               .IsRequired();
 
-          builder.Property(x => x.HashedRefreshToken)
+          builder.Property(x => x.TokenId)
+              .ValueGeneratedNever()
+              .HasColumnType("uuid")
+              .IsRequired();
+
+          builder.Property(x => x.HashedSecret)
               .HasMaxLength(AuthDbConstants.MaxUnenforcedLength)
               .IsRequired();
 

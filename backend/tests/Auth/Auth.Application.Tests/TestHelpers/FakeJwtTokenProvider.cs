@@ -11,7 +11,7 @@ internal sealed class FakeJwtTokenProvider : IJwtTokenProvider
         return $"access_token_for_{tokenClaims.UserId}";
     }
 
-    public string GenerateRefreshToken()
+    public string GenerateSecret()
     {
         _refreshTokenCounter++;
         return $"refresh_token_{_refreshTokenCounter}";

@@ -20,6 +20,80 @@ services:
     networks:
       - observability
 
+  valkey:
+    image: valkey/valkey:alpine
+    container_name: lumo-valkey
+    restart: unless-stopped
+    command: >
+      valkey-server
+      --requirepass ${REDIS_PASSWORD}
+      --appendonly yes
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379"
+    volumes:
+      - valkey-data:/data
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          'valkey-cli --no-auth-warning -a "$$REDIS_PASSWORD" ping | grep -q PONG || exit 1',
+        ]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+    networks:
+      - cache
+
+  gateway.api:
+    build:
+      context: .
+      dockerfile: src/gateway/Gateway.Api/Dockerfile
+    image: lumo-gateway-api
+    container_name: lumo-gateway-api
+    restart: unless-stopped
+    depends_on:
+      valkey:
+        condition: service_healthy
+      seq:
+        condition: service_healthy
+      auth.api:
+        condition: service_healthy
+    env_file:
+      - ./.env
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
+      ASPNETCORE_URLS: http://+:5000
+      Valkey__ConnectionString: ${VALKEY_CONNECTION_STRING}
+      Valkey__Password: ${REDIS_PASSWORD}
+      Seq__ServerUrl: ${SEQ_URL}
+      Seq__ApiKey: ${SEQ_API_KEY}
+      Seq__IsEnabled: ${SEQ_ENABLED:-true}
+      AuthServiceClient__BaseUrl: ${AUTH_SERVICE_CLIENT_BASE_URL}
+      AuthServiceClient__VerifyLoginEndpoint: ${AUTH_SERVICE_CLIENT_VERIFY_LOGIN_ENDPOINT}
+      AuthServiceClient__RefreshTokenEndpoint: ${AUTH_SERVICE_CLIENT_REFRESH_TOKEN_ENDPOINT}
+      Jwt__Secret: ${JWT_SECRET}
+      Jwt__Issuer: ${JWT_ISSUER:-lumo-auth}
+      Jwt__Audience: ${JWT_AUDIENCE:-lumo-clients}
+      Jwt__RequireHttpsMetadata: ${JWT_REQUIRE_HTTPS_METADATA:-false}
+    ports:
+      - "5000:5000"
+    networks:
+      - gateway
+      - auth
+      - cache
+      - observability
+    healthcheck:
+      test: ["CMD-SHELL", "dotnet --info >/dev/null 2>&1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
   auth-db:
     image: postgres:18-alpine
     container_name: lumo-auth-db
@@ -85,7 +159,7 @@ services:
       test: ["CMD-SHELL", "dotnet --info >/dev/null 2>&1"]
       interval: 30s
       timeout: 10s
-      retries: 2
+      retries: 3
       start_period: 20s
 
 volumes:
@@ -93,9 +167,15 @@ volumes:
     driver: local
   auth-db-data:
     driver: local
+  valkey-data:
+    driver: local
 
 networks:
+  gateway:
+    driver: bridge
   auth:
+    driver: bridge
+  cache:
     driver: bridge
   observability:
     driver: bridge

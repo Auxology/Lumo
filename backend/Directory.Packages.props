@@ -22,6 +22,7 @@
         <PackageVersion Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="10.0.1" />
         <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
         <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
+        <PackageVersion Include="RedisRateLimiting.AspNetCore" Version="1.2.0" />
 
         <!-- Auth Infrastructure Exclusive -->
         <PackageVersion Include="AWSSDK.S3" Version="4.0.14.2" />
@@ -33,6 +34,7 @@
         <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.1" />
         <PackageVersion Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1" />
         <PackageVersion Include="Swashbuckle.AspNetCore" Version="10.0.1" />
+        <PackageVersion Include="Yarp.ReverseProxy" Version="2.3.0" />
         <!-- Tests -->
         <PackageVersion Include="Shouldly" Version="4.3.0" />
         <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
