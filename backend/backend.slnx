@@ -8,5 +8,6 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/ArchitectureTests/ArchitectureTests.csproj" />
+    <Project Path="tests/SharedKernel.Tests/SharedKernel.Tests.csproj" />
   </Folder>
 </Solution>
