@@ -1,0 +1,13 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Static code analysis -->
+    <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.16.1.129956" />
+    <!-- Application -->
+    <!-- Infrastructure -->
+    <!-- Web.Api -->
+    <!-- ArchitectureTests -->
+  </ItemGroup>
+</Project>
