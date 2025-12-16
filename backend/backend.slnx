@@ -5,4 +5,7 @@
     <Project Path="src/Shared/SharedKernel.Infrastructure/SharedKernel.Infrastructure.csproj" />
     <Project Path="src/Shared/SharedKernel/SharedKernel.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/ArchitectureTests/ArchitectureTests.csproj" />
+  </Folder>
 </Solution>
