@@ -2,6 +2,7 @@
   <Folder Name="/src/" />
   <Folder Name="/src/Shared/">
     <Project Path="src/Shared/SharedKernel.Api/SharedKernel.Api.csproj" />
+    <Project Path="src/Shared/SharedKernel.Application/SharedKernel.Application.csproj" />
     <Project Path="src/Shared/SharedKernel.Infrastructure/SharedKernel.Infrastructure.csproj" />
     <Project Path="src/Shared/SharedKernel/SharedKernel.csproj" />
   </Folder>

@@ -7,6 +7,7 @@
     <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.16.1.129956" />
     <!-- Application -->
     <!-- Infrastructure -->
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.1" />
     <!-- Web.Api -->
     <!-- Tests -->
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
