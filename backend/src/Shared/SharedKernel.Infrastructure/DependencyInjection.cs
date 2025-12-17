@@ -14,12 +14,28 @@ public static class DependencyInjection
     {
         ArgumentNullException.ThrowIfNull(configuration);
         
+        services
+            .AddServices()
+            .AddAuthenticationInternal(configuration);
+        
+        return services;
+    }
+    private static IServiceCollection AddServices(this IServiceCollection services)
+    {
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
+        
+        return services;
+    }
 
+    private static IServiceCollection AddAuthenticationInternal(this IServiceCollection services,
+        IConfiguration configuration)
+
+    {
         services.AddHttpContextAccessor();
         services.AddScoped<IUserContext, UserContext>();
         services.AddSingleton<IJwtTokenValidator, JwtTokenValidator>();
-        
+        services.AddSingleton<ISecretHasher, SecretHasher>();
+
         services.AddOptions<JwtOptions>()
             .Bind(configuration.GetSection(JwtOptions.SectionName))
             .ValidateDataAnnotations()

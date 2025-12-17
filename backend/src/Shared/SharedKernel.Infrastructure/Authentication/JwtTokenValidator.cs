@@ -10,9 +10,11 @@ namespace SharedKernel.Infrastructure.Authentication;
 public sealed class JwtTokenValidator(IOptions<JwtOptions> jwtOptions) : IJwtTokenValidator
 {
     private readonly JwtOptions _jwtOptions = jwtOptions.Value;
-    private static readonly JsonWebTokenHandler JsonWebTokenHandler = new();
+    private readonly JsonWebTokenHandler _jsonWebTokenHandler = new();
 
-
+    private readonly SecurityKey _securityKey =
+        new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Value.SecretKey));
+    
     public async Task<bool> IsValidAsync(string accessToken, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(accessToken))
@@ -25,12 +27,12 @@ public sealed class JwtTokenValidator(IOptions<JwtOptions> jwtOptions) : IJwtTok
             ValidateAudience = true,
             ValidAudience = _jwtOptions.Audience,
             ValidateLifetime = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.SecretKey)),
+            IssuerSigningKey = _securityKey,
             ClockSkew = TimeSpan.Zero
         };
 
         TokenValidationResult result =
-            await JsonWebTokenHandler.ValidateTokenAsync(accessToken, tokenValidationParameters);
+            await _jsonWebTokenHandler.ValidateTokenAsync(accessToken, tokenValidationParameters);
         
         return result.IsValid;
     }
