@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SharedKernel.Application.Authentication;
 using SharedKernel.Infrastructure.Authentication;
+using SharedKernel.Infrastructure.Observability;
 using SharedKernel.Infrastructure.Options;
 using SharedKernel.Infrastructure.Time;
 
@@ -13,10 +14,11 @@ public static class DependencyInjection
         IConfiguration configuration)
     {
         ArgumentNullException.ThrowIfNull(configuration);
-        
+
         services
             .AddServices()
-            .AddAuthenticationInternal(configuration);
+            .AddAuthenticationInternal(configuration)
+            .AddOpenTelemetrySetup(configuration);
         
         return services;
     }
