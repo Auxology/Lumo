@@ -7,9 +7,9 @@ using SharedKernel.Infrastructure.Options;
 
 namespace SharedKernel.Infrastructure.Observability;
 
-public static class OpenTelemetrySetup
+internal static class OpenTelemetrySetup
 {
-    public static IServiceCollection AddOpenTelemetrySetup(this IServiceCollection services,
+    internal static IServiceCollection AddOpenTelemetrySetup(this IServiceCollection services,
         IConfiguration configuration)
     {
         ArgumentNullException.ThrowIfNull(configuration);

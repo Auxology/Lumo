@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SharedKernel.Application.Authentication;
 using SharedKernel.Infrastructure.Authentication;
+using SharedKernel.Infrastructure.Caching;
 using SharedKernel.Infrastructure.Observability;
 using SharedKernel.Infrastructure.Options;
 using SharedKernel.Infrastructure.Time;
@@ -18,8 +19,9 @@ public static class DependencyInjection
         services
             .AddServices()
             .AddAuthenticationInternal(configuration)
-            .AddOpenTelemetrySetup(configuration);
-        
+            .AddOpenTelemetrySetup(configuration)
+            .AddValkeySetup(configuration);
+
         return services;
     }
     private static IServiceCollection AddServices(this IServiceCollection services)
@@ -42,6 +44,48 @@ public static class DependencyInjection
             .Bind(configuration.GetSection(JwtOptions.SectionName))
             .ValidateDataAnnotations()
             .ValidateOnStart();
+
+        return services;
+    }
+
+    public static IServiceCollection AddSharedHealthChecks(this IServiceCollection services,
+        IConfiguration configuration)
+
+    {
+        ArgumentNullException.ThrowIfNull(configuration);
+
+        ValkeyOptions valkeyOptions = new ValkeyOptions();
+        configuration.GetSection(ValkeyOptions.SectionName).Bind(valkeyOptions);
+
+        SerilogOptions serilogOptions = new SerilogOptions();
+        configuration.GetSection(SerilogOptions.SectionName).Bind(serilogOptions);
+
+        OpenTelemetryOptions openTelemetryOptions = new OpenTelemetryOptions();
+        configuration.GetSection(OpenTelemetryOptions.SectionName).Bind(openTelemetryOptions);
+
+        string seqHealthUrl = serilogOptions.Seq.HealthCheckUrl ?? serilogOptions.Seq.ServerUrl + "/api";
+
+        string jaegerHealthUrl = openTelemetryOptions.Exporter.HealthCheckUrl ?? openTelemetryOptions.Exporter.Endpoint;
+
+        services.AddHealthChecks()
+            .AddRedis
+            (
+                redisConnectionString: valkeyOptions.ConnectionString,
+                name: "valkey",
+                tags: ["ready"]
+            )
+            .AddUrlGroup
+            (
+                new Uri(seqHealthUrl),
+                name: "seq",
+                tags: ["ready"]
+            )
+            .AddUrlGroup
+            (
+                new Uri(jaegerHealthUrl),
+                name: "jaeger",
+                tags: ["ready"]
+            );
 
         return services;
     }

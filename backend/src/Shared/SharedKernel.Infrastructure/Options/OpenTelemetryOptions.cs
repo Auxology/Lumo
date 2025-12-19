@@ -26,6 +26,9 @@ public sealed class OtelExporterOptions
     public string Endpoint { get; init; } = "http://localhost:4317";
 
     public bool Enabled { get; init; } = true;
+
+    [Url]
+    public string? HealthCheckUrl { get; init; }
 }
 
 public sealed class TracingOptions
