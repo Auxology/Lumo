@@ -23,6 +23,7 @@ services:
       - Serilog__Seq__ServerUrl=${SERILOG_SEQ_SERVER_URL:-http://seq:5341}
       - Serilog__Seq__ApiKey=${SERILOG_SEQ_API_KEY:-}
       - Serilog__Seq__Enabled=${SERILOG_SEQ_ENABLED:-true}
+      - Serilog__Seq__HealthCheckUrl=${SERILOG_SEQ_HEALTH_CHECK_URL:-http://seq:80/api}
       - Serilog__Console__Enabled=${SERILOG_CONSOLE_ENABLED:-true}
       - Serilog__Console__OutputTemplate=${SERILOG_CONSOLE_OUTPUT_TEMPLATE:-[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} {Properties:j}{NewLine}{Exception}}
       - Serilog__OverrideMinimumLevels__Microsoft=${SERILOG_OVERRIDE_MICROSOFT:-Warning}
@@ -35,6 +36,7 @@ services:
       - OpenTelemetry__ServiceNamespace=${OTEL_SERVICE_NAMESPACE:-Lumo}
       - OpenTelemetry__Exporter__Endpoint=${OTEL_EXPORTER_ENDPOINT:-http://jaeger:4317}
       - OpenTelemetry__Exporter__Enabled=${OTEL_EXPORTER_ENABLED:-true}
+      - OpenTelemetry__Exporter__HealthCheckUrl=${OTEL_EXPORTER_HEALTH_CHECK_URL:-http://jaeger:16686}
       - OpenTelemetry__Tracing__Enabled=${OTEL_TRACING_ENABLED:-true}
       - OpenTelemetry__Tracing__RecordException=${OTEL_TRACING_RECORD_EXCEPTION:-true}
       - OpenTelemetry__Tracing__Instrumentation__AspNetCore=${OTEL_INSTRUMENTATION_ASPNETCORE:-true}
@@ -63,6 +65,12 @@ services:
       jaeger:
         condition: service_healthy
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://localhost:5000/health/live"]
+      interval: ${GATEWAY_HEALTHCHECK_INTERVAL:-10s}
+      timeout: ${GATEWAY_HEALTHCHECK_TIMEOUT:-5s}
+      retries: ${GATEWAY_HEALTHCHECK_RETRIES:-3}
+      start_period: ${GATEWAY_HEALTHCHECK_START_PERIOD:-30s}
     deploy:
       resources:
         limits:

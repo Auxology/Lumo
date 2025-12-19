@@ -11,7 +11,8 @@ internal static class DependencyInjection
         services
             .AddOpenApi()
             .AddSharedKernelApi()
-            .AddSharedKernelInfrastructure(configuration);
+            .AddSharedKernelInfrastructure(configuration)
+            .AddSharedHealthChecks(configuration);
 
         services.AddScoped<ITokenCacheService, TokenCacheService>();
 

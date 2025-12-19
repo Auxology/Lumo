@@ -35,6 +35,10 @@
     <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.14.0" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.Process" Version="1.14.0-beta.2" />
     
+    <!-- Health Checks -->
+    <PackageVersion Include="AspnetCore.HealthChecks.Uris" Version="9.0.0" />
+    <PackageVersion Include="AspnetCore.HealthChecks.Redis" Version="9.0.0" />
+    
     <PackageVersion Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="10.0.1" />
     <!-- Web.Api -->
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.1" />

@@ -29,6 +29,9 @@ public sealed class SeqOptions
     public string? ApiKey { get; init; }
 
     public bool Enabled { get; init; } = true;
+
+    [Url]
+    public string? HealthCheckUrl { get; init; }
 }
 
 public sealed class ConsoleOptions
