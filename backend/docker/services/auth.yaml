@@ -1,0 +1,79 @@
+services:
+  auth.api:
+    image: ${REGISTRY:-lumo}/auth-api:${TAG:-latest}
+    container_name: lumo-auth-api
+    build:
+      context: ../..
+      dockerfile: src/Auth/Auth.Api/Dockerfile
+      args:
+        BUILD_CONFIGURATION: ${BUILD_CONFIGURATION:-Release}
+    ports:
+      - "${AUTH_HTTP_PORT:-5100}:5100"
+    environment:
+      # ASP.NET Core
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
+      - ASPNETCORE_URLS=http://+:5100
+
+      # ValkeyOptions
+      - Valkey__ConnectionString=${VALKEY_CONNECTION_STRING:-valkey:6379}
+      - Valkey__Enabled=${VALKEY_ENABLED:-true}
+
+      # SerilogOptions
+      - Serilog__MinimumLevel=${SERILOG_MINIMUM_LEVEL:-Information}
+      - Serilog__Seq__ServerUrl=${SERILOG_SEQ_SERVER_URL:-http://seq:5341}
+      - Serilog__Seq__ApiKey=${SERILOG_SEQ_API_KEY:-}
+      - Serilog__Seq__Enabled=${SERILOG_SEQ_ENABLED:-true}
+      - Serilog__Seq__HealthCheckUrl=${SERILOG_SEQ_HEALTH_CHECK_URL:-http://seq:80/api}
+      - Serilog__Console__Enabled=${SERILOG_CONSOLE_ENABLED:-true}
+      - Serilog__Console__OutputTemplate=${SERILOG_CONSOLE_OUTPUT_TEMPLATE:-[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} {Properties:j}{NewLine}{Exception}}
+      - Serilog__OverrideMinimumLevels__Microsoft=${SERILOG_OVERRIDE_MICROSOFT:-Warning}
+      - Serilog__OverrideMinimumLevels__Microsoft.Hosting.Lifetime=${SERILOG_OVERRIDE_MICROSOFT_HOSTING:-Information}
+      - Serilog__OverrideMinimumLevels__System=${SERILOG_OVERRIDE_SYSTEM:-Warning}
+
+      # OpenTelemetryOptions
+      - OpenTelemetry__ServiceName=${OTEL_SERVICE_NAME:-Auth.Api}
+      - OpenTelemetry__ServiceVersion=${OTEL_SERVICE_VERSION:-}
+      - OpenTelemetry__ServiceNamespace=${OTEL_SERVICE_NAMESPACE:-Lumo}
+      - OpenTelemetry__Exporter__Endpoint=${OTEL_EXPORTER_ENDPOINT:-http://jaeger:4317}
+      - OpenTelemetry__Exporter__Enabled=${OTEL_EXPORTER_ENABLED:-true}
+      - OpenTelemetry__Exporter__HealthCheckUrl=${OTEL_EXPORTER_HEALTH_CHECK_URL:-http://jaeger:16686}
+      - OpenTelemetry__Tracing__Enabled=${OTEL_TRACING_ENABLED:-true}
+      - OpenTelemetry__Tracing__RecordException=${OTEL_TRACING_RECORD_EXCEPTION:-true}
+      - OpenTelemetry__Tracing__Instrumentation__AspNetCore=${OTEL_INSTRUMENTATION_ASPNETCORE:-true}
+      - OpenTelemetry__Tracing__Instrumentation__HttpClient=${OTEL_INSTRUMENTATION_HTTPCLIENT:-true}
+      - OpenTelemetry__Tracing__Instrumentation__SqlClient=${OTEL_INSTRUMENTATION_SQLCLIENT:-true}
+      - OpenTelemetry__Tracing__Instrumentation__EntityFrameworkCore=${OTEL_INSTRUMENTATION_EF:-true}
+      - OpenTelemetry__Metrics__Enabled=${OTEL_METRICS_ENABLED:-true}
+      - OpenTelemetry__Metrics__Instrumentation__AspNetCore=${OTEL_METRICS_INSTRUMENTATION_ASPNETCORE:-true}
+      - OpenTelemetry__Metrics__Instrumentation__HttpClient=${OTEL_METRICS_INSTRUMENTATION_HTTPCLIENT:-true}
+      - OpenTelemetry__Metrics__Instrumentation__Runtime=${OTEL_METRICS_INSTRUMENTATION_RUNTIME:-true}
+      - OpenTelemetry__Metrics__Instrumentation__Process=${OTEL_METRICS_INSTRUMENTATION_PROCESS:-true}
+
+      # JwtOptions
+      - Jwt__Issuer=${JWT_ISSUER:-https://lumo.local}
+      - Jwt__Audience=${JWT_AUDIENCE:-lumo-api}
+      - Jwt__SecretKey=${JWT_SECRET_KEY:?JWT_SECRET_KEY is required}
+      - Jwt__AccessTokenExpiration=${JWT_ACCESS_TOKEN_EXPIRATION:-00:10:00}
+      - Jwt__RefreshTokenExpiration=${JWT_REFRESH_TOKEN_EXPIRATION:-30.00:00:00}
+    networks:
+      - lumo-network
+    depends_on:
+      valkey:
+        condition: service_healthy
+      seq:
+        condition: service_healthy
+      jaeger:
+        condition: service_healthy
+      gateway.api:
+        condition: service_healthy
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+    labels:
+      - "lumo.service=auth-api"
+      - "lumo.tier=application"
+
