@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SharedKernel.Application.Authentication;
 using SharedKernel.Infrastructure.Authentication;
+using SharedKernel.Infrastructure.Caching;
 using SharedKernel.Infrastructure.Observability;
 using SharedKernel.Infrastructure.Options;
 using SharedKernel.Infrastructure.Time;
@@ -18,7 +19,8 @@ public static class DependencyInjection
         services
             .AddServices()
             .AddAuthenticationInternal(configuration)
-            .AddOpenTelemetrySetup(configuration);
+            .AddOpenTelemetrySetup(configuration)
+            .AddValkeySetup(configuration);
         
         return services;
     }

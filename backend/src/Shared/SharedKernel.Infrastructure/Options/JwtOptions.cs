@@ -16,8 +16,8 @@ public sealed class JwtOptions
     public string SecretKey { get; init; } = string.Empty;
 
     [Range(typeof(TimeSpan), "00:01:00", "24:00:00")]
-    public TimeSpan AccessTokenExpiration { get; init; } = TimeSpan.FromMinutes(15);
+    public TimeSpan AccessTokenExpiration { get; init; } = TimeSpan.FromMinutes(10);
 
     [Range(typeof(TimeSpan), "00:01:00", "365.00:00:00")]
-    public TimeSpan RefreshTokenExpiration { get; init; } = TimeSpan.FromDays(7);
+    public TimeSpan RefreshTokenExpiration { get; init; } = TimeSpan.FromDays(30);
 }
