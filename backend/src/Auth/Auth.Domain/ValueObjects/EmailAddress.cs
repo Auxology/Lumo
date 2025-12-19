@@ -16,17 +16,17 @@ public readonly record struct EmailAddress
     public static Outcome<EmailAddress> Create(string email)
     {
         if (string.IsNullOrWhiteSpace(email))
-            return Outcome.Failure<EmailAddress>(Errors.StringRequired);
+            return Faults.StringRequired;
 
         email = Normalize(email);
 
         if (email.Length > MaxLength)
-            return Outcome.Failure<EmailAddress>(Errors.TooLong);
+            return Faults.TooLong;
 
         if (!IsValidFormat(email))
-            return Outcome.Failure<EmailAddress>(Errors.Invalid);
+            return Faults.Invalid;
 
-        return Outcome.Success(new EmailAddress(email));
+        return new EmailAddress(email);
     }
 
     public static EmailAddress UnsafeFromString(string email) => new(email);
@@ -54,24 +54,24 @@ public readonly record struct EmailAddress
 
     public static implicit operator string(EmailAddress email) => email.Value;
 
-    private static class Errors
+    private static class Faults
     {
         public static readonly Fault StringRequired = Fault.Validation
         (
-            "EmailAddress.StringRequired",
-            "Email address requires a non-empty string."
+            title: "EmailAddress.StringRequired",
+            detail: "Email address requires a non-empty string."
         );
 
         public static readonly Fault Invalid = Fault.Validation
         (
-            "EmailAddress.Invalid",
-            "Email address is not in a valid format."
+            title: "EmailAddress.Invalid",
+            detail: "Email address is not in a valid format."
         );
 
         public static readonly Fault TooLong = Fault.Validation
         (
-            "EmailAddress.TooLong",
-            $"Email address cannot exceed {MaxLength} characters."
+            title: "EmailAddress.TooLong",
+            detail: $"Email address cannot exceed {MaxLength} characters."
         );
     }
 }

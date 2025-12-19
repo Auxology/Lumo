@@ -16,9 +16,9 @@ public readonly record struct LoginRequestId
     public static Outcome<LoginRequestId> FromGuid(Guid value)
     {
         if (value == Guid.Empty)
-            return Outcome.Failure<LoginRequestId>(Errors.Invalid);
+            return Faults.Invalid;
 
-        return Outcome.Success(new LoginRequestId(value));
+        return new LoginRequestId(value);
     }
 
     public static LoginRequestId UnsafeFromGuid(Guid value) => new(value);
@@ -26,10 +26,10 @@ public readonly record struct LoginRequestId
     public static Outcome<LoginRequestId> FromString(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
-            return Outcome.Failure<LoginRequestId>(Errors.StringRequired);
+            return Faults.StringRequired;
 
         if (!Guid.TryParse(value, out var guid))
-            return Outcome.Failure<LoginRequestId>(Errors.InvalidFormat);
+            return Faults.InvalidFormat;
 
         return FromGuid(guid);
     }
@@ -42,22 +42,24 @@ public readonly record struct LoginRequestId
 
     public static explicit operator LoginRequestId(Guid value) => UnsafeFromGuid(value);
 
-    private static class Errors
+    private static class Faults
     {
         public static readonly Fault Invalid = Fault.Validation
         (
-            "LoginRequestId.Invalid",
-            "LoginRequestId cannot be an empty GUID.");
+            title: "LoginRequestId.Invalid",
+            detail: "LoginRequestId cannot be an empty GUID."
+        );
 
         public static readonly Fault InvalidFormat = Fault.Validation
         (
-            "LoginRequestId.InvalidFormat",
-            "The provided string is not a valid GUID format.");
+            title: "LoginRequestId.InvalidFormat",
+            detail: "The provided string is not a valid GUID format."
+        );
 
         public static readonly Fault StringRequired = Fault.Validation
         (
-            "LoginRequestId.StringRequired",
-            "LoginRequestId requires a non-empty string."
+            title: "LoginRequestId.StringRequired",
+            detail: "LoginRequestId requires a non-empty string."
         );
     }
 }

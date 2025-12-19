@@ -16,9 +16,9 @@ public readonly record struct SessionId
     public static Outcome<SessionId> FromGuid(Guid value)
     {
         if (value == Guid.Empty)
-            return Outcome.Failure<SessionId>(Errors.Invalid);
+            return Faults.Invalid;
 
-        return Outcome.Success(new SessionId(value));
+        return new SessionId(value);
     }
 
     public static SessionId UnsafeFromGuid(Guid value) => new(value);
@@ -26,10 +26,10 @@ public readonly record struct SessionId
     public static Outcome<SessionId> FromString(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
-            return Outcome.Failure<SessionId>(Errors.StringRequired);
+            return Faults.StringRequired;
 
         if (!Guid.TryParse(value, out var guid))
-            return Outcome.Failure<SessionId>(Errors.InvalidFormat);
+            return Faults.InvalidFormat;
 
         return FromGuid(guid);
     }
@@ -42,22 +42,24 @@ public readonly record struct SessionId
 
     public static explicit operator SessionId(Guid value) => UnsafeFromGuid(value);
 
-    private static class Errors
+    private static class Faults
     {
         public static readonly Fault Invalid = Fault.Validation
         (
-            "SessionId.Invalid",
-            "SessionId cannot be an empty GUID.");
+            title: "SessionId.Invalid",
+            detail: "SessionId cannot be an empty GUID."
+        );
 
         public static readonly Fault InvalidFormat = Fault.Validation
         (
-            "SessionId.InvalidFormat",
-            "The provided string is not a valid GUID format.");
+            title: "SessionId.InvalidFormat",
+            detail: "The provided string is not a valid GUID format."
+        );
 
         public static readonly Fault StringRequired = Fault.Validation
         (
-            "SessionId.StringRequired",
-            "SessionId requires a non-empty string."
+            title: "SessionId.StringRequired",
+            detail: "SessionId requires a non-empty string."
         );
     }
 }

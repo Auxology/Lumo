@@ -16,9 +16,9 @@ public readonly record struct RecoveryKeyChainId
     public static Outcome<RecoveryKeyChainId> FromGuid(Guid value)
     {
         if (value == Guid.Empty)
-            return Outcome.Failure<RecoveryKeyChainId>(Errors.Invalid);
+            return Faults.Invalid;
 
-        return Outcome.Success(new RecoveryKeyChainId(value));
+        return new RecoveryKeyChainId(value);
     }
 
     public static RecoveryKeyChainId UnsafeFromGuid(Guid value) => new(value);
@@ -26,10 +26,10 @@ public readonly record struct RecoveryKeyChainId
     public static Outcome<RecoveryKeyChainId> FromString(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
-            return Outcome.Failure<RecoveryKeyChainId>(Errors.StringRequired);
+            return Faults.StringRequired;
 
         if (!Guid.TryParse(value, out var guid))
-            return Outcome.Failure<RecoveryKeyChainId>(Errors.InvalidFormat);
+            return Faults.InvalidFormat;
 
         return FromGuid(guid);
     }
@@ -42,22 +42,24 @@ public readonly record struct RecoveryKeyChainId
 
     public static explicit operator RecoveryKeyChainId(Guid value) => UnsafeFromGuid(value);
 
-    private static class Errors
+    private static class Faults
     {
         public static readonly Fault Invalid = Fault.Validation
         (
-            "RecoveryKeyChainId.Invalid",
-            "RecoveryKeyChainId cannot be an empty GUID.");
+            title: "RecoveryKeyChainId.Invalid",
+            detail: "RecoveryKeyChainId cannot be an empty GUID."
+        );
 
         public static readonly Fault InvalidFormat = Fault.Validation
         (
-            "RecoveryKeyChainId.InvalidFormat",
-            "The provided string is not a valid GUID format.");
+            title: "RecoveryKeyChainId.InvalidFormat",
+            detail: "The provided string is not a valid GUID format."
+        );
 
         public static readonly Fault StringRequired = Fault.Validation
         (
-            "RecoveryKeyChainId.StringRequired",
-            "RecoveryKeyChainId requires a non-empty string."
+            title: "RecoveryKeyChainId.StringRequired",
+            detail: "RecoveryKeyChainId requires a non-empty string."
         );
     }
 }
