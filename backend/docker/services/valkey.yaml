@@ -1,0 +1,35 @@
+services:
+  valkey:
+    image: valkey/valkey:${VALKEY_VERSION:-8-alpine}
+    container_name: lumo-valkey
+    ports:
+      - "${VALKEY_PORT:-6379}:6379"
+    volumes:
+      - valkey-data:/data
+    networks:
+      - lumo-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: ${VALKEY_MEMORY_LIMIT:-256M}
+        reservations:
+          memory: ${VALKEY_MEMORY_RESERVATION:-128M}
+    labels:
+      - "lumo.service=valkey"
+      - "lumo.tier=infrastructure"
+    command: >
+      valkey-server
+      --appendonly ${VALKEY_APPENDONLY:-yes}
+      --appendfsync ${VALKEY_APPENDFSYNC:-everysec}
+      --maxmemory ${VALKEY_MAXMEMORY:-200mb}
+      --maxmemory-policy ${VALKEY_MAXMEMORY_POLICY:-allkeys-lru}
+      --tcp-keepalive ${VALKEY_TCP_KEEPALIVE:-300}
+      --timeout ${VALKEY_TIMEOUT:-0}
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: ${VALKEY_HEALTHCHECK_INTERVAL:-10s}
+      timeout: ${VALKEY_HEALTHCHECK_TIMEOUT:-5s}
+      retries: ${VALKEY_HEALTHCHECK_RETRIES:-5}
+      start_period: ${VALKEY_HEALTHCHECK_START_PERIOD:-10s}
+

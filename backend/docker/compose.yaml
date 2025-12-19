@@ -1,0 +1,34 @@
+name: lumo
+
+include:
+  - path: services/valkey.yaml
+  - path: services/seq.yaml
+  - path: services/jaeger.yaml
+  - path: services/gateway.yaml
+
+networks:
+  lumo-network:
+    name: lumo-network
+    driver: bridge
+    labels:
+      - "lumo.network=internal"
+
+volumes:
+  valkey-data:
+    name: lumo-valkey-data
+    labels:
+      - "lumo.volume=valkey-data"
+      - "lumo.service=valkey"
+
+  seq-data:
+    name: lumo-seq-data
+    labels:
+      - "lumo.volume=seq-data"
+      - "lumo.service=seq"
+
+  jaeger-data:
+    name: lumo-jaeger-data
+    labels:
+      - "lumo.volume=jaeger-data"
+      - "lumo.service=jaeger"
+
