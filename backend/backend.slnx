@@ -1,5 +1,7 @@
 <Solution>
-  <Folder Name="/src/" />
+  <Folder Name="/src/">
+    <Project Path="src/Gateway.Api/Gateway.Api.csproj" />
+  </Folder>
   <Folder Name="/src/Shared/">
     <Project Path="src/Shared/SharedKernel.Api/SharedKernel.Api.csproj" />
     <Project Path="src/Shared/SharedKernel.Application/SharedKernel.Application.csproj" />
