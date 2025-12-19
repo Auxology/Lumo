@@ -12,11 +12,13 @@ services:
     restart: unless-stopped
     environment:
       # License
-      - ACCEPT_EULA=${SEQ_ACCEPT_EULA:-Y}
+      - ACCEPT_EULA=Y
 
       # Performance & Caching
       - SEQ_CACHE_SYSTEMRAMTARGET=${SEQ_CACHE_RAM_TARGET:-256}
 
+      # Authentication (disable for development)
+      - SEQ_FIRSTRUN_NOAUTHENTICATION=${SEQ_FIRSTRUN_NOAUTHENTICATION:-true}
       # API Key (optional - for secure ingestion)
       - SEQ_FIRSTRUN_ADMINPASSWORDHASH=${SEQ_ADMIN_PASSWORD_HASH:-}
     deploy:
@@ -29,7 +31,7 @@ services:
       - "lumo.service=seq"
       - "lumo.tier=observability"
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://localhost:5341/health"]
+      test: ["CMD", "curl", "-sf", "http://localhost:80/api"]
       interval: ${SEQ_HEALTHCHECK_INTERVAL:-10s}
       timeout: ${SEQ_HEALTHCHECK_TIMEOUT:-5s}
       retries: ${SEQ_HEALTHCHECK_RETRIES:-5}

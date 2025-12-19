@@ -37,7 +37,7 @@ services:
       - "lumo.service=jaeger"
       - "lumo.tier=observability"
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://localhost:14269/"]
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:16686/"]
       interval: ${JAEGER_HEALTHCHECK_INTERVAL:-10s}
       timeout: ${JAEGER_HEALTHCHECK_TIMEOUT:-5s}
       retries: ${JAEGER_HEALTHCHECK_RETRIES:-5}
