@@ -84,4 +84,40 @@ public sealed class RecoveryKeyChain : AggregateRoot<RecoveryKeyChainId>
 
         return recoveryKeyChain;
     }
+
+    public Outcome Rotate
+    (
+        IReadOnlyCollection<(string identifier, string verifierHash)> newRecoveryKeyPairs,
+        DateTimeOffset utcNow
+    )
+    {
+        ArgumentNullException.ThrowIfNull(newRecoveryKeyPairs);
+        
+        if (newRecoveryKeyPairs.Count != RecoveryKeyConstants.MaxKeysPerChain)
+            return RecoveryKeyChainFaults.InvalidRecoveryKeyCount;
+        
+        List<RecoveryKey> newRecoveryKeys = new(capacity: RecoveryKeyConstants.MaxKeysPerChain);
+
+        foreach ((string identifier, string verifierHash) newRecoveryKeyPair in newRecoveryKeyPairs)
+        {
+            Outcome<RecoveryKey> newRecoveryKeyOutcome = RecoveryKey.Create
+            (
+                recoveryKeyChainId: Id,
+                identifier: newRecoveryKeyPair.identifier,
+                verifierHash: newRecoveryKeyPair.verifierHash
+            );
+            
+            if (newRecoveryKeyOutcome.IsFailure)
+                return newRecoveryKeyOutcome.Fault;
+            
+            newRecoveryKeys.Add(newRecoveryKeyOutcome.Value);
+        }
+        
+        _recoveryKeys.Clear();
+        _recoveryKeys.AddRange(newRecoveryKeys);
+        LastRotatedAt = utcNow;
+        Version += 1;
+        
+        return Outcome.Success();
+    }
 }
