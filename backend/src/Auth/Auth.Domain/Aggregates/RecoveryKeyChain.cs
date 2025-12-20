@@ -13,8 +13,6 @@ public sealed class RecoveryKeyChain : AggregateRoot<RecoveryKeyChainId>
     
     public UserId UserId { get; private set; }
     
-    public string KeyIdentifier { get; private set; } = string.Empty;
-    
     public DateTimeOffset CreatedAt { get; private set; }
     
     public DateTimeOffset? LastRotatedAt { get; private set; }
@@ -30,14 +28,12 @@ public sealed class RecoveryKeyChain : AggregateRoot<RecoveryKeyChainId>
     (
         RecoveryKeyChainId id,
         UserId userId,
-        string keyIdentifier,
         DateTimeOffset utcNow,
         List<RecoveryKey> recoveryKeys
     )
     {
         Id = id;
         UserId = userId;
-        KeyIdentifier = keyIdentifier;
         CreatedAt = utcNow;
         LastRotatedAt = null;
         Version = 1;
@@ -47,37 +43,34 @@ public sealed class RecoveryKeyChain : AggregateRoot<RecoveryKeyChainId>
     public static Outcome<RecoveryKeyChain> Create
     (
         UserId userId,
-        string keyIdentifier,
-        IReadOnlyList<string> verifierHashes,
+        IReadOnlyCollection<(string identifier, string verifierHash)> recoveryKeyPairs,
         DateTimeOffset utcNow
     )
     {
-        ArgumentNullException.ThrowIfNull(verifierHashes);
+        ArgumentNullException.ThrowIfNull(recoveryKeyPairs);
         
         if (userId.IsEmpty)
             return RecoveryKeyChainFaults.UserIdRequiredForCreation;
 
-        if (string.IsNullOrWhiteSpace(keyIdentifier))
-            return RecoveryKeyChainFaults.KeyIdentifierRequiredForCreation;
-
-        if (verifierHashes.Count != RecoveryKeyConstants.MaxKeysPerChain)
+        if (recoveryKeyPairs.Count != RecoveryKeyConstants.MaxKeysPerChain)
             return RecoveryKeyChainFaults.InvalidRecoveryKeyCount;
 
         RecoveryKeyChainId recoveryKeyChainId = RecoveryKeyChainId.New();
         
         List<RecoveryKey> recoveryKeys = new(capacity: RecoveryKeyConstants.MaxKeysPerChain);
 
-        for (int i = 0; i < verifierHashes.Count; i++)
+        foreach ((string identifier, string verifierHash) recoveryKeysPair in recoveryKeyPairs)
         {
             Outcome<RecoveryKey> recoveryKeyOutcome = RecoveryKey.Create
             (
                 recoveryKeyChainId: recoveryKeyChainId,
-                verifierHash: verifierHashes[i]
+                identifier: recoveryKeysPair.identifier,
+                verifierHash: recoveryKeysPair.verifierHash
             );
-
-            if (!recoveryKeyOutcome.IsSuccess)
+            
+            if (recoveryKeyOutcome.IsFailure)
                 return recoveryKeyOutcome.Fault;
-
+            
             recoveryKeys.Add(recoveryKeyOutcome.Value);
         }
 
@@ -85,7 +78,6 @@ public sealed class RecoveryKeyChain : AggregateRoot<RecoveryKeyChainId>
         (
             id: recoveryKeyChainId,
             userId: userId,
-            keyIdentifier: keyIdentifier,
             utcNow: utcNow,
             recoveryKeys: recoveryKeys
         );

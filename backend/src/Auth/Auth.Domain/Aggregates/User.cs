@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Auth.Domain.Constants;
+using Auth.Domain.Events.User;
 using Auth.Domain.Faults;
 using Auth.Domain.ValueObjects;
 using SharedKernel;
@@ -64,6 +65,15 @@ public sealed class User : AggregateRoot<UserId>
             emailAddress: emailAddress,
             utcNow: utcNow
         );
+
+        UserCreatedDomainEvent domainEvent = new
+        (
+            UserId: user.Id.Value,
+            EmailAddress: user.EmailAddress.Value,
+            CreatedAt: user.CreatedAt
+        );
+        
+        user.AddDomainEvent(domainEvent);
 
         return user;
     }

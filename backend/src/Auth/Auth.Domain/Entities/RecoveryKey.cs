@@ -8,6 +8,8 @@ namespace Auth.Domain.Entities;
 public sealed class RecoveryKey : Entity<int>
 {
     public RecoveryKeyChainId RecoveryKeyChainId { get; private set; }
+
+    public string Identifier { get; private set; } = string.Empty;
     
     public string VerifierHash { get; private set; } = string.Empty;
     
@@ -23,10 +25,12 @@ public sealed class RecoveryKey : Entity<int>
     private RecoveryKey
     (
         RecoveryKeyChainId recoveryKeyChainId,
+        string identifier,
         string verifierHash
     )
     {
         RecoveryKeyChainId = recoveryKeyChainId;
+        Identifier = identifier;
         VerifierHash = verifierHash;
         IsUsed = false;
         UsedAt = null;
@@ -36,18 +40,23 @@ public sealed class RecoveryKey : Entity<int>
     public static Outcome<RecoveryKey> Create
     (
         RecoveryKeyChainId recoveryKeyChainId,
+        string identifier,
         string verifierHash
     )
     {
         if (recoveryKeyChainId.IsEmpty)
             return RecoveryKeyFaults.RecoveryKeyChainIdRequiredForCreation;
 
+        if (string.IsNullOrWhiteSpace(identifier))
+            return RecoveryKeyFaults.IdentifierRequiredForCreation;
+        
         if (string.IsNullOrWhiteSpace(verifierHash))
             return RecoveryKeyFaults.VerifierHashRequiredForCreation;
 
         RecoveryKey recoveryKey = new
         (
             recoveryKeyChainId: recoveryKeyChainId,
+            identifier: identifier,
             verifierHash: verifierHash
         );
 

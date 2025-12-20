@@ -10,13 +10,7 @@ public static class RecoveryKeyChainFaults
         title: "RecoveryKeyChain.UserIdRequiredForCreation",
         detail: "A user ID is required to create recovery keys."
     );
-
-    public static readonly Fault KeyIdentifierRequiredForCreation = Fault.Validation
-    (
-        title: "RecoveryKeyChain.KeyIdentifierRequiredForCreation",
-        detail: "A key identifier is required to create recovery keys."
-    );
-
+    
     public static readonly Fault InvalidRecoveryKeyCount = Fault.Validation
     (
         title: "RecoveryKeyChain.InvalidRecoveryKeyCount",
