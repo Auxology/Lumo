@@ -82,4 +82,18 @@ public sealed class LoginRequest : AggregateRoot<LoginRequestId>
         
         return loginRequest;
     }
+
+    public Outcome Consume(DateTimeOffset utcNow)
+    {
+        if (ConsumedAt is not null)
+            return LoginRequestFaults.InvalidOrExpired;
+
+        if (ExpiresAt <= utcNow)
+            return LoginRequestFaults.InvalidOrExpired;
+        
+        ConsumedAt = utcNow;
+
+        return Outcome.Success();
+    }
+    
 }

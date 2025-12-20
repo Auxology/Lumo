@@ -27,6 +27,13 @@ public static class LoginRequestFaults
         title: "LoginRequest.MagicLinkTokenHashRequiredForCreation",
         detail: "A magic link token hash is required to create a login request."
     );
+    
+    public static readonly Fault InvalidOrExpired = Fault.Validation
+    (
+        title: "LoginRequest.InvalidOrExpired",
+        detail: "The provider token is invalid or has expired."
+    );
 }
+
 
 
