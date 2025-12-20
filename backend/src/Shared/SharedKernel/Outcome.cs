@@ -32,6 +32,7 @@ public class Outcome
     public static Outcome<TValue> Failure<TValue>(Fault fault) => 
         new(default, false, fault);
     
+    
     public static implicit operator Outcome(Fault fault) =>
         fault == Fault.None ? Success() : Failure(fault);
 }
