@@ -14,6 +14,8 @@
     
     <ItemGroup>
         <PackageReference Include="Microsoft.EntityFrameworkCore" />
+        <PackageReference Include="Mediator.SourceGenerator" PrivateAssets="all" />
+        <PackageReference Include="Mediator.Abstractions" />
     </ItemGroup>
 
 </Project>
