@@ -55,6 +55,10 @@ services:
       - Jwt__SecretKey=${JWT_SECRET_KEY:?JWT_SECRET_KEY is required}
       - Jwt__AccessTokenExpiration=${JWT_ACCESS_TOKEN_EXPIRATION:-00:10:00}
       - Jwt__RefreshTokenExpiration=${JWT_REFRESH_TOKEN_EXPIRATION:-30.00:00:00}
+
+      # DatabaseOptions
+      - Database__ConnectionString=${AUTH_DATABASE_CONNECTION_STRING:?AUTH_DATABASE_CONNECTION_STRING is required}
+      - Database__EnableSensitiveDataLogging=${AUTH_DATABASE_ENABLE_SENSITIVE_DATA_LOGGING:-false}
     networks:
       - lumo-network
     depends_on:
@@ -66,7 +70,22 @@ services:
         condition: service_healthy
       gateway.api:
         condition: service_healthy
+      auth-database:
+        condition: service_healthy
     restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "curl",
+          "--fail",
+          "--silent",
+          "http://localhost:5100/health/live",
+        ]
+      interval: ${AUTH_HEALTHCHECK_INTERVAL:-10s}
+      timeout: ${AUTH_HEALTHCHECK_TIMEOUT:-5s}
+      retries: ${AUTH_HEALTHCHECK_RETRIES:-3}
+      start_period: ${AUTH_HEALTHCHECK_START_PERIOD:-30s}
     deploy:
       resources:
         limits:
@@ -76,4 +95,3 @@ services:
     labels:
       - "lumo.service=auth-api"
       - "lumo.tier=application"
-

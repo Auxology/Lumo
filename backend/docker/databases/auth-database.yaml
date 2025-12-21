@@ -1,0 +1,36 @@
+services:
+  auth-database:
+    image: postgres:${POSTGRES_VERSION:-17-alpine}
+    container_name: lumo-auth-database
+    ports:
+      - "${AUTH_DATABASE_PORT:-5432}:5432"
+    volumes:
+      - auth-database-data:/var/lib/postgresql/data
+    networks:
+      - lumo-network
+    restart: unless-stopped
+    environment:
+      # PostgreSQL Configuration
+      - POSTGRES_DB=${AUTH_DATABASE_NAME:-auth}
+      - POSTGRES_USER=${AUTH_DATABASE_USER:-auth_user}
+      - POSTGRES_PASSWORD=${AUTH_DATABASE_PASSWORD:?AUTH_DATABASE_PASSWORD is required}
+      - PGDATA=${AUTH_DATABASE_PGDATA:-/var/lib/postgresql/data/pgdata}
+    deploy:
+      resources:
+        limits:
+          memory: ${AUTH_DATABASE_MEMORY_LIMIT:-512M}
+        reservations:
+          memory: ${AUTH_DATABASE_MEMORY_RESERVATION:-256M}
+    labels:
+      - "lumo.service=auth-database"
+      - "lumo.tier=infrastructure"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${AUTH_DATABASE_USER:-auth_user} -d ${AUTH_DATABASE_NAME:-auth}",
+        ]
+      interval: ${AUTH_DATABASE_HEALTHCHECK_INTERVAL:-10s}
+      timeout: ${AUTH_DATABASE_HEALTHCHECK_TIMEOUT:-5s}
+      retries: ${AUTH_DATABASE_HEALTHCHECK_RETRIES:-5}
+      start_period: ${AUTH_DATABASE_HEALTHCHECK_START_PERIOD:-15s}
