@@ -55,6 +55,8 @@ public static class DependencyInjection
     {
         services.AddSingleton<ITokenProvider, TokenProvider>();
         
+        services.AddSingleton<IRecoveryKeyService, RecoveryKeyService>();
+        
         return services;
     }
 }

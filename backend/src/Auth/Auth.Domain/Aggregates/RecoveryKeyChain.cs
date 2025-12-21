@@ -43,29 +43,29 @@ public sealed class RecoveryKeyChain : AggregateRoot<RecoveryKeyChainId>
     public static Outcome<RecoveryKeyChain> Create
     (
         UserId userId,
-        IReadOnlyCollection<(string identifier, string verifierHash)> recoveryKeyPairs,
+        IReadOnlyCollection<RecoverKeyInput> recoverKeyInputs,
         DateTimeOffset utcNow
     )
     {
-        ArgumentNullException.ThrowIfNull(recoveryKeyPairs);
+        ArgumentNullException.ThrowIfNull(recoverKeyInputs);
         
         if (userId.IsEmpty)
             return RecoveryKeyChainFaults.UserIdRequiredForCreation;
 
-        if (recoveryKeyPairs.Count != RecoveryKeyConstants.MaxKeysPerChain)
+        if (recoverKeyInputs.Count != RecoveryKeyConstants.MaxKeysPerChain)
             return RecoveryKeyChainFaults.InvalidRecoveryKeyCount;
 
         RecoveryKeyChainId recoveryKeyChainId = RecoveryKeyChainId.New();
         
         List<RecoveryKey> recoveryKeys = new(capacity: RecoveryKeyConstants.MaxKeysPerChain);
 
-        foreach ((string identifier, string verifierHash) recoveryKeysPair in recoveryKeyPairs)
+        foreach (RecoverKeyInput recoverKeyInput in recoverKeyInputs)
         {
             Outcome<RecoveryKey> recoveryKeyOutcome = RecoveryKey.Create
             (
                 recoveryKeyChainId: recoveryKeyChainId,
-                identifier: recoveryKeysPair.identifier,
-                verifierHash: recoveryKeysPair.verifierHash
+                identifier: recoverKeyInput.Identifier,
+                verifierHash: recoverKeyInput.VerifierHash
             );
             
             if (recoveryKeyOutcome.IsFailure)
