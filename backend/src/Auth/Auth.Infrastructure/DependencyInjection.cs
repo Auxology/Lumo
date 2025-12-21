@@ -1,4 +1,6 @@
+using Auth.Application.Abstractions.Authentication;
 using Auth.Application.Abstractions.Data;
+using Auth.Infrastructure.Authentication;
 using Auth.Infrastructure.Data;
 using Auth.Infrastructure.Options;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +16,8 @@ public static class DependencyInjection
         AddInfrastructure(this IServiceCollection services, IConfiguration configuration) =>
         services
             .AddSharedKernelInfrastructure(configuration)
-            .AddDatabase(configuration);
+            .AddDatabase(configuration)
+            .AddAuthenticationInternal();
 
     private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
@@ -44,6 +47,13 @@ public static class DependencyInjection
                 name: "auth-postgresql",
                 tags: ["ready"]
             );
+        
+        return services;
+    }
+
+    private static IServiceCollection AddAuthenticationInternal(this IServiceCollection services)
+    {
+        services.AddSingleton<ITokenProvider, TokenProvider>();
         
         return services;
     }

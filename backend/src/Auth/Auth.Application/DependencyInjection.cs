@@ -24,7 +24,7 @@ public static class DependencyInjection
     
     private static IServiceCollection AddFluentValidation(this IServiceCollection services)
     {
-        services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
+        services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly, includeInternalTypes: true);
         
         return services;
     }
