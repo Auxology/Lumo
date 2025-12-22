@@ -42,6 +42,7 @@ HealthCheckOptions healthCheckOptions = new()
 
 app.UseFastEndpoints(c =>
 {
+    c.Versioning.PrependToRoute = true;
     c.Versioning.Prefix = "v";
     c.Versioning.DefaultVersion = 1;
 });
@@ -52,11 +53,7 @@ if (app.Environment.IsDevelopment())
     app.Configuration.GetSection(AuthApiOptions.SectionName).Bind(authApiOptions);
 
     app.UseSwaggerGen();
-    app.MapOpenApi();
-    app.UseOpenApi(options =>
-    {
-        options.Path = authApiOptions.OpenApiRoutePattern;
-    });
+
     app.MapScalarApiReference(options =>
     {
         options

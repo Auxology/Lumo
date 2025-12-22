@@ -15,7 +15,7 @@ internal static class DependencyInjection
             .Bind(configuration.GetSection(AuthApiOptions.SectionName))
             .ValidateDataAnnotations()
             .ValidateOnStart();
-        
+
         AuthApiOptions authApiOptions = new();
         configuration.GetSection(AuthApiOptions.SectionName).Bind(authApiOptions);
 
@@ -29,6 +29,7 @@ internal static class DependencyInjection
 
         services.SwaggerDocument(o =>
         {
+            o.MaxEndpointVersion = 1;
             o.DocumentSettings = s =>
             {
                 s.Title = authApiOptions.Title;

@@ -1,6 +1,6 @@
 namespace Auth.Api.Endpoints.Users.SignUp;
 
-public sealed record SignUpEndpointResponse
+internal sealed record SignUpEndpointResponse
 (
     IReadOnlyCollection<string> UserFriendlyRecoveryKeys
 );

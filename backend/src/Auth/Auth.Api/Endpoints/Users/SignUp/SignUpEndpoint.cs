@@ -4,7 +4,7 @@ using Mediator;
 
 namespace Auth.Api.Endpoints.Users.SignUp;
 
-public sealed class SignUpEndpoint : BaseEndpoint<SignUpRequest, SignUpEndpointResponse>
+internal sealed class SignUpEndpoint : BaseEndpoint<SignUpRequest, SignUpEndpointResponse>
 {
     private readonly ISender _sender;
 

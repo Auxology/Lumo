@@ -4,7 +4,7 @@ using SharedKernel.Api.Infrastructure;
 
 namespace Auth.Api.Endpoints;
 
-public abstract class BaseEndpoint<TRequest, TResponse> : Endpoint<TRequest, TResponse>
+internal abstract class BaseEndpoint<TRequest, TResponse> : Endpoint<TRequest, TResponse>
     where TRequest : notnull
     where TResponse : notnull
 {
