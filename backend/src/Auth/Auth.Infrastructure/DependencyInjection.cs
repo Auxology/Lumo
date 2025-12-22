@@ -37,7 +37,8 @@ public static class DependencyInjection
         {
             options
                 .UseNpgsql(databaseOptions.ConnectionString)
-                .UseSnakeCaseNamingConvention();
+                .UseSnakeCaseNamingConvention()
+                .EnableSensitiveDataLogging(databaseOptions.EnableSensitiveDataLogging);
         });
         
         services.AddScoped<IAuthDbContext>(sp => sp.GetRequiredService<AuthDbContext>());

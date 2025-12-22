@@ -8,6 +8,3 @@ public interface IRecoveryKeyService
 
     bool VerifyRecoveryKey(string verifier, string hashedVerifier);
 }
-
-
-

@@ -16,9 +16,6 @@ internal abstract class BaseEndpoint<TRequest, TResponse> : Endpoint<TRequest, T
         CancellationToken cancellationToken = default
     )
     {
-        ArgumentNullException.ThrowIfNull(outcome);
-        ArgumentNullException.ThrowIfNull(mapper);
-        
         if (outcome.IsFailure)
         {
             await Send.ResultAsync(CustomResults.Problem(outcome, HttpContext));

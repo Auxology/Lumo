@@ -26,7 +26,7 @@ public sealed class User : AggregateRoot<UserId>
     private User() {} // For EF Core
 
     [SetsRequiredMembers]
-    public User
+    private User
     (
         string displayName,
         EmailAddress emailAddress,
@@ -103,11 +103,9 @@ public sealed class User : AggregateRoot<UserId>
         return Outcome.Success();
     }
     
-    public Outcome RemoveAvatarKey(DateTimeOffset utcNow)
+    public void RemoveAvatarKey(DateTimeOffset utcNow)
     {
         AvatarKey = null;
         UpdatedAt = utcNow;
-
-        return Outcome.Success();
     }
 }
