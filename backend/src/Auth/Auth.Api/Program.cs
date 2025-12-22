@@ -1,28 +1,24 @@
 using System.Text.Json;
+using Auth.Api;
+using Auth.Api.Options;
 using Auth.Application;
 using Auth.Infrastructure;
+using FastEndpoints;
+using FastEndpoints.Swagger;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using SharedKernel.Api;
+using Scalar.AspNetCore;
 using SharedKernel.Infrastructure.Observability;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddOpenApi();
-
 builder.Services
     .AddApplication()
-    .AddSharedKernelApi()
-    .AddInfrastructure(builder.Configuration)
-    .AddAuthorization();
+    .AddAuthApi(builder.Configuration)
+    .AddInfrastructure(builder.Configuration);
 
 builder.Host.ConfigureSerilog();
 
 var app = builder.Build();
-
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
 
 HealthCheckOptions healthCheckOptions = new()
 {
@@ -43,6 +39,31 @@ HealthCheckOptions healthCheckOptions = new()
         await context.Response.WriteAsync(result);
     }
 };
+
+app.UseFastEndpoints(c =>
+{
+    c.Versioning.Prefix = "v";
+    c.Versioning.DefaultVersion = 1;
+});
+
+if (app.Environment.IsDevelopment())
+{
+    AuthApiOptions authApiOptions = new();
+    app.Configuration.GetSection(AuthApiOptions.SectionName).Bind(authApiOptions);
+
+    app.UseSwaggerGen();
+    app.MapOpenApi();
+    app.UseOpenApi(options =>
+    {
+        options.Path = authApiOptions.OpenApiRoutePattern;
+    });
+    app.MapScalarApiReference(options =>
+    {
+        options
+            .WithTitle(authApiOptions.Title)
+            .WithOpenApiRoutePattern(authApiOptions.SwaggerRoutePattern);
+    });
+}
 
 app.MapHealthChecks("/health", healthCheckOptions);
 

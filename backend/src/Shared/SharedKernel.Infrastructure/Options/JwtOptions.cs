@@ -20,4 +20,7 @@ public sealed class JwtOptions
 
     [Range(typeof(TimeSpan), "00:01:00", "365.00:00:00")]
     public TimeSpan RefreshTokenExpiration { get; init; } = TimeSpan.FromDays(30);
+
+    [Required]
+    public bool RequireHttpsMetadata { get; init; } 
 }

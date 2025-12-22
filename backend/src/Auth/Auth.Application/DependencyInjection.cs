@@ -1,4 +1,5 @@
 using FluentValidation;
+using Mediator;
 using Microsoft.Extensions.DependencyInjection;
 using SharedKernel.Application.Pipelines;
 
@@ -15,7 +16,7 @@ public static class DependencyInjection
     {
         services.AddMediator(options =>
         {
-            options.Assemblies = [typeof(DependencyInjection).Assembly];
+            options.ServiceLifetime = ServiceLifetime.Scoped;
             options.PipelineBehaviors = [typeof(ValidationPipeline<,>), typeof(LoggingPipeline<,>)];
         });
 
