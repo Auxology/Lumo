@@ -3,9 +3,9 @@ using FluentValidation;
 
 namespace Auth.Application.Users.SignUp;
 
-internal sealed class SignUpCommandValidator : AbstractValidator<SignUpCommand>
+internal sealed class SignUpValidator : AbstractValidator<SignUpCommand>
 {
-    public SignUpCommandValidator()
+    public SignUpValidator()
     {
         RuleFor(suc => suc.DisplayName)
             .NotEmpty().WithMessage("Display Name is required")

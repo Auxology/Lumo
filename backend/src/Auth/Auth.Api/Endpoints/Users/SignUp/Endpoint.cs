@@ -4,11 +4,11 @@ using Mediator;
 
 namespace Auth.Api.Endpoints.Users.SignUp;
 
-internal sealed class SignUpEndpoint : BaseEndpoint<SignUpRequest, SignUpEndpointResponse>
+internal sealed class Endpoint : BaseEndpoint<Request, Response>
 {
     private readonly ISender _sender;
 
-    public SignUpEndpoint(ISender sender)
+    public Endpoint(ISender sender)
     {
         _sender = sender;
     }
@@ -23,28 +23,27 @@ internal sealed class SignUpEndpoint : BaseEndpoint<SignUpRequest, SignUpEndpoin
         {
             d.WithSummary("Sign Up")
                 .WithDescription("Creates a new user account.")
-                .Produces<SignUpEndpointResponse>(201, "application/json")
+                .Produces<Response>(201, "application/json")
                 .ProducesProblemDetails(400, "application/json")
                 .ProducesProblemDetails(409, "application/json")
                 .WithTags(CustomTags.Users);
         });
     }
 
-    public override async Task HandleAsync(SignUpRequest request, CancellationToken ct)
+    public override async Task HandleAsync(Request endpointRequest, CancellationToken ct)
     {
         SignUpCommand command = new
         (
-            DisplayName: request.DisplayName,
-            EmailAddress: request.EmailAddress
+            DisplayName: endpointRequest.DisplayName,
+            EmailAddress: endpointRequest.EmailAddress
         );
 
         await SendOutcomeAsync
         (
             outcome: await _sender.Send(command, ct),
-            mapper: r => new SignUpEndpointResponse(UserFriendlyRecoveryKeys: r.UserFriendlyRecoveryKeys),
+            mapper: r => new Response(UserFriendlyRecoveryKeys: r.UserFriendlyRecoveryKeys),
             successStatusCode: 201,
             ct
         );
     }
-
 }

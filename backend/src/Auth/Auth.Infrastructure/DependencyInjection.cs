@@ -59,7 +59,7 @@ public static class DependencyInjection
         services.AddSingleton<JsonWebTokenHandler>();
         services.AddSingleton<ITokenProvider, TokenProvider>();
         
-        services.AddSingleton<IRecoveryKeyService, RecoveryKeyService>();
+        services.AddSingleton<ISecureTokenGenerator, SecureTokenGenerator>();
         
         return services;
     }

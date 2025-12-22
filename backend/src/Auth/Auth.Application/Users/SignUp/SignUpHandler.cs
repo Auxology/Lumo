@@ -1,8 +1,8 @@
 using Auth.Application.Abstractions.Authentication;
 using Auth.Application.Abstractions.Data;
 using Auth.Application.Faults;
-using Auth.Application.Models;
 using Auth.Domain.Aggregates;
+using Auth.Domain.Constants;
 using Auth.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
@@ -10,9 +10,9 @@ using SharedKernel.Application.Messaging;
 
 namespace Auth.Application.Users.SignUp;
 
-internal sealed class SignUpCommandHandler(
+internal sealed class SignUpHandler(
     IAuthDbContext dbContext,
-    IRecoveryKeyService recoveryKeyService,
+    ISecureTokenGenerator secureTokenGenerator,
     IDateTimeProvider dateTimeProvider) : ICommandHandler<SignUpCommand, SignUpResponse>
 {
     public async ValueTask<Outcome<SignUpResponse>> Handle(SignUpCommand request, CancellationToken cancellationToken)
@@ -41,13 +41,13 @@ internal sealed class SignUpCommandHandler(
             return userOutcome.Fault;
         
         User user = userOutcome.Value;
-
-        GeneratedRecoveryKeys generatedRecoveryKeys = recoveryKeyService.GenerateRecoveryKeys();
+        
+        (List<RecoverKeyInput> recoverKeyInputs, List<string> userFriendlyKeys) = GenerateRecoveryKeys();
         
         Outcome<RecoveryKeyChain> recoveryKeyChainOutcome = RecoveryKeyChain.Create
         (
             userId: user.Id,
-            recoverKeyInputs: generatedRecoveryKeys.RecoverKeyInputs,
+            recoverKeyInputs: recoverKeyInputs,
             utcNow: dateTimeProvider.UtcNow
         );
         
@@ -62,9 +62,27 @@ internal sealed class SignUpCommandHandler(
 
         SignUpResponse response = new
         (
-            UserFriendlyRecoveryKeys: generatedRecoveryKeys.UserFriendlyRecoveryKeys
+            UserFriendlyRecoveryKeys: userFriendlyKeys
         );
         
         return response;
+    }
+
+    private (List<RecoverKeyInput> recoverKeyInputs, List<string> UserFriendlyRecoveryKeys) GenerateRecoveryKeys()
+    {
+        List<RecoverKeyInput> recoverKeyInputs = new(RecoveryKeyConstants.MaxKeysPerChain);
+        List<string> userFriendlyRecoveryKeys = new(RecoveryKeyConstants.MaxKeysPerChain);
+        
+        for (int i = 0; i < RecoveryKeyConstants.MaxKeysPerChain; i++)
+        {
+            string identifier = secureTokenGenerator.GenerateToken(RecoveryKeyConstants.IdentifierLength);
+            string verifier = secureTokenGenerator.GenerateToken(RecoveryKeyConstants.VerifierLength);
+            string verifierHash = secureTokenGenerator.HashToken(verifier);
+            
+            recoverKeyInputs.Add(RecoverKeyInput.Create(identifier, verifierHash));
+            userFriendlyRecoveryKeys.Add($"{identifier}.{verifier}");        
+        }
+        
+        return (recoverKeyInputs, userFriendlyRecoveryKeys);
     }
 }
