@@ -485,3 +485,5 @@ $RECYCLE.BIN/
 .cursor
 .cursorrules
 .idea
+
+**/appsettings.Development.json

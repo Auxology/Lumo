@@ -11,6 +11,15 @@ internal sealed class RecoveryKeyChainConfiguration : IEntityTypeConfiguration<R
     {
         b.HasKey(rkc => rkc.Id);
 
+        b.Property(rkc => rkc.Id)
+            .ValueGeneratedNever()
+            .HasConversion
+            (
+                id => id.Value,
+                guid => RecoveryKeyChainId.UnsafeFromGuid(guid)
+            )
+            .HasColumnType("uuid");
+
         b.Property(rkc => rkc.UserId)
             .IsRequired()
             .HasConversion

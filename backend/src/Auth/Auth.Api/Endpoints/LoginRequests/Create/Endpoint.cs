@@ -22,8 +22,8 @@ internal sealed class
 
         Description(d =>
         {
-            d.WithSummary("Sign Up")
-                .WithDescription("Creates a new user account.")
+            d.WithSummary("Create Login Request")
+                .WithDescription("Initiates a login request and sends OTP/magic link to the user's email.")
                 .Produces<Response>(201, "application/json")
                 .ProducesProblemDetails(400, "application/json")
                 .WithTags(CustomTags.LoginRequests);
@@ -37,10 +37,10 @@ internal sealed class
         await SendOutcomeAsync
         (
             outcome: await _sender.Send(command, ct),
-            mapper: clrr => new Response
+            mapper: clr => new Response
                 (
-                    TokenKey: clrr.TokenKey,
-                    ExpiresAt: clrr.ExpiresAt
+                    TokenKey: clr.TokenKey,
+                    ExpiresAt: clr.ExpiresAt
                 ),
             successStatusCode: 201,
             ct

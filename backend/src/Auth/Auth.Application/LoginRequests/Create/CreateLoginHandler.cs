@@ -16,7 +16,8 @@ internal sealed class CreateLoginHandler(
     IRequestContext requestContext,
     IDateTimeProvider dateTimeProvider) : ICommandHandler<CreateLoginCommand, CreateLoginResponse>
 {
-    public async ValueTask<Outcome<CreateLoginResponse>> Handle(CreateLoginCommand request, CancellationToken cancellationToken)
+    public async ValueTask<Outcome<CreateLoginResponse>> Handle(CreateLoginCommand request,
+        CancellationToken cancellationToken)
     {
         Outcome<EmailAddress> emailAddressOutcome = EmailAddress.Create(request.EmailAddress);
         
