@@ -1,22 +1,22 @@
 using FluentValidation;
 using FluentValidation.Results;
-using MediatR;
+using Mediator;
 using ValidationResult = FluentValidation.Results.ValidationResult;
 
 namespace SharedKernel.Application.Pipelines;
 
 public sealed class ValidationPipeline<TRequest, TResponse>(IEnumerable<IValidator<TRequest>> validators)
-    : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse>
+    : IPipelineBehavior<TRequest, TResponse> where TRequest : IMessage
 {
-    public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next,
+    public async ValueTask<TResponse> Handle(TRequest message, MessageHandlerDelegate<TRequest, TResponse> next,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(next);
-        
+
         if (!validators.Any())
-            return await next(cancellationToken);
-        
-        ValidationContext<TRequest> context = new(request);
+            return await next(message, cancellationToken);
+
+        ValidationContext<TRequest> context = new(message);
 
         ValidationResult[] validationResults =
             await Task.WhenAll(validators.Select(v => v.ValidateAsync(context, cancellationToken)));
@@ -25,10 +25,10 @@ public sealed class ValidationPipeline<TRequest, TResponse>(IEnumerable<IValidat
             .SelectMany(vr => vr.Errors)
             .Where(vf => vf != null)
             .ToArray();
-        
+
         if (validationFailures.Length == 0)
-            return await next(cancellationToken);
-        
+            return await next(message, cancellationToken);
+
         ValidationFault validationFault = CreateValidationFault(validationFailures);
 
         return (TResponse)(object)validationFault;

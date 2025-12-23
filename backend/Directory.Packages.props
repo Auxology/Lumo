@@ -7,7 +7,8 @@
     <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.17.0.131074" />
     <!-- Application -->
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.1" />
-    <PackageVersion Include="MediatR" Version="14.0.0" />
+    <PackageVersion Include="Mediator.SourceGenerator" Version="3.1.0-preview.14" />
+    <PackageVersion Include="Mediator.Abstractions" Version="3.1.0-preview.14" />
     <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
     <!-- Infrastructure -->
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.1" />
@@ -41,6 +42,7 @@
     <!-- Health Checks -->
     <PackageVersion Include="AspnetCore.HealthChecks.Uris" Version="9.0.0" />
     <PackageVersion Include="AspnetCore.HealthChecks.Redis" Version="9.0.0" />
+    <PackageVersion Include="AspnetCore.HealthChecks.NpgSql" Version="9.0.0" />
     
     <PackageVersion Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="10.0.1" />
     

@@ -1,0 +1,50 @@
+using Auth.Application.Abstractions.Data;
+using Auth.Infrastructure.Data;
+using Auth.Infrastructure.Options;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using SharedKernel.Infrastructure;
+
+namespace Auth.Infrastructure;
+
+public static class DependencyInjection
+{
+    public static IServiceCollection
+        AddInfrastructure(this IServiceCollection services, IConfiguration configuration) =>
+        services
+            .AddSharedKernelInfrastructure(configuration)
+            .AddDatabase(configuration);
+
+    private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
+    {
+        ArgumentNullException.ThrowIfNull(configuration);
+        
+        services.AddOptions<DatabaseOptions>()
+            .Bind(configuration.GetSection(DatabaseOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+        
+        DatabaseOptions databaseOptions = new();
+        configuration.GetSection(DatabaseOptions.SectionName).Bind(databaseOptions);
+
+        services.AddDbContext<AuthDbContext>(options =>
+        {
+            options
+                .UseNpgsql(databaseOptions.ConnectionString)
+                .UseSnakeCaseNamingConvention();
+        });
+        
+        services.AddScoped<IAuthDbContext>(sp => sp.GetRequiredService<AuthDbContext>());
+
+        services.AddHealthChecks()
+            .AddNpgSql
+            (
+                connectionString: databaseOptions.ConnectionString,
+                name: "auth-postgresql",
+                tags: ["ready"]
+            );
+        
+        return services;
+    }
+}

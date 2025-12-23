@@ -18,6 +18,7 @@
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" />
         <PackageReference Include="EFCore.NamingConventions" />
+        <PackageReference Include="AspNetCore.HealthChecks.NpgSql" />
     </ItemGroup>
 
 </Project>
