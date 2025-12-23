@@ -55,6 +55,7 @@ services:
       - Jwt__SecretKey=${JWT_SECRET_KEY:?JWT_SECRET_KEY is required}
       - Jwt__AccessTokenExpiration=${JWT_ACCESS_TOKEN_EXPIRATION:-00:10:00}
       - Jwt__RefreshTokenExpiration=${JWT_REFRESH_TOKEN_EXPIRATION:-30.00:00:00}
+      - Jwt__RequireHttpsMetadata=${JWT_REQUIRE_HTTPS_METADATA:-false}
 
       # DatabaseOptions
       - Database__ConnectionString=${AUTH_DATABASE_CONNECTION_STRING:?AUTH_DATABASE_CONNECTION_STRING is required}

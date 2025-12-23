@@ -1,9 +1,12 @@
+using Auth.Application.Abstractions.Authentication;
 using Auth.Application.Abstractions.Data;
+using Auth.Infrastructure.Authentication;
 using Auth.Infrastructure.Data;
 using Auth.Infrastructure.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.JsonWebTokens;
 using SharedKernel.Infrastructure;
 
 namespace Auth.Infrastructure;
@@ -14,7 +17,9 @@ public static class DependencyInjection
         AddInfrastructure(this IServiceCollection services, IConfiguration configuration) =>
         services
             .AddSharedKernelInfrastructure(configuration)
-            .AddDatabase(configuration);
+            .AddDatabase(configuration)
+            .AddAuthenticationInternal()
+            .AddAuthorization();
 
     private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
@@ -32,7 +37,8 @@ public static class DependencyInjection
         {
             options
                 .UseNpgsql(databaseOptions.ConnectionString)
-                .UseSnakeCaseNamingConvention();
+                .UseSnakeCaseNamingConvention()
+                .EnableSensitiveDataLogging(databaseOptions.EnableSensitiveDataLogging);
         });
         
         services.AddScoped<IAuthDbContext>(sp => sp.GetRequiredService<AuthDbContext>());
@@ -44,6 +50,16 @@ public static class DependencyInjection
                 name: "auth-postgresql",
                 tags: ["ready"]
             );
+        
+        return services;
+    }
+
+    private static IServiceCollection AddAuthenticationInternal(this IServiceCollection services)
+    {
+        services.AddSingleton<JsonWebTokenHandler>();
+        services.AddSingleton<ITokenProvider, TokenProvider>();
+        
+        services.AddSingleton<IRecoveryKeyService, RecoveryKeyService>();
         
         return services;
     }

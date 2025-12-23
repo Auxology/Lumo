@@ -43,44 +43,8 @@ internal sealed class LoginRequestConfiguration : IEntityTypeConfiguration<Login
             .IsRequired()
             .HasMaxLength(DataConfigurationConstants.DefaultStringMaxLength)
             .HasColumnType("varchar");
-        
-        b.ComplexProperty(lr => lr.Fingerprint, fp =>
-        {
-            fp.Property(f => f.IpAddress)
-                .IsRequired()
-                .HasMaxLength(DataConfigurationConstants.MaxIpAddressLength)
-                .HasColumnType("varchar");
-            
-            fp.Property(f => f.UserAgent)
-                .IsRequired()
-                .HasMaxLength(DataConfigurationConstants.MaxUserAgentLength)
-                .HasColumnType("varchar");
-            
-            fp.Property(f => f.Timezone)
-                .IsRequired()
-                .HasMaxLength(DataConfigurationConstants.MaxTimezoneLength)
-                .HasColumnType("varchar");
-            
-            fp.Property(f => f.Language)
-                .IsRequired()
-                .HasMaxLength(DataConfigurationConstants.MaxLanguageLength)
-                .HasColumnType("varchar");
-            
-            fp.Property(f => f.ComputedHash)
-                .IsRequired()
-                .HasMaxLength(DataConfigurationConstants.DefaultStringMaxLength)
-                .HasColumnType("varchar");
-            
-            fp.Property(f => f.NormalizedBrowser)
-                .IsRequired()
-                .HasMaxLength(DataConfigurationConstants.MaxNormalizedBrowserLength)
-                .HasColumnType("varchar");
-            
-            fp.Property(f => f.NormalizedOs)
-                .IsRequired()
-                .HasMaxLength(DataConfigurationConstants.MaxNormalizedOsLength)
-                .HasColumnType("varchar");
-        });
+
+        b.ComplexProperty(lr => lr.Fingerprint, fp => fp.ConfigureFingerprint());
         
         b.Property(lr => lr.CreatedAt)
             .IsRequired()
