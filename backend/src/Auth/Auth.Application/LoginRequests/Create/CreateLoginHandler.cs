@@ -1,0 +1,91 @@
+using Auth.Application.Abstractions.Authentication;
+using Auth.Application.Abstractions.Data;
+using Auth.Domain.Aggregates;
+using Auth.Domain.Constants;
+using Auth.Domain.ValueObjects;
+using Microsoft.EntityFrameworkCore;
+using SharedKernel;
+using SharedKernel.Application.Authentication;
+using SharedKernel.Application.Messaging;
+
+namespace Auth.Application.LoginRequests.Create;
+
+internal sealed class CreateLoginHandler(
+    IAuthDbContext dbContext,
+    ISecureTokenGenerator secureTokenGenerator,
+    IRequestContext requestContext,
+    IDateTimeProvider dateTimeProvider) : ICommandHandler<CreateLoginCommand, CreateLoginResponse>
+{
+    public async ValueTask<Outcome<CreateLoginResponse>> Handle(CreateLoginCommand request,
+        CancellationToken cancellationToken)
+    {
+        Outcome<EmailAddress> emailAddressOutcome = EmailAddress.Create(request.EmailAddress);
+        
+        if (emailAddressOutcome.IsFailure)
+            return emailAddressOutcome.Fault;
+        
+        EmailAddress emailAddress = emailAddressOutcome.Value;
+        
+        Outcome<Fingerprint> fingerprintOutcome = Fingerprint.Create
+        (
+            ipAddress: requestContext.IpAddress,
+            userAgent: requestContext.UserAgent,
+            timezone: requestContext.Timezone,
+            language: requestContext.Language,
+            normalizedBrowser: requestContext.NormalizedBrowser,
+            normalizedOs: requestContext.NormalizedOs
+        );
+        
+        if (fingerprintOutcome.IsFailure)
+            return fingerprintOutcome.Fault;
+
+        Fingerprint fingerprint = fingerprintOutcome.Value;
+        
+        (string tokenKey, string otpToken, string magicLinkToken) = GenerateTokens();
+
+        string otpTokenHash = secureTokenGenerator.HashToken(otpToken);
+        string magicLinkTokenHash = secureTokenGenerator.HashToken(magicLinkToken);
+
+        User? user = await dbContext.Users
+            .FirstOrDefaultAsync(u => u.EmailAddress == emailAddress, cancellationToken);
+
+        if (user is null)
+            return new CreateLoginResponse
+            (
+                TokenKey: tokenKey,
+                ExpiresAt: dateTimeProvider.UtcNow.AddMinutes(LoginRequestConstants.ExpirationMinutes)
+            );
+        
+        Outcome<LoginRequest> loginRequestOutcome = LoginRequest.Create
+        (
+            userId: user.Id,
+            tokenKey: tokenKey,
+            otpTokenHash: otpTokenHash,
+            magicLinkTokenHash: magicLinkTokenHash,
+            fingerprint: fingerprint,
+            utcNow: dateTimeProvider.UtcNow
+        );
+        
+        if (loginRequestOutcome.IsFailure)
+            return loginRequestOutcome.Fault;
+        
+        LoginRequest loginRequest = loginRequestOutcome.Value;
+        
+        await dbContext.LoginRequests.AddAsync(loginRequest, cancellationToken);
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        return new CreateLoginResponse
+        (
+            TokenKey: tokenKey,
+            ExpiresAt: loginRequest.ExpiresAt
+        );
+    }
+
+    private (string tokenKey, string otpToken, string magicLinkToken) GenerateTokens()
+    {
+        string tokenKey = secureTokenGenerator.GenerateToken(LoginRequestConstants.TokenKeyLength);
+        string otpToken = secureTokenGenerator.GenerateToken(LoginRequestConstants.OtpTokenLength);
+        string magicLinkToken = secureTokenGenerator.GenerateToken(LoginRequestConstants.MagicLinkTokenLength);
+        return (tokenKey, otpToken, magicLinkToken);
+    }
+}

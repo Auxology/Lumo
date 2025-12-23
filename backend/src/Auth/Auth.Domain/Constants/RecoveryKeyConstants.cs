@@ -4,7 +4,7 @@ public static class RecoveryKeyConstants
 {
     public const int MaxKeysPerChain = 10;
     
-    public const int IdentifierByteLength = 16;
+    public const int IdentifierLength = 16;
     
-    public const int VerifierByteLength = 32;
+    public const int VerifierLength = 32;
 }

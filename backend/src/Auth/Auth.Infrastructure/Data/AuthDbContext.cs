@@ -11,6 +11,7 @@ internal sealed class AuthDbContext(DbContextOptions<AuthDbContext> options) : D
     public DbSet<Session> Sessions { get; set; }
     public DbSet<RecoveryKeyChain> RecoveryKeyChains { get; set; }
     public DbSet<RecoveryKey> RecoveryKeys { get; set; }
+    public DbSet<LoginRequest> LoginRequests { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

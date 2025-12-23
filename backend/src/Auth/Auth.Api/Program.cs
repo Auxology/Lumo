@@ -58,7 +58,8 @@ if (app.Environment.IsDevelopment())
     {
         options
             .WithTitle(authApiOptions.Title)
-            .WithOpenApiRoutePattern(authApiOptions.SwaggerRoutePattern);
+            .WithOpenApiRoutePattern(authApiOptions.SwaggerRoutePattern)
+            .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
     });
 }
 
