@@ -5,6 +5,7 @@ include:
   - path: services/seq.yaml
   - path: services/jaeger.yaml
   - path: services/gateway.yaml
+  - path: services/auth.yaml
 
 networks:
   lumo-network:

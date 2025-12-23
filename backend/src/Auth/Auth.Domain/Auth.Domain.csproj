@@ -7,12 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="MediatR" />
-        <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+      <ProjectReference Include="..\..\Shared\SharedKernel\SharedKernel.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\SharedKernel\SharedKernel.csproj" />
-    </ItemGroup>
-    
 </Project>

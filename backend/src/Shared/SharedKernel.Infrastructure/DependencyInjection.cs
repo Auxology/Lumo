@@ -37,6 +37,7 @@ public static class DependencyInjection
     {
         services.AddHttpContextAccessor();
         services.AddScoped<IUserContext, UserContext>();
+        services.AddScoped<IRequestContext, RequestContext>();
         services.AddSingleton<IJwtTokenValidator, JwtTokenValidator>();
         services.AddSingleton<ISecretHasher, SecretHasher>();
 
