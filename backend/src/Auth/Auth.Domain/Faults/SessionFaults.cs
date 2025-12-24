@@ -33,17 +33,23 @@ public static class SessionFaults
         title: "Session.RefreshTokenHashRequiredForRefresh",
         detail: "A refresh token hash is required to refresh the session."
     );
-    
+
     public static readonly Fault SessionRevoked = Fault.Unauthorized
     (
         title: "Session.SessionRevoked",
         detail: "The session has been revoked."
     );
-    
+
     public static readonly Fault SessionExpired = Fault.Unauthorized
     (
         title: "Session.SessionExpired",
         detail: "The session has expired."
+    );
+
+    public static readonly Fault RefreshTokenInvalidOrExpired = Fault.Unauthorized
+    (
+        title: "Session.RefreshTokenInvalidOrExpired",
+        detail: "The refresh token is invalid or has expired."
     );
 }
 

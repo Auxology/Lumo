@@ -130,24 +130,27 @@ public sealed class SessionTests
     [Fact]
     public void Refresh_WithValidData_ShouldUpdateTokens()
     {
+        Fingerprint originalFingerprint = CreateValidFingerprint();
         Session session = Session.Create
         (
             userId: ValidUserId,
             refreshTokenKey: ValidRefreshTokenKey,
             refreshTokenHash: ValidRefreshTokenHash,
-            fingerprint: CreateValidFingerprint(),
+            fingerprint: originalFingerprint,
             utcNow: UtcNow
         ).Value;
 
         string newRefreshTokenKey = "new-refresh-key";
         string newRefreshTokenHash = "new-hashed-refresh-token";
+        Fingerprint newFingerprint = CreateValidFingerprint();
         DateTimeOffset refreshTime = UtcNow.AddHours(1);
 
-        Outcome outcome = session.Refresh(newRefreshTokenKey, newRefreshTokenHash, refreshTime);
+        Outcome outcome = session.Refresh(newRefreshTokenKey, newRefreshTokenHash, newFingerprint, refreshTime);
 
         outcome.IsSuccess.Should().BeTrue();
         session.RefreshTokenKey.Should().Be(newRefreshTokenKey);
         session.RefreshTokenHash.Should().Be(newRefreshTokenHash);
+        session.Fingerprint.Should().Be(newFingerprint);
         session.ExpiresAt.Should().Be(refreshTime.AddDays(SessionConstants.SessionExpirationDays));
         session.LastRefreshedAt.Should().Be(refreshTime);
         session.Version.Should().Be(2);
@@ -168,7 +171,7 @@ public sealed class SessionTests
             utcNow: UtcNow
         ).Value;
 
-        Outcome outcome = session.Refresh(newRefreshTokenKey!, "new-hash", UtcNow);
+        Outcome outcome = session.Refresh(newRefreshTokenKey!, "new-hash", CreateValidFingerprint(), UtcNow);
 
         outcome.IsFailure.Should().BeTrue();
         outcome.Fault.Should().Be(SessionFaults.RefreshTokenKeyRequiredForRefresh);
@@ -189,7 +192,7 @@ public sealed class SessionTests
             utcNow: UtcNow
         ).Value;
 
-        Outcome outcome = session.Refresh("new-key", newRefreshTokenHash!, UtcNow);
+        Outcome outcome = session.Refresh("new-key", newRefreshTokenHash!, CreateValidFingerprint(), UtcNow);
 
         outcome.IsFailure.Should().BeTrue();
         outcome.Fault.Should().Be(SessionFaults.RefreshTokenHashRequiredForRefresh);
@@ -209,7 +212,7 @@ public sealed class SessionTests
 
         DateTimeOffset expiredTime = UtcNow.AddDays(SessionConstants.SessionExpirationDays + 1);
 
-        Outcome outcome = session.Refresh("new-key", "new-hash", expiredTime);
+        Outcome outcome = session.Refresh("new-key", "new-hash", CreateValidFingerprint(), expiredTime);
 
         outcome.IsFailure.Should().BeTrue();
         outcome.Fault.Should().Be(SessionFaults.SessionExpired);
@@ -229,7 +232,7 @@ public sealed class SessionTests
 
         session.RevokeDueToLogout(UtcNow);
 
-        Outcome outcome = session.Refresh("new-key", "new-hash", UtcNow);
+        Outcome outcome = session.Refresh("new-key", "new-hash", CreateValidFingerprint(), UtcNow);
 
         outcome.IsFailure.Should().BeTrue();
         outcome.Fault.Should().Be(SessionFaults.SessionRevoked);
