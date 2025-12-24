@@ -30,12 +30,12 @@ internal sealed class Endpoint : BaseEndpoint<Request, Response>
         });
     }
 
-    public override async Task HandleAsync(Request request, CancellationToken ct)
+    public override async Task HandleAsync(Request endpointRequest, CancellationToken ct)
     {
         GetAvatarUploadUrlCommand command = new
         (
-            ContentType: request.ContentType,
-            ContentLength: request.ContentLength
+            ContentType: endpointRequest.ContentType,
+            ContentLength: endpointRequest.ContentLength
         );
 
         await SendOutcomeAsync

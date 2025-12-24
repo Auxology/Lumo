@@ -30,12 +30,12 @@ internal sealed class Endpoint : BaseEndpoint<Request>
         });
     }
 
-    public override async Task HandleAsync(Request request, CancellationToken ct)
+    public override async Task HandleAsync(Request endpointRequest, CancellationToken ct)
     {
         UpdateProfileCommand command = new
         (
-            NewDisplayName: request.NewDisplayName,
-            NewAvatarKey: request.NewAvatarKey
+            NewDisplayName: endpointRequest.NewDisplayName,
+            NewAvatarKey: endpointRequest.NewAvatarKey
         );
 
         await SendOutcomeAsync
