@@ -1,0 +1,57 @@
+using System.Globalization;
+using Amazon.S3;
+using Amazon.S3.Model;
+using Auth.Application.Abstractions.Storage;
+using Auth.Infrastructure.Options;
+using Microsoft.Extensions.Options;
+
+namespace Auth.Infrastructure.Storage;
+
+internal sealed class StorageService(IAmazonS3 s3Client, IOptions<S3Options> s3Options) : IStorageService
+{
+    private readonly S3Options _s3Options = s3Options.Value;
+
+    public async Task<PresignedUploadUrl> GetPresignedUploadUrlAsync(string fileKey, string contentType, long contentLength, TimeSpan expiration,
+        CancellationToken cancellationToken = default)
+    {
+        GetPreSignedUrlRequest request = new()
+        {
+            BucketName = _s3Options.BucketName,
+            Key = fileKey,
+            Verb = HttpVerb.PUT,
+            Expires = DateTime.UtcNow.Add(expiration),
+            ContentType = contentType,
+            Headers =
+            {
+                ["Content-Length"] = contentLength.ToString(CultureInfo.InvariantCulture)
+            }
+        };
+
+        string url = await s3Client.GetPreSignedURLAsync(request);
+        DateTimeOffset expiresAt = DateTimeOffset.UtcNow.Add(expiration);
+
+        PresignedUploadUrl presignedUploadUrl = new(url, expiresAt);
+
+        return presignedUploadUrl;
+    }
+
+    public async Task<bool> FileExistsAsync(string fileKey, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            GetObjectMetadataRequest request = new()
+            {
+                BucketName = _s3Options.BucketName,
+                Key = fileKey
+            };
+
+            await s3Client.GetObjectMetadataAsync(request, cancellationToken);
+
+            return true;
+        }
+        catch (AmazonS3Exception ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            return false;
+        }
+    }
+}
