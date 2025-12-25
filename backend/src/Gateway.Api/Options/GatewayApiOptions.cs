@@ -17,4 +17,8 @@ internal sealed class GatewayApiOptions
 
     [Required]
     public string SwaggerRoutePattern { get; init; } = "/swagger/{documentName}/swagger.json";
+
+    [Required]
+    [Url]
+    public string AuthServiceBaseUrl { get; init; } = string.Empty;
 }

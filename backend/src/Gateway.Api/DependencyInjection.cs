@@ -1,6 +1,8 @@
 using FastEndpoints;
 using FastEndpoints.Swagger;
+using Gateway.Api.Authentication;
 using Gateway.Api.Caching;
+using Gateway.Api.HttpClients;
 using Gateway.Api.Options;
 using SharedKernel.Api;
 using SharedKernel.Infrastructure;
@@ -44,6 +46,13 @@ internal static class DependencyInjection
         });
 
         services.AddScoped<ITokenCacheService, TokenCacheService>();
+
+        services.AddHttpClient<IAuthServiceClient, AuthServiceClient>(client =>
+        {
+            client.BaseAddress = new Uri(gatewayApiOptions.AuthServiceBaseUrl);
+        });
+
+        services.AddScoped<ISessionTokenOrchestrator, SessionTokenOrchestrator>();
 
         return services;
     }
