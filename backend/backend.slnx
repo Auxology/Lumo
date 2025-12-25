@@ -10,6 +10,7 @@
     <Project Path="src/Auth/Auth.Infrastructure/Auth.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/src/Shared/">
+    <Project Path="src/Shared/Contracts/Contracts.csproj" />
     <Project Path="src/Shared/SharedKernel.Api/SharedKernel.Api.csproj" />
     <Project Path="src/Shared/SharedKernel.Application/SharedKernel.Application.csproj" />
     <Project Path="src/Shared/SharedKernel.Infrastructure/SharedKernel.Infrastructure.csproj" />

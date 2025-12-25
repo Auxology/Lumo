@@ -1,10 +1,12 @@
 using Auth.Application.Sessions;
+using Contracts.Requests;
+using Contracts.Responses;
 using FastEndpoints;
 using Mediator;
 
 namespace Auth.Api.Endpoints.Sessions.Refresh;
 
-internal sealed class Endpoint : BaseEndpoint<Request, Response>
+internal sealed class Endpoint : BaseEndpoint<RefreshSessionApiRequest, RefreshSessionApiResponse>
 {
     private readonly ISender _sender;
 
@@ -23,14 +25,14 @@ internal sealed class Endpoint : BaseEndpoint<Request, Response>
         {
             d.WithSummary("Refresh Session")
                 .WithDescription("Refreshes an expired access token using a valid refresh token.")
-                .Produces<Response>(200, "application/json")
+                .Produces<RefreshSessionApiResponse>(200, "application/json")
                 .ProducesProblemDetails(400, "application/json")
                 .ProducesProblemDetails(401, "application/json")
                 .WithTags(CustomTags.Sessions);
         });
     }
 
-    public override async Task HandleAsync(Request endpointRequest, CancellationToken ct)
+    public override async Task HandleAsync(RefreshSessionApiRequest endpointRequest, CancellationToken ct)
     {
         RefreshTokenCommand command = new
         (
@@ -40,7 +42,7 @@ internal sealed class Endpoint : BaseEndpoint<Request, Response>
         await SendOutcomeAsync
         (
             outcome: await _sender.Send(command, ct),
-            mapper: rtr => new Response
+            mapper: rtr => new RefreshSessionApiResponse
             (
                 AccessToken: rtr.AccessToken,
                 RefreshToken: rtr.RefreshToken

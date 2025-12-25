@@ -1,4 +1,7 @@
+using FastEndpoints;
+using FastEndpoints.Swagger;
 using Gateway.Api.Caching;
+using Gateway.Api.Options;
 using SharedKernel.Api;
 using SharedKernel.Infrastructure;
 
@@ -9,10 +12,36 @@ internal static class DependencyInjection
     internal static IServiceCollection AddGatewayApi(this IServiceCollection services, IConfiguration configuration)
     {
         services
-            .AddOpenApi()
             .AddSharedKernelApi()
             .AddSharedKernelInfrastructure(configuration)
             .AddSharedHealthChecks(configuration);
+
+        services.AddOptions<GatewayApiOptions>()
+            .Bind(configuration.GetSection(GatewayApiOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        GatewayApiOptions gatewayApiOptions = new();
+        configuration.GetSection(GatewayApiOptions.SectionName).Bind(gatewayApiOptions);
+
+        services.AddFastEndpoints(options =>
+        {
+            options.Assemblies =
+            [
+                typeof(DependencyInjection).Assembly
+            ];
+        });
+
+        services.SwaggerDocument(o =>
+        {
+            o.MaxEndpointVersion = 1;
+            o.DocumentSettings = s =>
+            {
+                s.Title = gatewayApiOptions.Title;
+                s.Description = gatewayApiOptions.Description;
+                s.Version = gatewayApiOptions.Version;
+            };
+        });
 
         services.AddScoped<ITokenCacheService, TokenCacheService>();
 
