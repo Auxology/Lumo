@@ -71,5 +71,7 @@ app.MapHealthChecks("/health/live", new HealthCheckOptions
     Predicate = _ => false,
 });
 
+app.MapReverseProxy();
+
 await app.RunAsync();
 

@@ -59,7 +59,7 @@
         <PackageVersion Include="AWSSDK.S3" Version="4.0.16" />
         <PackageVersion Include="AWSSDK.Extensions.NETCore.Setup" Version="4.0.3.17" />
         <!-- Web.Api -->
-        <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.1" />
+        <PackageVersion Include="Yarp.ReverseProxy" Version="2.3.0" />
         <PackageVersion Include="FastEndpoints" Version="7.1.1" />
         <PackageVersion Include="FastEndpoints.Swagger" Version="7.1.1" />
         <PackageVersion Include="FastEndpoints.Generator" Version="7.1.1" />

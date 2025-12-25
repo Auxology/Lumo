@@ -4,6 +4,7 @@ using Gateway.Api.Authentication;
 using Gateway.Api.Caching;
 using Gateway.Api.HttpClients;
 using Gateway.Api.Options;
+using Gateway.Api.Transforms;
 using SharedKernel.Api;
 using SharedKernel.Infrastructure;
 
@@ -25,6 +26,10 @@ internal static class DependencyInjection
 
         GatewayApiOptions gatewayApiOptions = new();
         configuration.GetSection(GatewayApiOptions.SectionName).Bind(gatewayApiOptions);
+
+        services.AddReverseProxy()
+            .LoadFromConfig(configuration.GetSection("ReverseProxy"))
+            .AddTransforms<AuthTransformProvider>();
 
         services.AddFastEndpoints(options =>
         {
