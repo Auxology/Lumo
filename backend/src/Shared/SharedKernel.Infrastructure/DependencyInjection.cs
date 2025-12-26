@@ -83,13 +83,9 @@ public static class DependencyInjection
         OpenTelemetryOptions openTelemetryOptions = new OpenTelemetryOptions();
         configuration.GetSection(OpenTelemetryOptions.SectionName).Bind(openTelemetryOptions);
 
-        RabbitMqOptions rabbitMqOptions = new RabbitMqOptions();
-        configuration.GetSection(RabbitMqOptions.SectionName).Bind(rabbitMqOptions);
-
         string seqHealthUrl = serilogOptions.Seq.HealthCheckUrl ?? serilogOptions.Seq.ServerUrl + "/api";
 
         string jaegerHealthUrl = openTelemetryOptions.Exporter.HealthCheckUrl ?? openTelemetryOptions.Exporter.Endpoint;
-
 
         services.AddHealthChecks()
             .AddRedis

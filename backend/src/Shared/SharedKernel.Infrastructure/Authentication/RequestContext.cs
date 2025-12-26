@@ -13,12 +13,12 @@ public sealed class RequestContext : IRequestContext
     private static readonly Parser UaParser = Parser.GetDefault();
 
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly Lazy<ClientInfo> _clientInfo;
+
+    private ClientInfo? _clientInfo;
 
     public RequestContext(IHttpContextAccessor httpContextAccessor)
     {
         _httpContextAccessor = httpContextAccessor;
-        _clientInfo = new Lazy<ClientInfo>(() => UaParser.Parse(UserAgent));
     }
 
     private HttpContext HttpContext => _httpContextAccessor.HttpContext
@@ -32,11 +32,11 @@ public sealed class RequestContext : IRequestContext
 
     public string Language => GetPreferredLanguage();
 
-    public string NormalizedBrowser => _clientInfo.Value.UA.Family;
+    public string NormalizedBrowser => (_clientInfo ??= UaParser.Parse(UserAgent)).UA.Family;
 
-    public string NormalizedOs => _clientInfo.Value.OS.Family;
+    public string NormalizedOs => (_clientInfo ??= UaParser.Parse(UserAgent)).OS.Family;
 
-    public string CorrelationId => GetOrCreateCorrelationId();
+    public string CorrelationId => field ??= GetOrCreateCorrelationId();
 
     private string GetClientIpAddress()
     {

@@ -81,6 +81,8 @@ internal sealed class CreateLoginHandler(
             EmailAddress = emailAddress.ToString(),
             OtpToken = otpToken,
             MagicLinkToken = magicLinkToken,
+            IpAddress = requestContext.IpAddress,
+            UserAgent = requestContext.UserAgent,
             ExpiresAt = loginRequest.ExpiresAt
         };
 

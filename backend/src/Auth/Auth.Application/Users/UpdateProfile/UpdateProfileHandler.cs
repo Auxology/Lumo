@@ -3,6 +3,7 @@ using Auth.Application.Abstractions.Storage;
 using Auth.Application.Faults;
 using Auth.Domain.Aggregates;
 using Auth.Domain.ValueObjects;
+using Contracts.IntegrationEvents.Auth;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
 using SharedKernel.Application.Authentication;
@@ -13,7 +14,9 @@ namespace Auth.Application.Users.UpdateProfile;
 internal sealed class UpdateProfileHandler(
     IAuthDbContext dbContext,
     IUserContext userContext,
+    IRequestContext requestContext,
     IStorageService storageService,
+    IMessageBus messageBus,
     IDateTimeProvider dateTimeProvider) : ICommandHandler<UpdateProfileCommand>
 {
     public async ValueTask<Outcome> Handle(UpdateProfileCommand request, CancellationToken cancellationToken)
@@ -41,6 +44,17 @@ internal sealed class UpdateProfileHandler(
 
             if (changeDisplayNameOutcome.IsFailure)
                 return changeDisplayNameOutcome.Fault;
+
+            UserDisplayNameChanged userDisplayNameChanged = new()
+            {
+                EventId = Guid.NewGuid(),
+                OccurredAt = dateTimeProvider.UtcNow,
+                CorrelationId = Guid.Parse(requestContext.CorrelationId),
+                UserId = user.Id.Value,
+                DisplayName = request.NewDisplayName
+            };
+
+            await messageBus.PublishAsync(userDisplayNameChanged, cancellationToken);
         }
 
         if (request.NewAvatarKey is not null)

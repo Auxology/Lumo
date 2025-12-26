@@ -62,11 +62,11 @@ services:
             - Database__EnableSensitiveDataLogging=${AUTH_DATABASE_ENABLE_SENSITIVE_DATA_LOGGING:-false}
 
             # RabbitMqOptions
-            - RabbitMq__Host=${RABBITMQ_HOST:-rabbitmq}
-            - RabbitMq__Port=${RABBITMQ_PORT:-5672}
-            - RabbitMq__VirtualHost=${RABBITMQ_VIRTUAL_HOST:-/}
-            - RabbitMq__Username=${RABBITMQ_USERNAME:-admin}
-            - RabbitMq__Password=${RABBITMQ_PASSWORD:-admin}
+            - RabbitMq__Host=${RABBITMQ_HOST:?RABBITMQ_HOST is required}
+            - RabbitMq__Port=${RABBITMQ_PORT:?RABBITMQ_PORT is required}
+            - RabbitMq__VirtualHost=${RABBITMQ_VIRTUAL_HOST:?RABBITMQ_VIRTUAL_HOST is required}
+            - RabbitMq__Username=${RABBITMQ_USERNAME:?RABBITMQ_USERNAME is required}
+            - RabbitMq__Password=${RABBITMQ_PASSWORD:?RABBITMQ_PASSWORD is required}
 
             # S3Options
             - S3__BucketName=${S3_BUCKET_NAME:?S3_BUCKET_NAME is required}
@@ -75,7 +75,7 @@ services:
             # AWS SDK Credentials
             - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:?AWS_ACCESS_KEY_ID is required}
             - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:?AWS_SECRET_ACCESS_KEY is required}
-            - AWS_REGION=${AWS_REGION:-${S3_REGION}}
+            - AWS_REGION=${S3_REGION:?S3_REGION is required}
 
         networks:
             - lumo-network

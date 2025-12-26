@@ -12,9 +12,9 @@ services:
             - lumo-network
         restart: unless-stopped
         environment:
-            - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER:-admin}
+            - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER:?RABBITMQ_DEFAULT_USER is required}
             - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS:?RABBITMQ_DEFAULT_PASS is required}
-            - RABBITMQ_DEFAULT_VHOST=${RABBITMQ_DEFAULT_VHOST:-/}
+            - RABBITMQ_DEFAULT_VHOST=${RABBITMQ_DEFAULT_VHOST:?RABBITMQ_DEFAULT_VHOST is required}
         deploy:
             resources:
                 limits:

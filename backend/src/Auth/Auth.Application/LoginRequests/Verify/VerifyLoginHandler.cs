@@ -4,6 +4,7 @@ using Auth.Domain.Aggregates;
 using Auth.Domain.Constants;
 using Auth.Domain.Faults;
 using Auth.Domain.ValueObjects;
+using Contracts.IntegrationEvents.Auth;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
 using SharedKernel.Application.Authentication;
@@ -16,6 +17,7 @@ internal sealed class VerifyLoginHandler(
     IRequestContext requestContext,
     ISecureTokenGenerator secureTokenGenerator,
     ITokenProvider tokenProvider,
+    IMessageBus messageBus,
     IDateTimeProvider dateTimeProvider) : ICommandHandler<VerifyLoginCommand, VerifyLoginResponse>
 {
     public async ValueTask<Outcome<VerifyLoginResponse>> Handle(VerifyLoginCommand request,
@@ -36,11 +38,19 @@ internal sealed class VerifyLoginHandler(
 
         Fingerprint fingerprint = fingerprintOutcome.Value;
 
-        LoginRequest? loginRequest = await dbContext.LoginRequests
-            .FirstOrDefaultAsync(lr => lr.TokenKey == request.TokenKey, cancellationToken);
+        var data = await
+        (
+            from lr in dbContext.LoginRequests
+            join u in dbContext.Users on lr.UserId equals u.Id
+            where lr.TokenKey == request.TokenKey
+            select new { LoginRequest = lr, u.EmailAddress }
+        ).FirstOrDefaultAsync(cancellationToken);
 
-        if (loginRequest is null)
+        if (data is null)
             return LoginRequestFaults.InvalidOrExpired;
+
+        LoginRequest loginRequest = data.LoginRequest;
+        EmailAddress emailAddress = data.EmailAddress;
 
         bool isOtpValid = request.OtpToken is not null &&
                           secureTokenGenerator.VerifyToken(request.OtpToken, loginRequest.OtpTokenHash);
@@ -77,7 +87,19 @@ internal sealed class VerifyLoginHandler(
 
         Session session = sessionOutcome.Value;
 
+        LoginVerified loginVerified = new()
+        {
+            EventId = Guid.NewGuid(),
+            OccurredAt = dateTimeProvider.UtcNow,
+            CorrelationId = Guid.Parse(requestContext.CorrelationId),
+            UserId = loginRequest.UserId.Value,
+            EmailAddress = emailAddress.Value,
+            IpAddress = requestContext.IpAddress,
+            UserAgent = requestContext.UserAgent
+        };
+
         await dbContext.Sessions.AddAsync(session, cancellationToken);
+        await messageBus.PublishAsync(loginVerified, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
 
         string accessToken = tokenProvider.CreateToken(loginRequest.UserId.Value, session.Id.Value);
