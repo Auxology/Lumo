@@ -11,7 +11,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.JsonWebTokens;
+using SharedKernel.Application.Messaging;
 using SharedKernel.Infrastructure;
+using SharedKernel.Infrastructure.Messaging;
 using SharedKernel.Infrastructure.Options;
 
 namespace Auth.Infrastructure;
@@ -117,6 +119,8 @@ public static class DependencyInjection
                 cfg.ConfigureEndpoints(context);
             });
         });
+
+        services.AddScoped<IMessageBus, MessageBus>();
 
         return services;
     }

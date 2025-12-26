@@ -4,10 +4,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using SharedKernel.Application.Authentication;
-using SharedKernel.Application.Messaging;
 using SharedKernel.Infrastructure.Authentication;
 using SharedKernel.Infrastructure.Caching;
-using SharedKernel.Infrastructure.Messaging;
 using SharedKernel.Infrastructure.Observability;
 using SharedKernel.Infrastructure.Options;
 using SharedKernel.Infrastructure.Time;
@@ -32,8 +30,6 @@ public static class DependencyInjection
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
-
-        services.AddScoped<IMessageBus, MessageBus>();
 
         return services;
     }

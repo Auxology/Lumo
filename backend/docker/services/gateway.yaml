@@ -49,6 +49,9 @@ services:
             - OpenTelemetry__Metrics__Instrumentation__Runtime=${OTEL_METRICS_RUNTIME:-true}
             - OpenTelemetry__Metrics__Instrumentation__Process=${OTEL_METRICS_PROCESS:-true}
 
+            # GatewayApiOptions
+            - GatewayApi__AuthServiceBaseUrl=${AUTH_SERVICE_BASE_URL:-http://auth.api:5100}
+
             # JwtOptions
             - Jwt__Issuer=${JWT_ISSUER:-https://lumo.local}
             - Jwt__Audience=${JWT_AUDIENCE:-lumo-api}
