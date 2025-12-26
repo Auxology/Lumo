@@ -77,6 +77,6 @@ public sealed class RequestContext : IRequestContext
             return correlationId.ToString();
         }
 
-        return Guid.NewGuid().ToString();
+        return HttpContext.TraceIdentifier;
     }
 }
