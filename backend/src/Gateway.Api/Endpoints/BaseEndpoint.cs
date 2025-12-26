@@ -44,6 +44,9 @@ internal abstract class BaseEndpoint<TRequest> : Endpoint<TRequest>
             return;
         }
 
-        await Send.OkAsync(successStatusCode, cancellationToken);
+        if (successStatusCode == 204)
+            await Send.NoContentAsync(cancellationToken);
+        else
+            await Send.ResponseAsync(null, successStatusCode, cancellationToken);
     }
 }
