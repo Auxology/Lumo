@@ -6,11 +6,15 @@ using Auth.Infrastructure.Authentication;
 using Auth.Infrastructure.Data;
 using Auth.Infrastructure.Options;
 using Auth.Infrastructure.Storage;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.JsonWebTokens;
+using SharedKernel.Application.Messaging;
 using SharedKernel.Infrastructure;
+using SharedKernel.Infrastructure.Messaging;
+using SharedKernel.Infrastructure.Options;
 
 namespace Auth.Infrastructure;
 
@@ -23,7 +27,8 @@ public static class DependencyInjection
             .AddDatabase(configuration)
             .AddAuthenticationInternal()
             .AddAuthorization()
-            .AddStorage(configuration);
+            .AddStorage(configuration)
+            .AddMessaging(configuration);
 
     private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
@@ -78,6 +83,44 @@ public static class DependencyInjection
         services.AddAWSService<IAmazonS3>();
 
         services.AddSingleton<IStorageService, StorageService>();
+
+        return services;
+    }
+
+    private static IServiceCollection AddMessaging(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddOptions<RabbitMqOptions>()
+            .Bind(configuration.GetSection(RabbitMqOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        RabbitMqOptions rabbitMqOptions = new();
+        configuration.GetSection(RabbitMqOptions.SectionName).Bind(rabbitMqOptions);
+
+        services.AddMassTransit(bus =>
+        {
+            bus.AddEntityFrameworkOutbox<AuthDbContext>(outbox =>
+            {
+                outbox.UsePostgres();
+
+                outbox.UseBusOutbox();
+
+                outbox.QueryDelay = TimeSpan.FromSeconds(1);
+            });
+
+            bus.UsingRabbitMq((context, cfg) =>
+            {
+                cfg.Host(rabbitMqOptions.Host, rabbitMqOptions.Port, rabbitMqOptions.VirtualHost, h =>
+                {
+                    h.Username(rabbitMqOptions.Username);
+                    h.Password(rabbitMqOptions.Password);
+                });
+
+                cfg.ConfigureEndpoints(context);
+            });
+        });
+
+        services.AddScoped<IMessageBus, MessageBus>();
 
         return services;
     }

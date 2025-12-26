@@ -1,41 +1,48 @@
 name: lumo
 
 include:
-  - path: services/valkey.yaml
-  - path: services/seq.yaml
-  - path: services/jaeger.yaml
-  - path: services/gateway.yaml
-  - path: services/auth.yaml
-  - path: databases/auth-database.yaml
+    - path: services/valkey.yaml
+    - path: services/seq.yaml
+    - path: services/jaeger.yaml
+    - path: services/gateway.yaml
+    - path: services/auth.yaml
+    - path: services/rabbitmq.yaml
+    - path: databases/auth-database.yaml
 
 networks:
-  lumo-network:
-    name: lumo-network
-    driver: bridge
-    labels:
-      - "lumo.network=internal"
+    lumo-network:
+        name: lumo-network
+        driver: bridge
+        labels:
+            - "lumo.network=internal"
 
 volumes:
-  valkey-data:
-    name: lumo-valkey-data
-    labels:
-      - "lumo.volume=valkey-data"
-      - "lumo.service=valkey"
+    valkey-data:
+        name: lumo-valkey-data
+        labels:
+            - "lumo.volume=valkey-data"
+            - "lumo.service=valkey"
 
-  seq-data:
-    name: lumo-seq-data
-    labels:
-      - "lumo.volume=seq-data"
-      - "lumo.service=seq"
+    seq-data:
+        name: lumo-seq-data
+        labels:
+            - "lumo.volume=seq-data"
+            - "lumo.service=seq"
 
-  jaeger-data:
-    name: lumo-jaeger-data
-    labels:
-      - "lumo.volume=jaeger-data"
-      - "lumo.service=jaeger"
+    jaeger-data:
+        name: lumo-jaeger-data
+        labels:
+            - "lumo.volume=jaeger-data"
+            - "lumo.service=jaeger"
 
-  auth-database-data:
-    name: lumo-auth-database-data
-    labels:
-      - "lumo.volume=auth-database-data"
-      - "lumo.service=auth-database"
+    auth-database-data:
+        name: lumo-auth-database-data
+        labels:
+            - "lumo.volume=auth-database-data"
+            - "lumo.service=auth-database"
+
+    rabbitmq-data:
+        name: lumo-rabbitmq-data
+        labels:
+            - "lumo.volume=rabbitmq-data"
+            - "lumo.service=rabbitmq"

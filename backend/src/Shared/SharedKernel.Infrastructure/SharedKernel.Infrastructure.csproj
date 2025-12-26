@@ -46,6 +46,8 @@
         <PackageReference Include="AspnetCore.HealthChecks.Redis" />
         
         <PackageReference Include="UAParser" />
+        
+        <PackageReference Include="MassTransit" />
     </ItemGroup>
 
 </Project>

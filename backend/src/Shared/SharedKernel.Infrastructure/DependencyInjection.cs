@@ -30,7 +30,7 @@ public static class DependencyInjection
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
-        
+
         return services;
     }
 
@@ -64,7 +64,7 @@ public static class DependencyInjection
                     ClockSkew = TimeSpan.Zero
                 };
             });
-        
+
         return services;
     }
 
