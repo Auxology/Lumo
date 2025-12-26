@@ -1,0 +1,32 @@
+services:
+    rabbitmq:
+        image: rabbitmq:${RABBITMQ_VERSION:-3.13-management-alpine}
+        container_name: lumo-rabbitmq
+        ports:
+            - "${RABBITMQ_AMQP_PORT:-5672}:5672"
+            - "${RABBITMQ_MANAGEMENT_PORT:-15672}:15672"
+        volumes:
+            - rabbitmq-data:/var/lib/rabbitmq
+            - ./config/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+        networks:
+            - lumo-network
+        restart: unless-stopped
+        environment:
+            - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER:-admin}
+            - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS:?RABBITMQ_DEFAULT_PASS is required}
+            - RABBITMQ_DEFAULT_VHOST=${RABBITMQ_DEFAULT_VHOST:-/}
+        deploy:
+            resources:
+                limits:
+                    memory: ${RABBITMQ_MEMORY_LIMIT:-512M}
+                reservations:
+                    memory: ${RABBITMQ_MEMORY_RESERVATION:-256M}
+        labels:
+            - "lumo.service=rabbitmq"
+            - "lumo.tier=infrastructure"
+        healthcheck:
+            test: ["CMD", "rabbitmq-diagnostics", "ping"]
+            interval: ${RABBITMQ_HEALTHCHECK_INTERVAL:-10s}
+            timeout: ${RABBITMQ_HEALTHCHECK_TIMEOUT:-5s}
+            retries: ${RABBITMQ_HEALTHCHECK_RETRIES:-5}
+            start_period: ${RABBITMQ_HEALTHCHECK_START_PERIOD:-30s}

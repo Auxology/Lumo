@@ -3,6 +3,7 @@ using Auth.Application.Abstractions.Data;
 using Auth.Domain.Aggregates;
 using Auth.Domain.Constants;
 using Auth.Domain.ValueObjects;
+using Contracts.IntegrationEvents.Auth;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
 using SharedKernel.Application.Authentication;
@@ -14,18 +15,19 @@ internal sealed class CreateLoginHandler(
     IAuthDbContext dbContext,
     ISecureTokenGenerator secureTokenGenerator,
     IRequestContext requestContext,
+    IMessageBus messageBus,
     IDateTimeProvider dateTimeProvider) : ICommandHandler<CreateLoginCommand, CreateLoginResponse>
 {
     public async ValueTask<Outcome<CreateLoginResponse>> Handle(CreateLoginCommand request,
         CancellationToken cancellationToken)
     {
         Outcome<EmailAddress> emailAddressOutcome = EmailAddress.Create(request.EmailAddress);
-        
+
         if (emailAddressOutcome.IsFailure)
             return emailAddressOutcome.Fault;
-        
+
         EmailAddress emailAddress = emailAddressOutcome.Value;
-        
+
         Outcome<Fingerprint> fingerprintOutcome = Fingerprint.Create
         (
             ipAddress: requestContext.IpAddress,
@@ -35,12 +37,12 @@ internal sealed class CreateLoginHandler(
             normalizedBrowser: requestContext.NormalizedBrowser,
             normalizedOs: requestContext.NormalizedOs
         );
-        
+
         if (fingerprintOutcome.IsFailure)
             return fingerprintOutcome.Fault;
 
         Fingerprint fingerprint = fingerprintOutcome.Value;
-        
+
         (string tokenKey, string otpToken, string magicLinkToken) = GenerateTokens();
 
         string otpTokenHash = secureTokenGenerator.HashToken(otpToken);
@@ -55,7 +57,7 @@ internal sealed class CreateLoginHandler(
                 TokenKey: tokenKey,
                 ExpiresAt: dateTimeProvider.UtcNow.AddMinutes(LoginRequestConstants.ExpirationMinutes)
             );
-        
+
         Outcome<LoginRequest> loginRequestOutcome = LoginRequest.Create
         (
             userId: user.Id,
@@ -65,13 +67,25 @@ internal sealed class CreateLoginHandler(
             fingerprint: fingerprint,
             utcNow: dateTimeProvider.UtcNow
         );
-        
+
         if (loginRequestOutcome.IsFailure)
             return loginRequestOutcome.Fault;
-        
+
         LoginRequest loginRequest = loginRequestOutcome.Value;
-        
+
+        LoginRequested loginRequested = new()
+        {
+            EventId = Guid.NewGuid(),
+            OccurredAt = dateTimeProvider.UtcNow,
+            CorrelationId = Guid.NewGuid(),
+            EmailAddress = emailAddress.ToString(),
+            OtpToken = otpToken,
+            MagicLinkToken = magicLinkToken,
+            ExpiresAt = loginRequest.ExpiresAt
+        };
+
         await dbContext.LoginRequests.AddAsync(loginRequest, cancellationToken);
+        await messageBus.PublishAsync(loginRequested, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
 
         return new CreateLoginResponse

@@ -4,8 +4,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using SharedKernel.Application.Authentication;
+using SharedKernel.Application.Messaging;
 using SharedKernel.Infrastructure.Authentication;
 using SharedKernel.Infrastructure.Caching;
+using SharedKernel.Infrastructure.Messaging;
 using SharedKernel.Infrastructure.Observability;
 using SharedKernel.Infrastructure.Options;
 using SharedKernel.Infrastructure.Time;
@@ -30,7 +32,9 @@ public static class DependencyInjection
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
-        
+
+        services.AddScoped<IMessageBus, MessageBus>();
+
         return services;
     }
 
@@ -64,7 +68,7 @@ public static class DependencyInjection
                     ClockSkew = TimeSpan.Zero
                 };
             });
-        
+
         return services;
     }
 
@@ -83,9 +87,13 @@ public static class DependencyInjection
         OpenTelemetryOptions openTelemetryOptions = new OpenTelemetryOptions();
         configuration.GetSection(OpenTelemetryOptions.SectionName).Bind(openTelemetryOptions);
 
+        RabbitMqOptions rabbitMqOptions = new RabbitMqOptions();
+        configuration.GetSection(RabbitMqOptions.SectionName).Bind(rabbitMqOptions);
+
         string seqHealthUrl = serilogOptions.Seq.HealthCheckUrl ?? serilogOptions.Seq.ServerUrl + "/api";
 
         string jaegerHealthUrl = openTelemetryOptions.Exporter.HealthCheckUrl ?? openTelemetryOptions.Exporter.Endpoint;
+
 
         services.AddHealthChecks()
             .AddRedis

@@ -58,6 +58,11 @@
         <!-- AWS SDK -->
         <PackageVersion Include="AWSSDK.S3" Version="4.0.16" />
         <PackageVersion Include="AWSSDK.Extensions.NETCore.Setup" Version="4.0.3.17" />
+
+        <!-- MassTransit -->
+        <PackageVersion Include="MassTransit" Version="8.4.1" />
+        <PackageVersion Include="MassTransit.RabbitMQ" Version="8.4.1" />
+        <PackageVersion Include="MassTransit.EntityFrameworkCore" Version="8.4.1" />
         <!-- Web.Api -->
         <PackageVersion Include="Yarp.ReverseProxy" Version="2.3.0" />
         <PackageVersion Include="FastEndpoints" Version="7.1.1" />

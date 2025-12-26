@@ -21,6 +21,9 @@
         <PackageReference Include="AspNetCore.HealthChecks.NpgSql" />
         <PackageReference Include="AWSSDK.S3" />
         <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" />
+        <PackageReference Include="MassTransit" />
+        <PackageReference Include="MassTransit.RabbitMQ" />
+        <PackageReference Include="MassTransit.EntityFrameworkCore" />
     </ItemGroup>
 
 </Project>
