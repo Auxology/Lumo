@@ -28,7 +28,7 @@ public sealed class RequestContext : IRequestContext
 
     public string UserAgent => HttpContext.Request.Headers.UserAgent.ToString();
 
-    public string Timezone => HttpContext.Request.Headers[TimezoneHeader].ToString();
+    public string Timezone => GetTimezone();
 
     public string Language => GetPreferredLanguage();
 
@@ -48,6 +48,16 @@ public sealed class RequestContext : IRequestContext
         return HttpContext.Connection.RemoteIpAddress?.ToString() ?? string.Empty;
     }
 
+    private string GetTimezone()
+    {
+        string timezone = HttpContext.Request.Headers[TimezoneHeader].ToString();
+
+        if (string.IsNullOrWhiteSpace(timezone))
+            return "UTC";
+
+        return timezone.Trim();
+    }
+
     private string GetPreferredLanguage()
     {
         string acceptLanguage = HttpContext.Request.Headers.AcceptLanguage.ToString();
@@ -61,11 +71,12 @@ public sealed class RequestContext : IRequestContext
     private string GetOrCreateCorrelationId()
     {
         if (HttpContext.Request.Headers.TryGetValue(CorrelationIdHeader, out var correlationId) &&
-            !string.IsNullOrEmpty(correlationId))
+            !string.IsNullOrEmpty(correlationId) &&
+            Guid.TryParse(correlationId, out _))
         {
             return correlationId.ToString();
         }
 
-        return HttpContext.TraceIdentifier;
+        return Guid.NewGuid().ToString();
     }
 }
