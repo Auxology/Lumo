@@ -51,7 +51,7 @@ internal sealed class UpdateProfileHandler(
                 OccurredAt = dateTimeProvider.UtcNow,
                 CorrelationId = Guid.Parse(requestContext.CorrelationId),
                 UserId = user.Id.Value,
-                DisplayName = request.NewDisplayName
+                DisplayName = user.DisplayName
             };
 
             await messageBus.PublishAsync(userDisplayNameChanged, cancellationToken);

@@ -8,7 +8,7 @@ public sealed record LoginVerified
 
     public required Guid CorrelationId { get; init; }
 
-    public required Guid UserId { get; set; }
+    public required Guid UserId { get; init; }
 
     public required string EmailAddress { get; init; }
 
