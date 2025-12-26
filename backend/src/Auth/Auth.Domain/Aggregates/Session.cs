@@ -12,23 +12,23 @@ public sealed class Session : AggregateRoot<SessionId>
     public UserId UserId { get; private set; }
 
     public string RefreshTokenKey { get; private set; } = string.Empty;
-    
+
     public string RefreshTokenHash { get; private set; } = string.Empty;
-    
+
     public Fingerprint Fingerprint { get; private set; }
-    
+
     public DateTimeOffset CreatedAt { get; private set; }
-    
+
     public DateTimeOffset ExpiresAt { get; private set; }
-    
+
     public DateTimeOffset? LastRefreshedAt { get; private set; }
-    
+
     public SessionRevokeReason? RevokeReason { get; private set; }
-    
+
     public DateTimeOffset? RevokedAt { get; private set; }
-    
+
     public int Version { get; private set; }
-    
+
     private Session() {} // For EF Core
 
     [SetsRequiredMembers]
@@ -65,10 +65,10 @@ public sealed class Session : AggregateRoot<SessionId>
     {
         if (userId.IsEmpty)
             return SessionFaults.UserIdRequiredForCreation;
-        
+
         if (string.IsNullOrWhiteSpace(refreshTokenKey))
             return SessionFaults.RefreshTokenKeyRequiredForCreation;
-        
+
         if (string.IsNullOrWhiteSpace(refreshTokenHash))
             return SessionFaults.RefreshTokenHashRequiredForCreation;
 
@@ -80,7 +80,7 @@ public sealed class Session : AggregateRoot<SessionId>
             fingerprint: fingerprint,
             utcNow: utcNow
         );
-        
+
         return session;
     }
 
@@ -88,52 +88,54 @@ public sealed class Session : AggregateRoot<SessionId>
     (
         string newRefreshTokenKey,
         string newRefreshTokenHash,
+        Fingerprint fingerprint,
         DateTimeOffset utcNow
     )
     {
         if (string.IsNullOrWhiteSpace(newRefreshTokenKey))
             return SessionFaults.RefreshTokenKeyRequiredForRefresh;
-        
+
         if (string.IsNullOrWhiteSpace(newRefreshTokenHash))
             return SessionFaults.RefreshTokenHashRequiredForRefresh;
-        
+
         Outcome ensureActiveOutcome = EnsureActive(utcNow);
-        
+
         if (ensureActiveOutcome.IsFailure)
             return ensureActiveOutcome;
-        
+
         RefreshTokenKey = newRefreshTokenKey;
         RefreshTokenHash = newRefreshTokenHash;
+        Fingerprint = fingerprint;
         ExpiresAt = utcNow.AddDays(SessionConstants.SessionExpirationDays);
         LastRefreshedAt = utcNow;
         Version += 1;
-        
+
         return Outcome.Success();
     }
 
     public Outcome RevokeDueToLogout(DateTimeOffset utcNow)
     {
         Outcome ensureActiveOutcome = EnsureActive(utcNow);
-        
+
         if (ensureActiveOutcome.IsFailure)
             return ensureActiveOutcome;
-        
+
         RevokeReason = SessionRevokeReason.UserLogout;
         RevokedAt = utcNow;
-        
+
         return Outcome.Success();
     }
-    
+
     public Outcome RevokeDueToEmailChange(DateTimeOffset utcNow)
     {
-        Outcome ensureActiveOutcome = EnsureActive(utcNow); 
-        
+        Outcome ensureActiveOutcome = EnsureActive(utcNow);
+
         if (ensureActiveOutcome.IsFailure)
             return ensureActiveOutcome;
-        
+
         RevokeReason = SessionRevokeReason.EmailChange;
         RevokedAt = utcNow;
-        
+
         return Outcome.Success();
     }
 
@@ -141,10 +143,10 @@ public sealed class Session : AggregateRoot<SessionId>
     {
         if (ExpiresAt <= utcNow)
             return SessionFaults.SessionExpired;
-        
+
         if (RevokedAt is not null)
             return SessionFaults.SessionRevoked;
-        
+
         return Outcome.Success();
     }
 }

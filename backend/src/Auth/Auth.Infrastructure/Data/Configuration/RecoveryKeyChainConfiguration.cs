@@ -32,14 +32,14 @@ internal sealed class RecoveryKeyChainConfiguration : IEntityTypeConfiguration<R
         b.Property(rkc => rkc.CreatedAt)
             .IsRequired()
             .HasColumnType("timestamptz");
-        
+
         b.Property(rkc => rkc.LastRotatedAt)
             .IsRequired(false)
             .HasColumnType("timestamptz");
 
         b.Property(rkc => rkc.Version)
             .IsRequired()
-            .HasColumnType("integer");
+            .IsConcurrencyToken();
 
         b.HasMany(rkc => rkc.RecoveryKeys)
             .WithOne()
@@ -49,7 +49,7 @@ internal sealed class RecoveryKeyChainConfiguration : IEntityTypeConfiguration<R
 
         b.HasIndex(rkc => rkc.UserId)
             .IsUnique();
-        
+
         b.HasIndex(rkc => rkc.CreatedAt);
     }
 }

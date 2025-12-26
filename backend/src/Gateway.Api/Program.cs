@@ -1,6 +1,10 @@
 using System.Text.Json;
+using FastEndpoints;
+using FastEndpoints.Swagger;
 using Gateway.Api;
+using Gateway.Api.Options;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Scalar.AspNetCore;
 using SharedKernel.Infrastructure.Observability;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,12 +15,7 @@ builder.Host.ConfigureSerilog();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
-
-var healthCheckOptions = new HealthCheckOptions
+HealthCheckOptions healthCheckOptions = new()
 {
     ResponseWriter = async (context, report) =>
     {
@@ -36,6 +35,29 @@ var healthCheckOptions = new HealthCheckOptions
     }
 };
 
+app.UseFastEndpoints(c =>
+{
+    c.Versioning.PrependToRoute = true;
+    c.Versioning.Prefix = "v";
+    c.Versioning.DefaultVersion = 1;
+});
+
+if (app.Environment.IsDevelopment())
+{
+    GatewayApiOptions gatewayApiOptions = new();
+    app.Configuration.GetSection(GatewayApiOptions.SectionName).Bind(gatewayApiOptions);
+
+    app.UseSwaggerGen();
+
+    app.MapScalarApiReference(options =>
+    {
+        options
+            .WithTitle(gatewayApiOptions.Title)
+            .WithOpenApiRoutePattern(gatewayApiOptions.SwaggerRoutePattern)
+            .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
+    });
+}
+
 app.MapHealthChecks("/health", healthCheckOptions);
 
 app.MapHealthChecks("/health/ready", new HealthCheckOptions
@@ -48,6 +70,8 @@ app.MapHealthChecks("/health/live", new HealthCheckOptions
 {
     Predicate = _ => false,
 });
+
+app.MapReverseProxy();
 
 await app.RunAsync();
 

@@ -1,8 +1,11 @@
+using Amazon.S3;
 using Auth.Application.Abstractions.Authentication;
 using Auth.Application.Abstractions.Data;
+using Auth.Application.Abstractions.Storage;
 using Auth.Infrastructure.Authentication;
 using Auth.Infrastructure.Data;
 using Auth.Infrastructure.Options;
+using Auth.Infrastructure.Storage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,17 +22,18 @@ public static class DependencyInjection
             .AddSharedKernelInfrastructure(configuration)
             .AddDatabase(configuration)
             .AddAuthenticationInternal()
-            .AddAuthorization();
+            .AddAuthorization()
+            .AddStorage(configuration);
 
     private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
         ArgumentNullException.ThrowIfNull(configuration);
-        
+
         services.AddOptions<DatabaseOptions>()
             .Bind(configuration.GetSection(DatabaseOptions.SectionName))
             .ValidateDataAnnotations()
             .ValidateOnStart();
-        
+
         DatabaseOptions databaseOptions = new();
         configuration.GetSection(DatabaseOptions.SectionName).Bind(databaseOptions);
 
@@ -40,7 +44,7 @@ public static class DependencyInjection
                 .UseSnakeCaseNamingConvention()
                 .EnableSensitiveDataLogging(databaseOptions.EnableSensitiveDataLogging);
         });
-        
+
         services.AddScoped<IAuthDbContext>(sp => sp.GetRequiredService<AuthDbContext>());
 
         services.AddHealthChecks()
@@ -50,7 +54,7 @@ public static class DependencyInjection
                 name: "auth-postgresql",
                 tags: ["ready"]
             );
-        
+
         return services;
     }
 
@@ -58,9 +62,23 @@ public static class DependencyInjection
     {
         services.AddSingleton<JsonWebTokenHandler>();
         services.AddSingleton<ITokenProvider, TokenProvider>();
-        
+
         services.AddSingleton<ISecureTokenGenerator, SecureTokenGenerator>();
-        
+
+        return services;
+    }
+
+    private static IServiceCollection AddStorage(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddOptions<S3Options>()
+            .Bind(configuration.GetSection(S3Options.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        services.AddAWSService<IAmazonS3>();
+
+        services.AddSingleton<IStorageService, StorageService>();
+
         return services;
     }
 }

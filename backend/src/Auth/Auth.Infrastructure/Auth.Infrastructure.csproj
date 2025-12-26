@@ -13,12 +13,14 @@
       <ProjectReference Include="..\Auth.Application\Auth.Application.csproj" />
       <ProjectReference Include="..\Auth.Domain\Auth.Domain.csproj" />
     </ItemGroup>
-    
+
     <ItemGroup>
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" />
         <PackageReference Include="EFCore.NamingConventions" />
         <PackageReference Include="AspNetCore.HealthChecks.NpgSql" />
+        <PackageReference Include="AWSSDK.S3" />
+        <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" />
     </ItemGroup>
 
 </Project>
