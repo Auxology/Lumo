@@ -43,6 +43,9 @@ internal sealed class RefreshTokenHandler(
         string refreshTokenKey = parts[0];
         string refreshToken = parts[1];
 
+        if (string.IsNullOrWhiteSpace(refreshTokenKey) || string.IsNullOrWhiteSpace(refreshToken))
+            return SessionFaults.RefreshTokenInvalidOrExpired;
+
         Session? session = await dbContext.Sessions
             .FirstOrDefaultAsync(s => s.RefreshTokenKey == refreshTokenKey, cancellationToken);
 
@@ -69,7 +72,14 @@ internal sealed class RefreshTokenHandler(
         if (refreshOutcome.IsFailure)
             return SessionFaults.RefreshTokenInvalidOrExpired;
 
-        await dbContext.SaveChangesAsync(cancellationToken);
+        try
+        {
+            await dbContext.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            return SessionFaults.RefreshTokenInvalidOrExpired;
+        }
 
         string accessToken = tokenProvider.CreateToken(session.UserId.Value, session.Id.Value);
 

@@ -27,7 +27,7 @@ internal sealed class Endpoint : Endpoint<VerifyLoginApiRequest>
         {
             d.WithSummary("Verify Login")
                 .WithDescription("Verifies login credentials and sets refresh token cookie.")
-                .Produces<VerifyLoginApiResponse>(204)
+                .Produces(204)
                 .ProducesProblemDetails(400, "application/json")
                 .ProducesProblemDetails(401, "application/json")
                 .WithTags(CustomTags.LoginRequests);

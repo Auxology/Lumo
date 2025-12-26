@@ -14,12 +14,14 @@ internal sealed class StorageService(IAmazonS3 s3Client, IOptions<S3Options> s3O
     public async Task<PresignedUploadUrl> GetPresignedUploadUrlAsync(string fileKey, string contentType, long contentLength, TimeSpan expiration,
         CancellationToken cancellationToken = default)
     {
+        DateTimeOffset expiresAt = DateTimeOffset.UtcNow.Add(expiration);
+
         GetPreSignedUrlRequest request = new()
         {
             BucketName = _s3Options.BucketName,
             Key = fileKey,
             Verb = HttpVerb.PUT,
-            Expires = DateTime.UtcNow.Add(expiration),
+            Expires = expiresAt.UtcDateTime,
             ContentType = contentType,
             Headers =
             {
@@ -28,7 +30,6 @@ internal sealed class StorageService(IAmazonS3 s3Client, IOptions<S3Options> s3O
         };
 
         string url = await s3Client.GetPreSignedURLAsync(request);
-        DateTimeOffset expiresAt = DateTimeOffset.UtcNow.Add(expiration);
 
         PresignedUploadUrl presignedUploadUrl = new(url, expiresAt);
 

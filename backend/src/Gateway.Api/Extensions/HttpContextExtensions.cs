@@ -16,6 +16,7 @@ internal static class HttpContextExtensions
             HttpOnly = true,
             Secure = true,
             SameSite = SameSiteMode.Strict,
+            Path = "/",
             MaxAge = jwtOptions.RefreshTokenExpiration
         });
     }
@@ -25,7 +26,8 @@ internal static class HttpContextExtensions
         {
             HttpOnly = true,
             Secure = true,
-            SameSite = SameSiteMode.Strict
+            SameSite = SameSiteMode.Strict,
+            Path = "/"
         });
 
     public static string? GetRefreshTokenCookie(this HttpContext httpContext) =>

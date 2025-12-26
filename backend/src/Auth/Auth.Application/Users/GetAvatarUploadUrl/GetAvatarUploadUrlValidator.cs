@@ -9,7 +9,7 @@ internal sealed class GetAvatarUploadUrlValidator : AbstractValidator<GetAvatarU
     {
         RuleFor(gauuc => gauuc.ContentType)
             .NotEmpty().WithMessage("Content Type is required")
-            .Must(ct => AvatarConstants.AllowedContentTypes.Contains(ct))
+            .Must(ct => AvatarConstants.AllowedContentTypes.Contains(ct, StringComparer.OrdinalIgnoreCase))
             .WithMessage($"Content Type must be one of: {string.Join(", ", AvatarConstants.AllowedContentTypes)}");
 
         RuleFor(gauuc => gauuc.ContentLength)

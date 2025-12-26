@@ -19,7 +19,7 @@ internal sealed class SessionConfiguration : IEntityTypeConfiguration<Session>
                 guid => SessionId.UnsafeFromGuid(guid)
             )
             .HasColumnType("uuid");
-        
+
         b.Property(s => s.UserId)
             .IsRequired()
             .HasConversion
@@ -28,31 +28,31 @@ internal sealed class SessionConfiguration : IEntityTypeConfiguration<Session>
                 guid => UserId.UnsafeFromGuid(guid)
             )
             .HasColumnType("uuid");
-        
+
         b.ComplexProperty(s => s.Fingerprint, fp => fp.ConfigureFingerprint());
-        
+
         b.Property(s => s.RefreshTokenKey)
             .IsRequired()
             .HasMaxLength(DataConfigurationConstants.DefaultStringMaxLength)
             .HasColumnType("varchar");
-        
+
         b.Property(s => s.RefreshTokenHash)
             .IsRequired()
             .HasMaxLength(DataConfigurationConstants.DefaultStringMaxLength)
             .HasColumnType("varchar");
-        
+
         b.Property(s => s.CreatedAt)
             .IsRequired()
             .HasColumnType("timestamptz");
-        
+
         b.Property(s => s.ExpiresAt)
             .IsRequired()
             .HasColumnType("timestamptz");
-        
+
         b.Property(s => s.LastRefreshedAt)
             .IsRequired(false)
             .HasColumnType("timestamptz");
-        
+
         b.Property(s => s.RevokeReason)
             .IsRequired(false)
             .HasConversion<string>()
@@ -62,17 +62,21 @@ internal sealed class SessionConfiguration : IEntityTypeConfiguration<Session>
             .IsRequired(false)
             .HasColumnType("timestamptz");
 
+        b.Property(s => s.Version)
+            .IsRequired()
+            .IsConcurrencyToken();
+
         b.HasIndex(s => s.UserId);
-        
+
         b.HasIndex(s => s.RefreshTokenKey)
             .IsUnique();
-        
+
         b.HasIndex(s => s.ExpiresAt);
-        
+
         b.HasIndex(s => s.RevokedAt);
-        
+
         b.HasIndex(s => new { s.UserId, s.RevokedAt });
-        
+
         b.HasIndex(s => new { s.ExpiresAt, s.RevokedAt });
     }
 }

@@ -22,9 +22,9 @@ internal sealed class SessionTokenOrchestrator(
 
         await tokenCacheService.SetAccessTokenAsync
         (
-            outcome.Value.AccessToken,
-            outcome.Value.RefreshToken,
-            cancellationToken
+            refreshToken: outcome.Value.RefreshToken,
+            accessToken: outcome.Value.AccessToken,
+            cancellationToken: cancellationToken
         );
 
         return outcome.Value.RefreshToken;
