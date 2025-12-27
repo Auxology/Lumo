@@ -10,6 +10,7 @@ using SharedKernel.Infrastructure.Options;
 
 using Microsoft.Extensions.Hosting;
 using Notifications.Api.Consumers;
+using Notifications.Api.Services;
 
 namespace Notifications.Api;
 
@@ -72,8 +73,6 @@ internal static class DependencyInjection
         services.AddMassTransit(bus =>
         {
             bus.AddConsumer<UserSignedUpConsumer>();
-            bus.AddConsumer<LoginRequestedConsumer>();
-            bus.AddConsumer<LoginVerifiedConsumer>();
 
             bus.AddEntityFrameworkOutbox<NotificationDbContext>(outbox =>
             {
@@ -123,6 +122,8 @@ internal static class DependencyInjection
         services.AddDefaultAWSOptions(configuration.GetAWSOptions());
 
         services.AddAWSService<IAmazonSimpleEmailServiceV2>();
+
+        services.AddScoped<IEmailService, SesEmailService>();
 
         return services;
     }

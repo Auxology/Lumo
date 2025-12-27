@@ -77,6 +77,7 @@ public sealed class RequestContext : IRequestContext
             return correlationId.ToString();
         }
 
-        return HttpContext.TraceIdentifier;
+        // I avoid passing trace identifier because it will cause exceptions.
+        return Guid.NewGuid().ToString();
     }
 }
