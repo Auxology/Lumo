@@ -1,5 +1,11 @@
+using Microsoft.EntityFrameworkCore;
+using Notifications.Api.Entities;
+
 namespace Notifications.Api.Data;
 
-#pragma warning disable CA1040
-internal interface INotificationDbContext;
-#pragma warning restore CA1040
+internal interface INotificationDbContext
+{
+    DbSet<ProcessedEvent> ProcessedEvents { get; }
+
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+}

@@ -27,6 +27,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Shared\Contracts\Contracts.csproj" />
         <ProjectReference Include="..\Shared\SharedKernel.Api\SharedKernel.Api.csproj" />
         <ProjectReference Include="..\Shared\SharedKernel.Application\SharedKernel.Application.csproj" />
         <ProjectReference Include="..\Shared\SharedKernel.Infrastructure\SharedKernel.Infrastructure.csproj" />
