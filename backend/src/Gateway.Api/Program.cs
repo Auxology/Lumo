@@ -15,6 +15,8 @@ builder.Host.ConfigureSerilog();
 
 var app = builder.Build();
 
+bool isDevelopment = app.Environment.IsDevelopment();
+
 HealthCheckOptions healthCheckOptions = new()
 {
     ResponseWriter = async (context, report) =>
@@ -29,7 +31,7 @@ HealthCheckOptions healthCheckOptions = new()
                 name = e.Key,
                 status = e.Value.Status.ToString(),
                 description = e.Value.Description,
-                exception = e.Value.Exception?.Message
+                exception = isDevelopment ? e.Value.Exception?.Message : null
             })
         });
         await context.Response.WriteAsync(result);

@@ -15,13 +15,15 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services
     .AddApplication()
     .AddAuthApi(builder.Configuration)
-    .AddInfrastructure(builder.Configuration);
+    .AddInfrastructure(builder.Configuration, builder.Environment);
 
 builder.Host.ConfigureSerilog();
 
 var app = builder.Build();
 
 await app.MigrateAuthDbAsync();
+
+bool isDevelopment = app.Environment.IsDevelopment();
 
 HealthCheckOptions healthCheckOptions = new()
 {
@@ -36,7 +38,7 @@ HealthCheckOptions healthCheckOptions = new()
                 name = e.Key,
                 status = e.Value.Status.ToString(),
                 description = e.Value.Description,
-                exception = e.Value.Exception?.Message
+                exception = isDevelopment ? e.Value.Exception?.Message : null
             })
         });
         await context.Response.WriteAsync(result);

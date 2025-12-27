@@ -15,6 +15,7 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using SharedKernel.Application.Messaging;
 using SharedKernel.Infrastructure;
 using SharedKernel.Infrastructure.Messaging;
+using Microsoft.Extensions.Hosting;
 using SharedKernel.Infrastructure.Options;
 
 namespace Auth.Infrastructure;
@@ -22,16 +23,16 @@ namespace Auth.Infrastructure;
 public static class DependencyInjection
 {
     public static IServiceCollection
-        AddInfrastructure(this IServiceCollection services, IConfiguration configuration) =>
+        AddInfrastructure(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment) =>
         services
             .AddSharedKernelInfrastructure(configuration)
-            .AddDatabase(configuration)
+            .AddDatabase(configuration, environment)
             .AddAuthenticationInternal()
             .AddAuthorization()
             .AddStorage(configuration)
             .AddMessaging(configuration);
 
-    private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
+    private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
     {
         ArgumentNullException.ThrowIfNull(configuration);
 
@@ -43,12 +44,14 @@ public static class DependencyInjection
         DatabaseOptions databaseOptions = new();
         configuration.GetSection(DatabaseOptions.SectionName).Bind(databaseOptions);
 
+        bool enableSensitiveLogging = databaseOptions.EnableSensitiveDataLogging && environment.IsDevelopment();
+
         services.AddDbContext<AuthDbContext>(options =>
         {
             options
                 .UseNpgsql(databaseOptions.ConnectionString)
                 .UseSnakeCaseNamingConvention()
-                .EnableSensitiveDataLogging(databaseOptions.EnableSensitiveDataLogging);
+                .EnableSensitiveDataLogging(enableSensitiveLogging);
         });
 
         services.AddScoped<IAuthDbContext>(sp => sp.GetRequiredService<AuthDbContext>());

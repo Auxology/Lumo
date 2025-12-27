@@ -8,11 +8,13 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.ConfigureSerilog();
 
-builder.Services.AddNotificationsApi(builder.Configuration);
+builder.Services.AddNotificationsApi(builder.Configuration, builder.Environment);
 
 var app = builder.Build();
 
 await app.MigrateNotificationDbAsync();
+
+bool isDevelopment = app.Environment.IsDevelopment();
 
 HealthCheckOptions healthCheckOptions = new()
 {
@@ -27,7 +29,7 @@ HealthCheckOptions healthCheckOptions = new()
                 name = e.Key,
                 status = e.Value.Status.ToString(),
                 description = e.Value.Description,
-                exception = e.Value.Exception?.Message
+                exception = isDevelopment ? e.Value.Exception?.Message : null
             })
         });
         await context.Response.WriteAsync(result);

@@ -17,6 +17,10 @@ internal sealed class NotificationDbContextFactory : IDesignTimeDbContextFactory
 
         string? connectionString = configuration.GetSection("Database:ConnectionString").Value;
 
+        if (string.IsNullOrWhiteSpace(connectionString))
+            throw new InvalidOperationException(
+                "Database connection string is not configured. Ensure 'Database:ConnectionString' is set in appsettings.json or environment variables.");
+
         DbContextOptionsBuilder<NotificationDbContext> optionsBuilder = new();
         optionsBuilder
             .UseNpgsql(connectionString)

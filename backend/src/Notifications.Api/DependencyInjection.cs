@@ -8,20 +8,22 @@ using SharedKernel.Api;
 using SharedKernel.Infrastructure;
 using SharedKernel.Infrastructure.Options;
 
+using Microsoft.Extensions.Hosting;
+
 namespace Notifications.Api;
 
 internal static class DependencyInjection
 {
     public static IServiceCollection
-        AddNotificationsApi(this IServiceCollection services, IConfiguration configuration) =>
+        AddNotificationsApi(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment) =>
         services
             .AddSharedKernelApi()
             .AddSharedKernelInfrastructure(configuration)
-            .AddDatabase(configuration)
+            .AddDatabase(configuration, environment)
             .AddMessaging(configuration)
             .AddSimpleEmailService(configuration);
 
-    private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
+    private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
     {
         ArgumentNullException.ThrowIfNull(configuration);
 
@@ -33,12 +35,14 @@ internal static class DependencyInjection
         DatabaseOptions databaseOptions = new();
         configuration.GetSection(DatabaseOptions.SectionName).Bind(databaseOptions);
 
+        bool enableSensitiveLogging = databaseOptions.EnableSensitiveDataLogging && environment.IsDevelopment();
+
         services.AddDbContext<NotificationDbContext>(options =>
         {
             options
                 .UseNpgsql(databaseOptions.ConnectionString)
                 .UseSnakeCaseNamingConvention()
-                .EnableSensitiveDataLogging(databaseOptions.EnableSensitiveDataLogging);
+                .EnableSensitiveDataLogging(enableSensitiveLogging);
         });
 
         services.AddScoped<INotificationDbContext>(sp => sp.GetRequiredService<NotificationDbContext>());
