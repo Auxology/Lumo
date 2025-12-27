@@ -21,8 +21,11 @@ HealthCheckOptions healthCheckOptions = new()
 {
     ResponseWriter = async (context, report) =>
     {
-        context.Response.ContentType = "application/json";
+        context.Response.StatusCode = report.Status == Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Healthy
+            ? StatusCodes.Status200OK
+            : StatusCodes.Status503ServiceUnavailable;
 
+        context.Response.ContentType = "application/json";
         string result = JsonSerializer.Serialize(new
         {
             status = report.Status.ToString(),
