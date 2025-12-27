@@ -1,7 +1,12 @@
+using System.ComponentModel.DataAnnotations;
 using Amazon.SimpleEmailV2;
+using MassTransit;
+using Microsoft.EntityFrameworkCore;
+using Notifications.Api.Data;
 using Notifications.Api.Options;
 using SharedKernel.Api;
 using SharedKernel.Infrastructure;
+using SharedKernel.Infrastructure.Options;
 
 namespace Notifications.Api;
 
@@ -12,7 +17,91 @@ internal static class DependencyInjection
         services
             .AddSharedKernelApi()
             .AddSharedKernelInfrastructure(configuration)
+            .AddDatabase(configuration)
+            .AddMessaging(configuration)
             .AddSimpleEmailService(configuration);
+
+    private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
+    {
+        ArgumentNullException.ThrowIfNull(configuration);
+
+        services.AddOptions<DatabaseOptions>()
+            .Bind(configuration.GetSection(DatabaseOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        DatabaseOptions databaseOptions = new();
+        configuration.GetSection(DatabaseOptions.SectionName).Bind(databaseOptions);
+
+        services.AddDbContext<NotificationDbContext>(options =>
+        {
+            options
+                .UseNpgsql(databaseOptions.ConnectionString)
+                .UseSnakeCaseNamingConvention()
+                .EnableSensitiveDataLogging(databaseOptions.EnableSensitiveDataLogging);
+        });
+
+        services.AddScoped<INotificationDbContext>(sp => sp.GetRequiredService<NotificationDbContext>());
+
+        services.AddHealthChecks()
+            .AddNpgSql
+            (
+                connectionString: databaseOptions.ConnectionString,
+                name: "notifications-postgresql",
+                tags: ["ready"]
+            );
+
+        return services;
+    }
+
+    private static IServiceCollection AddMessaging(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddOptions<RabbitMqOptions>()
+            .Bind(configuration.GetSection(RabbitMqOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        RabbitMqOptions rabbitMqOptions = new();
+        configuration.GetSection(RabbitMqOptions.SectionName).Bind(rabbitMqOptions);
+
+        services.AddMassTransit(bus =>
+        {
+            bus.AddEntityFrameworkOutbox<NotificationDbContext>(outbox =>
+            {
+                outbox.UsePostgres();
+
+                outbox.UseBusOutbox();
+
+                outbox.QueryDelay = TimeSpan.FromSeconds(1);
+            });
+
+            bus.UsingRabbitMq((context, cfg) =>
+            {
+                cfg.Host(rabbitMqOptions.Host, rabbitMqOptions.Port, rabbitMqOptions.VirtualHost, h =>
+                {
+                    h.Username(rabbitMqOptions.Username);
+                    h.Password(rabbitMqOptions.Password);
+                });
+
+                cfg.UseMessageRetry(retry =>
+                {
+                    retry.Ignore<ArgumentException>();
+                    retry.Ignore<ValidationException>();
+                    retry.Exponential
+                    (
+                        retryLimit: 5,
+                        minInterval: TimeSpan.FromSeconds(1),
+                        maxInterval: TimeSpan.FromMinutes(1),
+                        intervalDelta: TimeSpan.FromSeconds(2)
+                    );
+                });
+
+                cfg.ConfigureEndpoints(context);
+            });
+        });
+
+        return services;
+    }
 
     private static IServiceCollection AddSimpleEmailService(this IServiceCollection services,
         IConfiguration configuration)

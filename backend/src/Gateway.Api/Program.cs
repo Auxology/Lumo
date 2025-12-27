@@ -20,7 +20,8 @@ HealthCheckOptions healthCheckOptions = new()
     ResponseWriter = async (context, report) =>
     {
         context.Response.ContentType = "application/json";
-        var result = JsonSerializer.Serialize(new
+
+        string result = JsonSerializer.Serialize(new
         {
             status = report.Status.ToString(),
             checks = report.Entries.Select(e => new
@@ -68,7 +69,8 @@ app.MapHealthChecks("/health/ready", new HealthCheckOptions
 
 app.MapHealthChecks("/health/live", new HealthCheckOptions
 {
-    Predicate = _ => false,
+    Predicate = check => check.Tags.Contains("live"),
+    ResponseWriter = healthCheckOptions.ResponseWriter
 });
 
 app.MapReverseProxy();

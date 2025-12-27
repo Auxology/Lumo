@@ -49,6 +49,25 @@ services:
             - OpenTelemetry__Metrics__Instrumentation__Runtime=${OTEL_METRICS_INSTRUMENTATION_RUNTIME:-true}
             - OpenTelemetry__Metrics__Instrumentation__Process=${OTEL_METRICS_INSTRUMENTATION_PROCESS:-true}
 
+            # JwtOptions
+            - Jwt__Issuer=${JWT_ISSUER:-https://lumo.local}
+            - Jwt__Audience=${JWT_AUDIENCE:-lumo-api}
+            - Jwt__SecretKey=${JWT_SECRET_KEY:?JWT_SECRET_KEY is required}
+            - Jwt__AccessTokenExpiration=${JWT_ACCESS_TOKEN_EXPIRATION:-00:10:00}
+            - Jwt__RefreshTokenExpiration=${JWT_REFRESH_TOKEN_EXPIRATION:-30.00:00:00}
+            - Jwt__RequireHttpsMetadata=${JWT_REQUIRE_HTTPS_METADATA:-false}
+
+            # DatabaseOptions
+            - Database__ConnectionString=${NOTIFICATIONS_DATABASE_CONNECTION_STRING:?NOTIFICATIONS_DATABASE_CONNECTION_STRING is required}
+            - Database__EnableSensitiveDataLogging=${NOTIFICATIONS_DATABASE_ENABLE_SENSITIVE_DATA_LOGGING:-false}
+
+            # RabbitMqOptions
+            - RabbitMq__Host=${RABBITMQ_HOST:?RABBITMQ_HOST is required}
+            - RabbitMq__Port=${RABBITMQ_PORT:?RABBITMQ_PORT is required}
+            - RabbitMq__VirtualHost=${RABBITMQ_VIRTUAL_HOST:?RABBITMQ_VIRTUAL_HOST is required}
+            - RabbitMq__Username=${RABBITMQ_USERNAME:?RABBITMQ_USERNAME is required}
+            - RabbitMq__Password=${RABBITMQ_PASSWORD:?RABBITMQ_PASSWORD is required}
+
             # EmailOptions
             - Email__SenderEmail=${EMAIL_SENDER_EMAIL:?EMAIL_SENDER_EMAIL is required}
             - Email__ApplicationName=${EMAIL_APPLICATION_NAME:?EMAIL_APPLICATION_NAME is required}
@@ -66,6 +85,10 @@ services:
             seq:
                 condition: service_healthy
             jaeger:
+                condition: service_healthy
+            rabbitmq:
+                condition: service_healthy
+            notifications-database:
                 condition: service_healthy
         restart: unless-stopped
         healthcheck:

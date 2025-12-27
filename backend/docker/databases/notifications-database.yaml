@@ -1,0 +1,36 @@
+services:
+    notifications-database:
+        image: postgres:${POSTGRES_VERSION:-17-alpine}
+        container_name: lumo-notifications-database
+        ports:
+            - "${NOTIFICATIONS_DATABASE_PORT:-5433}:5432"
+        volumes:
+            - notifications-database-data:/var/lib/postgresql/data
+        networks:
+            - lumo-network
+        restart: unless-stopped
+        environment:
+            # PostgreSQL Configuration
+            - POSTGRES_DB=${NOTIFICATIONS_DATABASE_NAME:-notifications}
+            - POSTGRES_USER=${NOTIFICATIONS_DATABASE_USER:-notifications_user}
+            - POSTGRES_PASSWORD=${NOTIFICATIONS_DATABASE_PASSWORD:?NOTIFICATIONS_DATABASE_PASSWORD is required}
+            - PGDATA=${NOTIFICATIONS_DATABASE_PGDATA:-/var/lib/postgresql/data/pgdata}
+        deploy:
+            resources:
+                limits:
+                    memory: ${NOTIFICATIONS_DATABASE_MEMORY_LIMIT:-512M}
+                reservations:
+                    memory: ${NOTIFICATIONS_DATABASE_MEMORY_RESERVATION:-256M}
+        labels:
+            - "lumo.service=notifications-database"
+            - "lumo.tier=infrastructure"
+        healthcheck:
+            test:
+                [
+                    "CMD-SHELL",
+                    "pg_isready -U ${NOTIFICATIONS_DATABASE_USER:-notifications_user} -d ${NOTIFICATIONS_DATABASE_NAME:-notifications}",
+                ]
+            interval: ${NOTIFICATIONS_DATABASE_HEALTHCHECK_INTERVAL:-10s}
+            timeout: ${NOTIFICATIONS_DATABASE_HEALTHCHECK_TIMEOUT:-5s}
+            retries: ${NOTIFICATIONS_DATABASE_HEALTHCHECK_RETRIES:-5}
+            start_period: ${NOTIFICATIONS_DATABASE_HEALTHCHECK_START_PERIOD:-15s}

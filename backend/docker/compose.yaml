@@ -9,6 +9,7 @@ include:
     - path: services/notifications.yaml
     - path: services/rabbitmq.yaml
     - path: databases/auth-database.yaml
+    - path: databases/notifications-database.yaml
 
 networks:
     lumo-network:
@@ -47,3 +48,9 @@ volumes:
         labels:
             - "lumo.volume=rabbitmq-data"
             - "lumo.service=rabbitmq"
+
+    notifications-database-data:
+        name: lumo-notifications-database-data
+        labels:
+            - "lumo.volume=notifications-database-data"
+            - "lumo.service=notifications-database"

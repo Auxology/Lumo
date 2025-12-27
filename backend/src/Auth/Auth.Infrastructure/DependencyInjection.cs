@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Amazon.S3;
 using Auth.Application.Abstractions.Authentication;
 using Auth.Application.Abstractions.Data;
@@ -114,6 +115,19 @@ public static class DependencyInjection
                 {
                     h.Username(rabbitMqOptions.Username);
                     h.Password(rabbitMqOptions.Password);
+                });
+
+                cfg.UseMessageRetry(retry =>
+                {
+                    retry.Ignore<ArgumentException>();
+                    retry.Ignore<ValidationException>();
+                    retry.Exponential
+                    (
+                        retryLimit: 5,
+                        minInterval: TimeSpan.FromSeconds(1),
+                        maxInterval: TimeSpan.FromMinutes(1),
+                        intervalDelta: TimeSpan.FromSeconds(2)
+                    );
                 });
 
                 cfg.ConfigureEndpoints(context);
