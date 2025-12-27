@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Notifications.Api;
+using Notifications.Api.Extensions;
 using SharedKernel.Infrastructure.Observability;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +11,8 @@ builder.Host.ConfigureSerilog();
 builder.Services.AddNotificationsApi(builder.Configuration);
 
 var app = builder.Build();
+
+await app.MigrateNotificationDbAsync();
 
 HealthCheckOptions healthCheckOptions = new()
 {
