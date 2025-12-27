@@ -11,4 +11,7 @@ internal sealed record LoginVerifiedEmailTemplateData
     public required string Location { get; init; }
 
     public required string ApplicationName { get; init; }
+
+    public override string ToString() =>
+        $"LoginVerifiedEmailTemplateData {{ LoginTime={LoginTime}, IpAddress=[REDACTED], Device={Device}, Location=[REDACTED], ApplicationName={ApplicationName} }}";
 }

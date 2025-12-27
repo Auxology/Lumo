@@ -21,6 +21,10 @@ internal sealed class SesEmailService(
     public async Task SendTemplatedEmailAsync<TData>(string recipientEmailAddress, string templateName, TData templateData,
         CancellationToken cancellationToken = default) where TData : class
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(recipientEmailAddress);
+        ArgumentException.ThrowIfNullOrWhiteSpace(templateName);
+        ArgumentNullException.ThrowIfNull(templateData);
+
         string templateDataJson = JsonSerializer.Serialize(templateData, JsonOptions);
 
         SendEmailRequest request = new()
@@ -40,12 +44,10 @@ internal sealed class SesEmailService(
             }
         };
 
-        logger.LogInformation("Sending templated email to {RecipientEmail} using template {TemplateName}",
-            recipientEmailAddress, templateName);
+        logger.LogInformation("Sending templated email using template {TemplateName}", templateName);
 
         await sesService.SendEmailAsync(request, cancellationToken);
 
-        logger.LogInformation("Templated email sent to {RecipientEmail} using template {TemplateName}",
-            recipientEmailAddress, templateName);
+        logger.LogInformation("Templated email sent using template {TemplateName}", templateName);
     }
 }

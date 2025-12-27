@@ -5,4 +5,7 @@ internal sealed record WelcomeEmailTemplateData
     public required string DisplayName { get; init; }
 
     public required string ApplicationName { get; init; }
+
+    public override string ToString() =>
+        $"WelcomeEmailTemplateData {{ DisplayName=[REDACTED], ApplicationName={ApplicationName} }}";
 }

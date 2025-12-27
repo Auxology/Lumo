@@ -14,4 +14,7 @@ internal sealed record LoginRequestedEmailTemplateData
     public required string Device { get; init; }
 
     public required string ApplicationName { get; init; }
+
+    public override string ToString() =>
+        $"LoginRequestedEmailTemplateData {{ OtpCode=[REDACTED], MagicLink=[REDACTED], ExpiresIn={ExpiresIn}, IpAddress=[REDACTED], Device={Device}, ApplicationName={ApplicationName} }}";
 }

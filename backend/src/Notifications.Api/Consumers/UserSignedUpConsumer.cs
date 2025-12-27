@@ -38,14 +38,6 @@ internal sealed class UserSignedUpConsumer(
             ApplicationName = _emailOptions.ApplicationName
         };
 
-        await emailService.SendTemplatedEmailAsync
-        (
-            recipientEmailAddress: context.Message.EmailAddress,
-            templateName: _emailOptions.WelcomeEmailTemplateName,
-            templateData: templateData,
-            cancellationToken: cancellationToken
-        );
-
         try
         {
             await notificationDbContext.ProcessedEvents.AddAsync(processedEvent, cancellationToken);
@@ -55,5 +47,13 @@ internal sealed class UserSignedUpConsumer(
         {
             return;
         }
+
+        await emailService.SendTemplatedEmailAsync
+        (
+            recipientEmailAddress: context.Message.EmailAddress,
+            templateName: _emailOptions.WelcomeEmailTemplateName,
+            templateData: templateData,
+            cancellationToken: cancellationToken
+        );
     }
 }
