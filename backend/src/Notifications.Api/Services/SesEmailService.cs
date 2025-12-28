@@ -44,10 +44,12 @@ internal sealed class SesEmailService(
             }
         };
 
-        logger.LogInformation("Sending templated email using template {TemplateName}", templateName);
+        logger.LogInformation("Sending templated email to recipient. Template: {TemplateName}", templateName);
 
-        await sesService.SendEmailAsync(request, cancellationToken);
+        SendEmailResponse response = await sesService.SendEmailAsync(request, cancellationToken);
 
-        logger.LogInformation("Templated email sent using template {TemplateName}", templateName);
+        logger.LogInformation(
+            "Templated email sent using template {TemplateName}. MessageId: {MessageId}, HttpStatusCode: {StatusCode}",
+            templateName, response.MessageId, response.HttpStatusCode);
     }
 }

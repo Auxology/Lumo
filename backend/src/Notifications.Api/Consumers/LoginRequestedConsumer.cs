@@ -11,15 +11,15 @@ using SharedKernel;
 
 namespace Notifications.Api.Consumers;
 
-internal sealed class UserSignedUpConsumer(
+internal sealed class LoginRequestedConsumer(
     INotificationDbContext notificationDbContext,
     IEmailService emailService,
     IOptions<EmailOptions> emailOptions,
-    IDateTimeProvider dateTimeProvider) : IConsumer<UserSignedUp>
+    IDateTimeProvider dateTimeProvider) : IConsumer<LoginRequested>
 {
     private readonly EmailOptions _emailOptions = emailOptions.Value;
 
-    public async Task Consume(ConsumeContext<UserSignedUp> context)
+    public async Task Consume(ConsumeContext<LoginRequested> context)
     {
         CancellationToken cancellationToken = context.CancellationToken;
         Guid eventId = context.Message.EventId;
@@ -32,16 +32,21 @@ internal sealed class UserSignedUpConsumer(
 
         ProcessedEvent processedEvent = ProcessedEvent.Create(eventId, dateTimeProvider.UtcNow);
 
-        WelcomeEmailTemplateData templateData = new()
+        LoginRequestedEmailTemplateData templateData = new()
         {
-            DisplayName = context.Message.DisplayName,
-            ApplicationName = _emailOptions.ApplicationName
+            OtpToken = context.Message.OtpToken,
+            MagicLinkToken = context.Message.MagicLinkToken,
+            ExpiresAt = context.Message.ExpiresAt,
+            IpAddress = context.Message.IpAddress,
+            UserAgent = context.Message.UserAgent,
+            ApplicationName = _emailOptions.ApplicationName,
+            FrontendUrl = _emailOptions.FrontendUrl
         };
 
         await emailService.SendTemplatedEmailAsync
         (
             recipientEmailAddress: context.Message.EmailAddress,
-            templateName: _emailOptions.WelcomeEmailTemplateName,
+            templateName: _emailOptions.LoginRequestedTemplateName,
             templateData: templateData,
             cancellationToken: cancellationToken
         );

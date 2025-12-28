@@ -71,6 +71,10 @@ services:
             # EmailOptions
             - Email__SenderEmail=${EMAIL_SENDER_EMAIL:?EMAIL_SENDER_EMAIL is required}
             - Email__ApplicationName=${EMAIL_APPLICATION_NAME:?EMAIL_APPLICATION_NAME is required}
+            - Email__FrontendUrl=${EMAIL_FRONTEND_URL:?EMAIL_FRONTEND_URL is required}
+            - Email__WelcomeEmailTemplateName=${EMAIL_WELCOME_EMAIL_TEMPLATE_NAME:?EMAIL_WELCOME_EMAIL_TEMPLATE_NAME is required}
+            - Email__LoginRequestedTemplateName=${EMAIL_LOGIN_REQUESTED_TEMPLATE_NAME:?EMAIL_LOGIN_REQUESTED_TEMPLATE_NAME is required}
+            - Email__LoginVerifiedTemplateName=${EMAIL_LOGIN_VERIFIED_TEMPLATE_NAME:?EMAIL_LOGIN_VERIFIED_TEMPLATE_NAME is required}
 
             # AWS SDK Credentials
             - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:?AWS_ACCESS_KEY_ID is required}

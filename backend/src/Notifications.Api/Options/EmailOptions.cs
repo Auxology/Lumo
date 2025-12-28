@@ -12,10 +12,15 @@ internal sealed class EmailOptions
     [Required, MinLength(1)]
     public string ApplicationName { get; init; } = string.Empty;
 
-    public string WelcomeEmailTemplateName { get; init; } = "WelcomeEmail";
+    [Required, Url]
+    public string FrontendUrl { get; init; } = string.Empty;
 
-    public string LoginRequestedTemplateName { get; init; } = "LoginRequested";
+    [Required, MinLength(1)]
+    public string WelcomeEmailTemplateName { get; init; } = string.Empty;
 
-    public string LoginVerifiedTemplateName { get; init; } = "LoginVerified";
+    [Required, MinLength(1)]
+    public string LoginRequestedTemplateName { get; init; } = string.Empty;
 
+    [Required, MinLength(1)]
+    public string LoginVerifiedTemplateName { get; init; } = string.Empty;
 }

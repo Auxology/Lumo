@@ -1,4 +1,9 @@
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Notifications.Api.Data;
 
 namespace Notifications.Api.Extensions;
@@ -7,10 +12,21 @@ internal static class MigrationExtensions
 {
     internal static async Task MigrateNotificationDbAsync(this WebApplication app)
     {
-        if (!app.Environment.IsDevelopment()) return;
+        ArgumentNullException.ThrowIfNull(app);
 
         using var scope = app.Services.CreateScope();
         ILogger<NotificationDbContext> logger = scope.ServiceProvider.GetRequiredService<ILogger<NotificationDbContext>>();
+        IConfiguration configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+
+        bool isDevelopment = app.Environment.IsDevelopment();
+        bool migrateOnStartup = configuration.GetValue<bool>("MIGRATE_ON_STARTUP", false);
+
+        if (!isDevelopment && !migrateOnStartup)
+        {
+            logger.LogInformation("Skipping NotificationDb migrations: not in Development environment and MIGRATE_ON_STARTUP is not enabled. Migrations should be run via CI/CD or an init job.");
+            return;
+        }
+
         NotificationDbContext db = scope.ServiceProvider.GetRequiredService<NotificationDbContext>();
 
         logger.LogInformation("Applying NotificationDb migrations...");

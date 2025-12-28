@@ -20,7 +20,7 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
                 guid => UserId.UnsafeFromGuid(guid)
             )
             .HasColumnType("uuid");
-        
+
         b.Property(u => u.DisplayName)
             .IsRequired()
             .HasMaxLength(UserConstants.MaxDisplayNameLength)
@@ -28,6 +28,7 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
 
         b.Property(u => u.EmailAddress)
             .IsRequired()
+            .HasMaxLength(UserConstants.MaxEmailAddressLength)
             .HasConversion
             (
                 email => email.Value,
@@ -38,7 +39,7 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
         b.Property(u => u.AvatarKey)
             .IsRequired(false)
             .HasColumnType("varchar");
-        
+
         b.Property(u => u.IsVerified)
             .IsRequired()
             .HasColumnType("boolean");
@@ -46,20 +47,20 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
         b.Property(u => u.CreatedAt)
             .IsRequired()
             .HasColumnType("timestamptz");
-        
+
         b.Property(u => u.UpdatedAt)
             .IsRequired(false)
             .HasColumnType("timestamptz");
-        
+
         b.Property(u => u.VerifiedAt)
             .IsRequired(false)
             .HasColumnType("timestamptz");
 
         b.HasIndex(u => u.EmailAddress)
             .IsUnique();
-        
+
         b.HasIndex(u => u.IsVerified);
-        
+
         b.HasIndex(u => u.CreatedAt);
     }
 }

@@ -73,6 +73,7 @@ internal static class DependencyInjection
         services.AddMassTransit(bus =>
         {
             bus.AddConsumer<UserSignedUpConsumer>();
+            bus.AddConsumer<LoginRequestedConsumer>();
 
             bus.AddEntityFrameworkOutbox<NotificationDbContext>(outbox =>
             {

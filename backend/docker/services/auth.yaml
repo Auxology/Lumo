@@ -73,7 +73,7 @@ services:
             - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:?AWS_SECRET_ACCESS_KEY is required}
             - AWS_REGION=${AWS_REGION:?AWS_REGION is required}
 
-              # S3Options
+            # S3Options
             - S3__BucketName=${S3_BUCKET_NAME:?S3_BUCKET_NAME is required}
             - S3__Region=${AWS_REGION:?AWS_REGION is required}
 
