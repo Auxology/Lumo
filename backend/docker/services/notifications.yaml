@@ -1,18 +1,18 @@
 services:
-    auth.api:
-        image: ${REGISTRY:-lumo}/auth-api:${TAG:-latest}
-        container_name: lumo-auth-api
+    notifications.api:
+        image: ${REGISTRY:-lumo}/notifications-api:${TAG:-latest}
+        container_name: lumo-notifications-api
         build:
             context: ../..
-            dockerfile: src/Auth/Auth.Api/Dockerfile
+            dockerfile: src/Notifications.Api/Dockerfile
             args:
                 BUILD_CONFIGURATION: ${BUILD_CONFIGURATION:-Release}
         ports:
-            - "${AUTH_HTTP_PORT:-5100}:5100"
+            - "${NOTIFICATIONS_HTTP_PORT:-5200}:5200"
         environment:
             # ASP.NET Core
             - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
-            - ASPNETCORE_URLS=http://+:5100
+            - ASPNETCORE_URLS=http://+:5200
 
             # ValkeyOptions
             - Valkey__ConnectionString=${VALKEY_CONNECTION_STRING:-valkey:6379}
@@ -31,7 +31,7 @@ services:
             - Serilog__OverrideMinimumLevels__System=${SERILOG_OVERRIDE_SYSTEM:-Warning}
 
             # OpenTelemetryOptions
-            - OpenTelemetry__ServiceName=${OTEL_SERVICE_NAME:-Auth.Api}
+            - OpenTelemetry__ServiceName=${OTEL_SERVICE_NAME:-Notifications.Api}
             - OpenTelemetry__ServiceVersion=${OTEL_SERVICE_VERSION:-}
             - OpenTelemetry__ServiceNamespace=${OTEL_SERVICE_NAMESPACE:-Lumo}
             - OpenTelemetry__Exporter__Endpoint=${OTEL_EXPORTER_ENDPOINT:-http://jaeger:4317}
@@ -58,8 +58,8 @@ services:
             - Jwt__RequireHttpsMetadata=${JWT_REQUIRE_HTTPS_METADATA:-false}
 
             # DatabaseOptions
-            - Database__ConnectionString=${AUTH_DATABASE_CONNECTION_STRING:?AUTH_DATABASE_CONNECTION_STRING is required}
-            - Database__EnableSensitiveDataLogging=${AUTH_DATABASE_ENABLE_SENSITIVE_DATA_LOGGING:-false}
+            - Database__ConnectionString=${NOTIFICATIONS_DATABASE_CONNECTION_STRING:?NOTIFICATIONS_DATABASE_CONNECTION_STRING is required}
+            - Database__EnableSensitiveDataLogging=${NOTIFICATIONS_DATABASE_ENABLE_SENSITIVE_DATA_LOGGING:-false}
 
             # RabbitMqOptions
             - RabbitMq__Host=${RABBITMQ_HOST:?RABBITMQ_HOST is required}
@@ -68,14 +68,18 @@ services:
             - RabbitMq__Username=${RABBITMQ_USERNAME:?RABBITMQ_USERNAME is required}
             - RabbitMq__Password=${RABBITMQ_PASSWORD:?RABBITMQ_PASSWORD is required}
 
+            # EmailOptions
+            - Email__SenderEmail=${EMAIL_SENDER_EMAIL:?EMAIL_SENDER_EMAIL is required}
+            - Email__ApplicationName=${EMAIL_APPLICATION_NAME:?EMAIL_APPLICATION_NAME is required}
+            - Email__FrontendUrl=${EMAIL_FRONTEND_URL:?EMAIL_FRONTEND_URL is required}
+            - Email__WelcomeEmailTemplateName=${EMAIL_WELCOME_EMAIL_TEMPLATE_NAME:?EMAIL_WELCOME_EMAIL_TEMPLATE_NAME is required}
+            - Email__LoginRequestedTemplateName=${EMAIL_LOGIN_REQUESTED_TEMPLATE_NAME:?EMAIL_LOGIN_REQUESTED_TEMPLATE_NAME is required}
+            - Email__LoginVerifiedTemplateName=${EMAIL_LOGIN_VERIFIED_TEMPLATE_NAME:?EMAIL_LOGIN_VERIFIED_TEMPLATE_NAME is required}
+
             # AWS SDK Credentials
             - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:?AWS_ACCESS_KEY_ID is required}
             - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:?AWS_SECRET_ACCESS_KEY is required}
             - AWS_REGION=${AWS_REGION:?AWS_REGION is required}
-
-            # S3Options
-            - S3__BucketName=${S3_BUCKET_NAME:?S3_BUCKET_NAME is required}
-            - S3__Region=${AWS_REGION:?AWS_REGION is required}
 
         networks:
             - lumo-network
@@ -88,9 +92,7 @@ services:
                 condition: service_healthy
             rabbitmq:
                 condition: service_healthy
-            gateway.api:
-                condition: service_healthy
-            auth-database:
+            notifications-database:
                 condition: service_healthy
         restart: unless-stopped
         healthcheck:
@@ -100,12 +102,12 @@ services:
                     "curl",
                     "--fail",
                     "--silent",
-                    "http://localhost:5100/health/live",
+                    "http://localhost:5200/health/live",
                 ]
-            interval: ${AUTH_HEALTHCHECK_INTERVAL:-10s}
-            timeout: ${AUTH_HEALTHCHECK_TIMEOUT:-5s}
-            retries: ${AUTH_HEALTHCHECK_RETRIES:-3}
-            start_period: ${AUTH_HEALTHCHECK_START_PERIOD:-30s}
+            interval: ${NOTIFICATIONS_HEALTHCHECK_INTERVAL:-10s}
+            timeout: ${NOTIFICATIONS_HEALTHCHECK_TIMEOUT:-5s}
+            retries: ${NOTIFICATIONS_HEALTHCHECK_RETRIES:-3}
+            start_period: ${NOTIFICATIONS_HEALTHCHECK_START_PERIOD:-30s}
         deploy:
             resources:
                 limits:
@@ -113,5 +115,5 @@ services:
                 reservations:
                     memory: 256M
         labels:
-            - "lumo.service=auth-api"
+            - "lumo.service=notifications-api"
             - "lumo.tier=application"

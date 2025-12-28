@@ -2,6 +2,7 @@
   <Folder Name="/Solution Items/" />
   <Folder Name="/src/">
     <Project Path="src/Gateway.Api/Gateway.Api.csproj" />
+    <Project Path="src/Notifications.Api/Notifications.Api.csproj" />
   </Folder>
   <Folder Name="/src/Auth/">
     <Project Path="src/Auth/Auth.Api/Auth.Api.csproj" />

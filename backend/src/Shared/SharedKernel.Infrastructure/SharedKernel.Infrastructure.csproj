@@ -41,12 +41,12 @@
         <PackageReference Include="OpenTelemetry.Instrumentation.Process" />
 
         <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" />
-        
+
         <PackageReference Include="AspnetCore.HealthChecks.Uris" />
         <PackageReference Include="AspnetCore.HealthChecks.Redis" />
-        
+
         <PackageReference Include="UAParser" />
-        
+
         <PackageReference Include="MassTransit" />
     </ItemGroup>
 

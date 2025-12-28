@@ -1,19 +1,18 @@
 using System.Text.Json;
-using FastEndpoints;
-using FastEndpoints.Swagger;
-using Gateway.Api;
-using Gateway.Api.Options;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using Scalar.AspNetCore;
+using Notifications.Api;
+using Notifications.Api.Extensions;
 using SharedKernel.Infrastructure.Observability;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddGatewayApi(builder.Configuration);
-
 builder.Host.ConfigureSerilog();
 
+builder.Services.AddNotificationsApi(builder.Configuration, builder.Environment);
+
 var app = builder.Build();
+
+await app.MigrateNotificationDbAsync();
 
 bool isDevelopment = app.Environment.IsDevelopment();
 
@@ -41,33 +40,6 @@ HealthCheckOptions healthCheckOptions = new()
     }
 };
 
-app.UseFastEndpoints(c =>
-{
-    c.Versioning.PrependToRoute = true;
-    c.Versioning.Prefix = "v";
-    c.Versioning.DefaultVersion = 1;
-    c.Endpoints.Configurator = ep =>
-    {
-        ep.Options(b => b.RequireAuthorization());
-    };
-});
-
-if (app.Environment.IsDevelopment())
-{
-    GatewayApiOptions gatewayApiOptions = new();
-    app.Configuration.GetSection(GatewayApiOptions.SectionName).Bind(gatewayApiOptions);
-
-    app.UseSwaggerGen();
-
-    app.MapScalarApiReference(options =>
-    {
-        options
-            .WithTitle(gatewayApiOptions.Title)
-            .WithOpenApiRoutePattern(gatewayApiOptions.SwaggerRoutePattern)
-            .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
-    });
-}
-
 app.MapHealthChecks("/health", healthCheckOptions);
 
 app.MapHealthChecks("/health/ready", new HealthCheckOptions
@@ -82,7 +54,4 @@ app.MapHealthChecks("/health/live", new HealthCheckOptions
     ResponseWriter = healthCheckOptions.ResponseWriter
 });
 
-app.MapReverseProxy();
-
 await app.RunAsync();
-

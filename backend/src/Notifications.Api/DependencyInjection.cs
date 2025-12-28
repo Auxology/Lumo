@@ -1,36 +1,29 @@
 using System.ComponentModel.DataAnnotations;
-using Amazon.S3;
-using Auth.Application.Abstractions.Authentication;
-using Auth.Application.Abstractions.Data;
-using Auth.Application.Abstractions.Storage;
-using Auth.Infrastructure.Authentication;
-using Auth.Infrastructure.Data;
-using Auth.Infrastructure.Options;
-using Auth.Infrastructure.Storage;
+using Amazon.SimpleEmailV2;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.JsonWebTokens;
-using SharedKernel.Application.Messaging;
+using Notifications.Api.Data;
+using Notifications.Api.Options;
+using SharedKernel.Api;
 using SharedKernel.Infrastructure;
-using SharedKernel.Infrastructure.Messaging;
-using Microsoft.Extensions.Hosting;
 using SharedKernel.Infrastructure.Options;
 
-namespace Auth.Infrastructure;
+using Microsoft.Extensions.Hosting;
+using Notifications.Api.Consumers;
+using Notifications.Api.Services;
 
-public static class DependencyInjection
+namespace Notifications.Api;
+
+internal static class DependencyInjection
 {
     public static IServiceCollection
-        AddInfrastructure(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment) =>
+        AddNotificationsApi(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment) =>
         services
+            .AddSharedKernelApi()
             .AddSharedKernelInfrastructure(configuration)
             .AddDatabase(configuration, environment)
-            .AddAuthenticationInternal()
-            .AddAuthorization()
-            .AddStorage(configuration)
-            .AddMessaging(configuration);
+            .AddMessaging(configuration)
+            .AddSimpleEmailService(configuration);
 
     private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
     {
@@ -46,7 +39,7 @@ public static class DependencyInjection
 
         bool enableSensitiveLogging = databaseOptions.EnableSensitiveDataLogging && environment.IsDevelopment();
 
-        services.AddDbContext<AuthDbContext>(options =>
+        services.AddDbContext<NotificationDbContext>(options =>
         {
             options
                 .UseNpgsql(databaseOptions.ConnectionString)
@@ -54,39 +47,15 @@ public static class DependencyInjection
                 .EnableSensitiveDataLogging(enableSensitiveLogging);
         });
 
-        services.AddScoped<IAuthDbContext>(sp => sp.GetRequiredService<AuthDbContext>());
+        services.AddScoped<INotificationDbContext>(sp => sp.GetRequiredService<NotificationDbContext>());
 
         services.AddHealthChecks()
             .AddNpgSql
             (
                 connectionString: databaseOptions.ConnectionString,
-                name: "auth-postgresql",
+                name: "notifications-postgresql",
                 tags: ["ready"]
             );
-
-        return services;
-    }
-
-    private static IServiceCollection AddAuthenticationInternal(this IServiceCollection services)
-    {
-        services.AddSingleton<JsonWebTokenHandler>();
-        services.AddSingleton<ITokenProvider, TokenProvider>();
-
-        services.AddSingleton<ISecureTokenGenerator, SecureTokenGenerator>();
-
-        return services;
-    }
-
-    private static IServiceCollection AddStorage(this IServiceCollection services, IConfiguration configuration)
-    {
-        services.AddOptions<S3Options>()
-            .Bind(configuration.GetSection(S3Options.SectionName))
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
-
-        services.AddAWSService<IAmazonS3>();
-
-        services.AddSingleton<IStorageService, StorageService>();
 
         return services;
     }
@@ -103,7 +72,10 @@ public static class DependencyInjection
 
         services.AddMassTransit(bus =>
         {
-            bus.AddEntityFrameworkOutbox<AuthDbContext>(outbox =>
+            bus.AddConsumer<UserSignedUpConsumer>();
+            bus.AddConsumer<LoginRequestedConsumer>();
+
+            bus.AddEntityFrameworkOutbox<NotificationDbContext>(outbox =>
             {
                 outbox.UsePostgres();
 
@@ -137,7 +109,22 @@ public static class DependencyInjection
             });
         });
 
-        services.AddScoped<IMessageBus, MessageBus>();
+        return services;
+    }
+
+    private static IServiceCollection AddSimpleEmailService(this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        services.AddOptions<EmailOptions>()
+            .Bind(configuration.GetSection(EmailOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        services.AddDefaultAWSOptions(configuration.GetAWSOptions());
+
+        services.AddAWSService<IAmazonSimpleEmailServiceV2>();
+
+        services.AddScoped<IEmailService, SesEmailService>();
 
         return services;
     }

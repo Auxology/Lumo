@@ -77,6 +77,8 @@ public sealed class RequestContext : IRequestContext
             return correlationId.ToString();
         }
 
-        return HttpContext.TraceIdentifier;
+        // TraceIdentifier is not used because it's not a valid GUID format (e.g., "0HMPNHL0JH8FL:00000001")
+        // and CorrelationId is expected to be a parseable GUID elsewhere in the system.
+        return Guid.NewGuid().ToString();
     }
 }

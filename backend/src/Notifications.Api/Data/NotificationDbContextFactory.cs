@@ -2,14 +2,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 
-namespace Auth.Infrastructure.Data;
+namespace Notifications.Api.Data;
 
-internal sealed class AuthDbContextFactory : IDesignTimeDbContextFactory<AuthDbContext>
+internal sealed class NotificationDbContextFactory : IDesignTimeDbContextFactory<NotificationDbContext>
 {
-    public AuthDbContext CreateDbContext(string[] args)
+    public NotificationDbContext CreateDbContext(string[] args)
     {
         IConfigurationRoot configuration = new ConfigurationBuilder()
-            .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../Auth.Api"))
+            .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json", optional: false)
             .AddJsonFile("appsettings.Development.json", optional: true)
             .AddEnvironmentVariables()
@@ -21,11 +21,11 @@ internal sealed class AuthDbContextFactory : IDesignTimeDbContextFactory<AuthDbC
             throw new InvalidOperationException(
                 "Database connection string is not configured. Ensure 'Database:ConnectionString' is set in appsettings.json or environment variables.");
 
-        DbContextOptionsBuilder<AuthDbContext> optionsBuilder = new();
+        DbContextOptionsBuilder<NotificationDbContext> optionsBuilder = new();
         optionsBuilder
             .UseNpgsql(connectionString)
             .UseSnakeCaseNamingConvention();
 
-        return new AuthDbContext(optionsBuilder.Options);
+        return new NotificationDbContext(optionsBuilder.Options);
     }
 }

@@ -78,7 +78,7 @@ internal sealed class CreateLoginHandler(
             EventId = Guid.NewGuid(),
             OccurredAt = dateTimeProvider.UtcNow,
             CorrelationId = Guid.Parse(requestContext.CorrelationId),
-            EmailAddress = emailAddress.ToString(),
+            EmailAddress = emailAddress.Value,
             OtpToken = otpToken,
             MagicLinkToken = magicLinkToken,
             IpAddress = requestContext.IpAddress,
