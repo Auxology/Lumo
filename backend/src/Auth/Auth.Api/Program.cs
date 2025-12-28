@@ -49,11 +49,18 @@ HealthCheckOptions healthCheckOptions = new()
     }
 };
 
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.UseFastEndpoints(c =>
 {
     c.Versioning.PrependToRoute = true;
     c.Versioning.Prefix = "v";
     c.Versioning.DefaultVersion = 1;
+    c.Endpoints.Configurator = ep =>
+    {
+        ep.Options(b => b.RequireAuthorization());
+    };
 });
 
 if (app.Environment.IsDevelopment())
@@ -85,8 +92,5 @@ app.MapHealthChecks("/health/live", new HealthCheckOptions
     Predicate = check => check.Tags.Contains("live"),
     ResponseWriter = healthCheckOptions.ResponseWriter
 });
-
-app.UseAuthentication();
-app.UseAuthorization();
 
 await app.RunAsync();

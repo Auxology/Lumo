@@ -1,6 +1,7 @@
 using Contracts.IntegrationEvents.Auth;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Options;
 using Notifications.Api.Data;
 using Notifications.Api.Entities;
@@ -32,6 +33,20 @@ internal sealed class LoginRequestedConsumer(
 
         ProcessedEvent processedEvent = ProcessedEvent.Create(eventId, dateTimeProvider.UtcNow);
 
+
+        await using IDbContextTransaction transaction =
+            await notificationDbContext.Database.BeginTransactionAsync(cancellationToken);
+
+        try
+        {
+            await notificationDbContext.ProcessedEvents.AddAsync(processedEvent, cancellationToken);
+            await notificationDbContext.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateException)
+        {
+            return;
+        }
+
         LoginRequestedEmailTemplateData templateData = new()
         {
             OtpToken = context.Message.OtpToken,
@@ -51,14 +66,6 @@ internal sealed class LoginRequestedConsumer(
             cancellationToken: cancellationToken
         );
 
-        try
-        {
-            await notificationDbContext.ProcessedEvents.AddAsync(processedEvent, cancellationToken);
-            await notificationDbContext.SaveChangesAsync(cancellationToken);
-        }
-        catch (DbUpdateException)
-        {
-            return;
-        }
+        await transaction.CommitAsync(cancellationToken);
     }
 }
