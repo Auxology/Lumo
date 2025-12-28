@@ -30,7 +30,15 @@ public static class MigrationExtensions
         AuthDbContext db = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
 
         logger.LogInformation("Applying AuthDb migrations...");
-        await db.Database.MigrateAsync();
-        logger.LogInformation("AuthDb migrations applied successfully");
+        try
+        {
+            await db.Database.MigrateAsync();
+            logger.LogInformation("AuthDb migrations applied successfully");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to apply AuthDb migrations");
+            throw;
+        }
     }
 }

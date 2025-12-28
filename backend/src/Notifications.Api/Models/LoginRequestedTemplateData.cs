@@ -16,7 +16,7 @@ internal sealed record LoginRequestedEmailTemplateData
 
     public required string FrontendUrl { get; init; }
 
-    public string MagicLinkUrl => $"{FrontendUrl}/auth/magic-link?token={MagicLinkToken}";
+    public string MagicLinkUrl => $"{FrontendUrl.TrimEnd('/')}/auth/magic-link?token={Uri.EscapeDataString(MagicLinkToken)}";
 
     public override string ToString() =>
         $"LoginRequestedEmailTemplateData {{ OtpToken=[REDACTED], MagicLinkToken=[REDACTED], ExpiresAt={ExpiresAt}, IpAddress=[REDACTED], UserAgent={UserAgent}, ApplicationName={ApplicationName}, FrontendUrl={FrontendUrl} }}";

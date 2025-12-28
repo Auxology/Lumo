@@ -8,5 +8,5 @@ internal interface IEmailService
         string templateName,
         TData templateData,
         CancellationToken cancellationToken = default
-    ) where TData : class;
+    ) where TData : notnull;
 }

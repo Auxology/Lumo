@@ -30,7 +30,15 @@ internal static class MigrationExtensions
         NotificationDbContext db = scope.ServiceProvider.GetRequiredService<NotificationDbContext>();
 
         logger.LogInformation("Applying NotificationDb migrations...");
-        await db.Database.MigrateAsync();
-        logger.LogInformation("NotificationDb migrations applied successfully");
+        try
+        {
+            await db.Database.MigrateAsync();
+            logger.LogInformation("NotificationDb migrations applied successfully");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to apply NotificationDb migrations");
+            throw;
+        }
     }
 }

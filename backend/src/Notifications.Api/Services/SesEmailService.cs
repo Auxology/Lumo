@@ -19,7 +19,7 @@ internal sealed class SesEmailService(
     private readonly EmailOptions _emailOptions = emailOptions.Value;
 
     public async Task SendTemplatedEmailAsync<TData>(string recipientEmailAddress, string templateName, TData templateData,
-        CancellationToken cancellationToken = default) where TData : class
+        CancellationToken cancellationToken = default) where TData : notnull
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(recipientEmailAddress);
         ArgumentException.ThrowIfNullOrWhiteSpace(templateName);
