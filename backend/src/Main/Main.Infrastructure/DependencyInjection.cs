@@ -1,0 +1,112 @@
+using System.ComponentModel.DataAnnotations;
+using Main.Application.Abstractions.Data;
+using Main.Infrastructure.Data;
+using Main.Infrastructure.Options;
+using MassTransit;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using SharedKernel.Application.Messaging;
+using SharedKernel.Infrastructure;
+using SharedKernel.Infrastructure.Messaging;
+using SharedKernel.Infrastructure.Options;
+
+namespace Main.Infrastructure;
+
+public static class DependencyInjection
+{
+    public static IServiceCollection
+        AddInfrastructure(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment) =>
+        services
+            .AddSharedKernelInfrastructure(configuration)
+            .AddDatabase(configuration, environment)
+            .AddAuthorization()
+            .AddMessaging(configuration);
+
+    private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
+    {
+        ArgumentNullException.ThrowIfNull(configuration);
+
+        services.AddOptions<DatabaseOptions>()
+            .Bind(configuration.GetSection(DatabaseOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        DatabaseOptions databaseOptions = new();
+        configuration.GetSection(DatabaseOptions.SectionName).Bind(databaseOptions);
+
+        bool enableSensitiveLogging = databaseOptions.EnableSensitiveDataLogging && environment.IsDevelopment();
+
+        services.AddDbContext<MainDbContext>(options =>
+        {
+            options
+                .UseNpgsql(databaseOptions.ConnectionString)
+                .UseSnakeCaseNamingConvention()
+                .EnableSensitiveDataLogging(enableSensitiveLogging);
+        });
+
+        services.AddScoped<IMainDbContext>(sp => sp.GetRequiredService<MainDbContext>());
+
+        services.AddHealthChecks()
+            .AddNpgSql
+            (
+                connectionString: databaseOptions.ConnectionString,
+                name: "main-postgresql",
+                tags: ["ready"]
+            );
+
+        return services;
+    }
+
+    private static IServiceCollection AddMessaging(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddOptions<RabbitMqOptions>()
+            .Bind(configuration.GetSection(RabbitMqOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        RabbitMqOptions rabbitMqOptions = new();
+        configuration.GetSection(RabbitMqOptions.SectionName).Bind(rabbitMqOptions);
+
+        services.AddMassTransit(bus =>
+        {
+            bus.AddEntityFrameworkOutbox<MainDbContext>(outbox =>
+            {
+                outbox.UsePostgres();
+
+                outbox.UseBusOutbox();
+
+                outbox.QueryDelay = TimeSpan.FromSeconds(1);
+            });
+
+            bus.UsingRabbitMq((context, cfg) =>
+            {
+                cfg.Host(rabbitMqOptions.Host, rabbitMqOptions.Port, rabbitMqOptions.VirtualHost, h =>
+                {
+                    h.Username(rabbitMqOptions.Username);
+                    h.Password(rabbitMqOptions.Password);
+                });
+
+                cfg.UseMessageRetry(retry =>
+                {
+                    retry.Ignore<ArgumentException>();
+                    retry.Ignore<ValidationException>();
+                    retry.Exponential
+                    (
+                        retryLimit: 5,
+                        minInterval: TimeSpan.FromSeconds(1),
+                        maxInterval: TimeSpan.FromMinutes(1),
+                        intervalDelta: TimeSpan.FromSeconds(2)
+                    );
+                });
+
+                cfg.ConfigureEndpoints(context);
+            });
+        });
+
+        services.AddScoped<IMessageBus, MessageBus>();
+
+        return services;
+    }
+}

@@ -6,9 +6,11 @@ include:
     - path: services/jaeger.yaml
     - path: services/gateway.yaml
     - path: services/auth.yaml
+    - path: services/main.yaml
     - path: services/notifications.yaml
     - path: services/rabbitmq.yaml
     - path: databases/auth-database.yaml
+    - path: databases/main-database.yaml
     - path: databases/notifications-database.yaml
 
 networks:
@@ -42,6 +44,12 @@ volumes:
         labels:
             - "lumo.volume=auth-database-data"
             - "lumo.service=auth-database"
+
+    main-database-data:
+        name: lumo-main-database-data
+        labels:
+            - "lumo.volume=main-database-data"
+            - "lumo.service=main-database"
 
     rabbitmq-data:
         name: lumo-rabbitmq-data
