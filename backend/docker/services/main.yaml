@@ -60,6 +60,13 @@ services:
             - Database__ConnectionString=${MAIN_DATABASE_CONNECTION_STRING:?MAIN_DATABASE_CONNECTION_STRING is required}
             - Database__EnableSensitiveDataLogging=${MAIN_DATABASE_ENABLE_SENSITIVE_DATA_LOGGING:-false}
 
+            # OpenRouterOptions
+            - OpenRouter__ApiKey=${OPENROUTER_API_KEY:?OPENROUTER_API_KEY is required}
+            - OpenRouter__BaseUrl=${OPENROUTER_BASE_URL:-https://openrouter.ai/api/v1}
+            - OpenRouter__DefaultModel=${OPENROUTER_DEFAULT_MODEL:-allenai/olmo-3.1-32b-think:free}
+            - OpenRouter__AppName=${OPENROUTER_APP_NAME:-}
+            - OpenRouter__SiteUrl=${OPENROUTER_SITE_URL:-}
+
             # RabbitMqOptions
             - RabbitMq__Host=${RABBITMQ_HOST:?RABBITMQ_HOST is required}
             - RabbitMq__Port=${RABBITMQ_PORT:?RABBITMQ_PORT is required}

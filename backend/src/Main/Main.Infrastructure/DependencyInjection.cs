@@ -1,3 +1,4 @@
+using System.ClientModel;
 using System.ComponentModel.DataAnnotations;
 using Main.Application.Abstractions.Data;
 using Main.Infrastructure.Data;
@@ -7,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using OpenAI;
 using SharedKernel.Application.Messaging;
 using SharedKernel.Infrastructure;
 using SharedKernel.Infrastructure.Messaging;
@@ -22,7 +24,8 @@ public static class DependencyInjection
             .AddSharedKernelInfrastructure(configuration)
             .AddDatabase(configuration, environment)
             .AddAuthorization()
-            .AddMessaging(configuration);
+            .AddMessaging(configuration)
+            .AddAi(configuration);
 
     private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
     {
@@ -106,6 +109,39 @@ public static class DependencyInjection
         });
 
         services.AddScoped<IMessageBus, MessageBus>();
+
+        return services;
+    }
+
+    private static IServiceCollection AddAi(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddOptions<OpenRouterOptions>()
+            .Bind(configuration.GetSection(OpenRouterOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        OpenRouterOptions openRouterOptions = new();
+        configuration.GetSection(OpenRouterOptions.SectionName).Bind(openRouterOptions);
+
+        services.AddSingleton<OpenAIClient>(_ =>
+        {
+            OpenAIClientOptions options = new()
+            {
+                Endpoint = new Uri(openRouterOptions.BaseUrl)
+            };
+
+            return new OpenAIClient
+            (
+                credential: new ApiKeyCredential(openRouterOptions.ApiKey),
+                options: options
+            );
+        });
+
+        services.AddSingleton(sp =>
+        {
+            OpenAIClient client = sp.GetRequiredService<OpenAIClient>();
+            return client.GetChatClient(openRouterOptions.DefaultModel);
+        });
 
         return services;
     }
