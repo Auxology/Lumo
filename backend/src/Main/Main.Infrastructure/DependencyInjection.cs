@@ -27,7 +27,8 @@ public static class DependencyInjection
             .AddMessaging(configuration)
             .AddAi(configuration);
 
-    private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
+    private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration,
+        IHostEnvironment environment)
     {
         ArgumentNullException.ThrowIfNull(configuration);
 
@@ -64,6 +65,8 @@ public static class DependencyInjection
 
     private static IServiceCollection AddMessaging(this IServiceCollection services, IConfiguration configuration)
     {
+        ArgumentNullException.ThrowIfNull(configuration);
+
         services.AddOptions<RabbitMqOptions>()
             .Bind(configuration.GetSection(RabbitMqOptions.SectionName))
             .ValidateDataAnnotations()
@@ -115,6 +118,8 @@ public static class DependencyInjection
 
     private static IServiceCollection AddAi(this IServiceCollection services, IConfiguration configuration)
     {
+        ArgumentNullException.ThrowIfNull(configuration);
+
         services.AddOptions<OpenRouterOptions>()
             .Bind(configuration.GetSection(OpenRouterOptions.SectionName))
             .ValidateDataAnnotations()
