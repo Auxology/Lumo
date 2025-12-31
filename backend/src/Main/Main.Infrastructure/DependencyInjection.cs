@@ -57,7 +57,7 @@ public static class DependencyInjection
             (
                 connectionString: databaseOptions.ConnectionString,
                 name: "main-postgresql",
-                tags: ["ready"]
+                tags: ["ready", "live"]
             );
 
         return services;

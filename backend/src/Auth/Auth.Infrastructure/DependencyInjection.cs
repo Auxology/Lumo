@@ -61,7 +61,7 @@ public static class DependencyInjection
             (
                 connectionString: databaseOptions.ConnectionString,
                 name: "auth-postgresql",
-                tags: ["ready"]
+                tags: ["ready", "live"]
             );
 
         return services;

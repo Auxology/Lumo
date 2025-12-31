@@ -33,7 +33,6 @@ internal sealed class LoginRequestedConsumer(
 
         ProcessedEvent processedEvent = ProcessedEvent.Create(eventId, dateTimeProvider.UtcNow);
 
-
         await using IDbContextTransaction transaction =
             await notificationDbContext.Database.BeginTransactionAsync(cancellationToken);
 

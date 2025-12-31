@@ -8,6 +8,8 @@ public sealed record UserSignedUp
 
     public required Guid CorrelationId { get; init; }
 
+    public required Guid UserId { get; init; }
+
     public required string DisplayName { get; init; }
 
     public required string EmailAddress { get; init; }

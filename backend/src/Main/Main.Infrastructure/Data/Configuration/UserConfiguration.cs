@@ -1,6 +1,7 @@
 using Main.Domain.ReadModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using SharedKernel.Infrastructure.Data;
 
 namespace Main.Infrastructure.Data.Configuration;
 
@@ -16,11 +17,13 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
 
         b.Property(u => u.EmailAddress)
             .IsRequired()
-            .HasColumnType("varchar(1000)");
+            .HasMaxLength(DataConfigurationConstants.DefaultStringMaxLength)
+            .HasColumnType($"varchar({DataConfigurationConstants.DefaultStringMaxLength})");
 
         b.Property(u => u.AvatarKey)
             .IsRequired(false)
-            .HasColumnType("varchar(1000)");
+            .HasMaxLength(DataConfigurationConstants.DefaultStringMaxLength)
+            .HasColumnType($"varchar({DataConfigurationConstants.DefaultStringMaxLength})");
 
         b.HasIndex(u => u.EmailAddress)
             .IsUnique();
