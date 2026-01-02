@@ -1,5 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
+using Main.Domain.Constants;
 using Main.Domain.Entities;
+using Main.Domain.Faults;
 using Main.Domain.ValueObjects;
 using SharedKernel;
 
@@ -39,5 +41,44 @@ public sealed class Chat : AggregateRoot<ChatId>
         IsArchived = false;
         CreatedAt = utcNow;
         UpdatedAt = null;
+    }
+
+    public static Outcome<Chat> Create(Guid userId, DateTimeOffset utcNow)
+    {
+        if (userId == Guid.Empty)
+            return ChatFaults.UserIdRequired;
+
+        Chat chat = new
+        (
+            userId: userId,
+            utcNow: utcNow
+        );
+
+        return chat;
+    }
+
+    public Outcome AddTitle(string title, DateTimeOffset utcNow)
+    {
+        if (string.IsNullOrWhiteSpace(title))
+            return ChatFaults.TitleRequired;
+
+        if (title.Length > ChatConstants.MaxTitleLength)
+            return ChatFaults.TitleTooLong;
+
+        Title = title;
+        UpdatedAt = utcNow;
+
+        return Outcome.Success();
+    }
+
+    public bool Archive(DateTimeOffset utcNow)
+    {
+        if (IsArchived)
+            return false;
+
+        IsArchived = true;
+        UpdatedAt = utcNow;
+
+        return true;
     }
 }

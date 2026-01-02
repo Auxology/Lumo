@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Main.Domain.Enums;
+using Main.Domain.Faults;
 using Main.Domain.ValueObjects;
 using SharedKernel;
 
@@ -34,5 +35,38 @@ public sealed class Message : Entity<int>
         MessageContent = messageContent;
         TokenCount = tokenCount;
         CreatedAt = utcNow;
+    }
+
+    public static Outcome<Message> Create
+    (
+        ChatId chatId,
+        MessageRole messageRole,
+        string messageContent,
+        long tokenCount,
+        DateTimeOffset utcNow
+    )
+    {
+        if (chatId.IsEmpty)
+            return MessageFaults.ChatIdRequired;
+
+        if (!Enum.IsDefined(messageRole))
+            return MessageFaults.InvalidMessageRole;
+
+        if (string.IsNullOrWhiteSpace(messageContent))
+            return MessageFaults.MessageContentRequired;
+
+        if (tokenCount < 0)
+            return MessageFaults.NegativeTokenCount;
+
+        Message message = new
+        (
+            chatId: chatId,
+            messageRole: messageRole,
+            messageContent: messageContent,
+            tokenCount: tokenCount,
+            utcNow: utcNow
+        );
+
+        return message;
     }
 }

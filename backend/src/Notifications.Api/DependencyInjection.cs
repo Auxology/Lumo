@@ -54,7 +54,7 @@ internal static class DependencyInjection
             (
                 connectionString: databaseOptions.ConnectionString,
                 name: "notifications-postgresql",
-                tags: ["ready", "live"]
+                tags: ["ready"]
             );
 
         return services;
