@@ -1,6 +1,9 @@
 using System.ClientModel;
 using System.ComponentModel.DataAnnotations;
+using Main.Application.Abstractions.AI;
 using Main.Application.Abstractions.Data;
+using Main.Infrastructure.AI;
+using Main.Infrastructure.Consumers;
 using Main.Infrastructure.Data;
 using Main.Infrastructure.Options;
 using MassTransit;
@@ -77,6 +80,8 @@ public static class DependencyInjection
 
         services.AddMassTransit(bus =>
         {
+            bus.AddConsumer<UserSignedUpConsumer>();
+
             bus.AddEntityFrameworkOutbox<MainDbContext>(outbox =>
             {
                 outbox.UsePostgres();
@@ -147,6 +152,8 @@ public static class DependencyInjection
             OpenAIClient client = sp.GetRequiredService<OpenAIClient>();
             return client.GetChatClient(openRouterOptions.DefaultModel);
         });
+
+        services.AddSingleton<IChatCompletionService, ChatCompletionService>();
 
         return services;
     }
