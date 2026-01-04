@@ -1,6 +1,8 @@
 using Auth.Api.Options;
+
 using FastEndpoints;
 using FastEndpoints.Swagger;
+
 using SharedKernel.Api;
 
 namespace Auth.Api;

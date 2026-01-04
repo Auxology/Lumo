@@ -1,13 +1,18 @@
 using System.Text.Json;
+
 using Auth.Api;
 using Auth.Api.Options;
 using Auth.Application;
 using Auth.Infrastructure;
 using Auth.Infrastructure.Extensions;
+
 using FastEndpoints;
 using FastEndpoints.Swagger;
+
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+
 using Scalar.AspNetCore;
+
 using SharedKernel.Infrastructure.Observability;
 
 var builder = WebApplication.CreateBuilder(args);

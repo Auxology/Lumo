@@ -1,5 +1,6 @@
 using Auth.Domain.Aggregates;
 using Auth.Domain.ValueObjects;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

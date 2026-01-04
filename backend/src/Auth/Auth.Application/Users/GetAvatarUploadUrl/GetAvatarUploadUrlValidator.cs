@@ -1,4 +1,5 @@
 using Auth.Application.Abstractions.Storage;
+
 using FluentValidation;
 
 namespace Auth.Application.Users.GetAvatarUploadUrl;

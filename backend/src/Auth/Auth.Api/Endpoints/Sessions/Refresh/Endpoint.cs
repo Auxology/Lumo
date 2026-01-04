@@ -1,7 +1,10 @@
 using Auth.Application.Sessions;
+
 using Contracts.Requests;
 using Contracts.Responses;
+
 using FastEndpoints;
+
 using Mediator;
 
 namespace Auth.Api.Endpoints.Sessions.Refresh;

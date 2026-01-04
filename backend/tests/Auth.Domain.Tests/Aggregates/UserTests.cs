@@ -3,7 +3,9 @@ using Auth.Domain.Constants;
 using Auth.Domain.Events.User;
 using Auth.Domain.Faults;
 using Auth.Domain.ValueObjects;
+
 using FluentAssertions;
+
 using SharedKernel;
 
 namespace Auth.Domain.Tests.Aggregates;

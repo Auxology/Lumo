@@ -1,12 +1,15 @@
 using Contracts.IntegrationEvents.Chat;
+
 using Main.Application.Abstractions.AI;
 using Main.Application.Abstractions.Data;
 using Main.Domain.Constants;
-using Main.Domain.Entities;
 using Main.Domain.ValueObjects;
+
 using MassTransit;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+
 using SharedKernel;
 
 namespace Main.Infrastructure.Consumers;
@@ -14,21 +17,11 @@ namespace Main.Infrastructure.Consumers;
 internal sealed class ChatStartedConsumer(
     IMainDbContext dbContext,
     IChatCompletionService chatCompletionService,
-    ILogger<ChatStartedConsumer> logger,
-    IDateTimeProvider dateTimeProvider) : IConsumer<ChatStarted>
+    ILogger<ChatStartedConsumer> logger) : IConsumer<ChatStarted>
 {
     public async Task Consume(ConsumeContext<ChatStarted> context)
     {
         CancellationToken cancellationToken = context.CancellationToken;
-        Guid eventId = context.Message.EventId;
-
-        bool alreadyProcessed = await dbContext.ProcessedEvents
-            .AnyAsync(e => e.EventId == eventId, cancellationToken);
-
-        if (alreadyProcessed)
-            return;
-
-        ProcessedEvent processedEvent = ProcessedEvent.Create(eventId, dateTimeProvider.UtcNow);
 
         Outcome<ChatId> chatIdOutcome = ChatId.FromGuid(context.Message.ChatId);
 
@@ -52,9 +45,7 @@ internal sealed class ChatStartedConsumer(
             ))
             .ToListAsync(cancellationToken);
 
-        await dbContext.ProcessedEvents.AddAsync(processedEvent, cancellationToken);
-        await dbContext.SaveChangesAsync(cancellationToken);
-
+        // TODO: Critical architecture issues to be decided here
         await chatCompletionService.StreamCompletionAsync
         (
             chatId: chatId.Value,
@@ -62,6 +53,6 @@ internal sealed class ChatStartedConsumer(
             cancellationToken: cancellationToken
         );
 
-        logger.LogInformation("Processed ChatStarted event: {EventId}", eventId);
+        logger.LogInformation("Processed ChatStarted event: {EventId}", context.Message.EventId);
     }
 }

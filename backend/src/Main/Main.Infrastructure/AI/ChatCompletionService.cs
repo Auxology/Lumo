@@ -1,7 +1,10 @@
 using System.ClientModel;
+
 using Main.Application.Abstractions.AI;
 using Main.Domain.Constants;
+
 using Microsoft.Extensions.Logging;
+
 using OpenAI.Chat;
 
 namespace Main.Infrastructure.AI;
@@ -30,12 +33,15 @@ internal sealed class ChatCompletionService(
                 cancellationToken: cancellationToken
             );
 
-            string title = response.Content[0].Text.Trim();
+            string? text = response.Content.FirstOrDefault()?.Text;
+
+            if (string.IsNullOrWhiteSpace(text))
+                return "New Chat";
+
+            string title = text.Trim();
 
             if (title.Length > ChatConstants.MaxTitleLength)
                 title = title[..(ChatConstants.MaxTitleLength - 3)] + "...";
-
-            logger.LogInformation("Generated chat title: {Title}", title);
 
             return title;
         }

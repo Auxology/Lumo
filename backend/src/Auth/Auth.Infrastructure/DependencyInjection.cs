@@ -1,5 +1,7 @@
 using System.ComponentModel.DataAnnotations;
+
 using Amazon.S3;
+
 using Auth.Application.Abstractions.Authentication;
 using Auth.Application.Abstractions.Data;
 using Auth.Application.Abstractions.Storage;
@@ -7,15 +9,18 @@ using Auth.Infrastructure.Authentication;
 using Auth.Infrastructure.Data;
 using Auth.Infrastructure.Options;
 using Auth.Infrastructure.Storage;
+
 using MassTransit;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.JsonWebTokens;
+
 using SharedKernel.Application.Messaging;
 using SharedKernel.Infrastructure;
 using SharedKernel.Infrastructure.Messaging;
-using Microsoft.Extensions.Hosting;
 using SharedKernel.Infrastructure.Options;
 
 namespace Auth.Infrastructure;

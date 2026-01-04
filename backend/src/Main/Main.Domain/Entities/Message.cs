@@ -1,7 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
+
 using Main.Domain.Enums;
 using Main.Domain.Faults;
 using Main.Domain.ValueObjects;
+
 using SharedKernel;
 
 namespace Main.Domain.Entities;

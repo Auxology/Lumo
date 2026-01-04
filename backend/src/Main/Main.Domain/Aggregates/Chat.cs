@@ -1,9 +1,11 @@
 using System.Diagnostics.CodeAnalysis;
+
 using Main.Domain.Constants;
 using Main.Domain.Entities;
 using Main.Domain.Enums;
 using Main.Domain.Faults;
 using Main.Domain.ValueObjects;
+
 using SharedKernel;
 
 namespace Main.Domain.Aggregates;
@@ -24,7 +26,7 @@ public sealed class Chat : AggregateRoot<ChatId>
 
     public DateTimeOffset? UpdatedAt { get; private set; }
 
-    public IReadOnlyCollection<Message> Messages => [.._messages];
+    public IReadOnlyCollection<Message> Messages => [.. _messages];
 
     private Chat() { } // For EF Core
 
@@ -60,6 +62,9 @@ public sealed class Chat : AggregateRoot<ChatId>
 
     public Outcome AddTitle(string title, DateTimeOffset utcNow)
     {
+        if (IsArchived)
+            return ChatFaults.CannotModifyArchivedChat;
+
         if (string.IsNullOrWhiteSpace(title))
             return ChatFaults.TitleRequired;
 

@@ -22,5 +22,5 @@ public sealed class JwtOptions
     public TimeSpan RefreshTokenExpiration { get; init; } = TimeSpan.FromDays(30);
 
     [Required]
-    public bool RequireHttpsMetadata { get; init; } 
+    public bool RequireHttpsMetadata { get; init; }
 }

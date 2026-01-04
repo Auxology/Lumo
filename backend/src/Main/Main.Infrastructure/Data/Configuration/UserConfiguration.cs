@@ -1,6 +1,8 @@
 using Main.Domain.ReadModels;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
 using SharedKernel.Infrastructure.Data;
 
 namespace Main.Infrastructure.Data.Configuration;

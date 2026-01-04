@@ -1,4 +1,5 @@
 using FastEndpoints;
+
 using SharedKernel;
 using SharedKernel.Api.Infrastructure;
 

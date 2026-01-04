@@ -1,4 +1,5 @@
 using Auth.Domain.ValueObjects;
+
 using FluentAssertions;
 
 namespace Auth.Domain.Tests.ValueObjects;
@@ -35,4 +36,3 @@ public sealed class RecoverKeyInputTests
         input1.Should().NotBe(input2);
     }
 }
-

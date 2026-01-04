@@ -1,10 +1,15 @@
 using System.Text.Json;
+
 using FastEndpoints;
 using FastEndpoints.Swagger;
+
 using Gateway.Api;
 using Gateway.Api.Options;
+
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+
 using Scalar.AspNetCore;
+
 using SharedKernel.Infrastructure.Observability;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -85,4 +90,3 @@ app.MapHealthChecks("/health/live", new HealthCheckOptions
 app.MapReverseProxy();
 
 await app.RunAsync();
-

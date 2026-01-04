@@ -1,5 +1,7 @@
 using FluentValidation;
+
 using Microsoft.Extensions.DependencyInjection;
+
 using SharedKernel.Application.Pipelines;
 
 namespace Main.Application;

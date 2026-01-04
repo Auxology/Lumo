@@ -1,7 +1,10 @@
 using System.Text.Json;
+
 using Contracts.Requests;
 using Contracts.Responses;
+
 using Gateway.Api.Faults;
+
 using SharedKernel;
 using SharedKernel.Api.DTOs;
 using SharedKernel.Api.Extensions;

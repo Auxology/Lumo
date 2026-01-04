@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
+
 using Auth.Application.Abstractions.Authentication;
 
 namespace Auth.Infrastructure.Authentication;

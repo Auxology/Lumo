@@ -1,4 +1,5 @@
 using Auth.Domain.Constants;
+
 using SharedKernel;
 
 namespace Auth.Domain.Faults;

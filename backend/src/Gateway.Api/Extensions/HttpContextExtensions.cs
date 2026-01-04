@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Options;
+
 using SharedKernel.Infrastructure.Options;
 
 namespace Gateway.Api.Extensions;

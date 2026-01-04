@@ -14,7 +14,7 @@ internal sealed class AuthApiOptions
 
     [Required]
     public string Version { get; init; } = "v1";
-    
+
     [Required]
     public string SwaggerRoutePattern { get; init; } = "/swagger/{documentName}/swagger.json";
 }

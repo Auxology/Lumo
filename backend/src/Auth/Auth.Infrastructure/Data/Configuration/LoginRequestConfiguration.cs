@@ -1,7 +1,9 @@
 using Auth.Domain.Aggregates;
 using Auth.Domain.ValueObjects;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
 using SharedKernel.Infrastructure.Data;
 
 namespace Auth.Infrastructure.Data.Configuration;
@@ -19,7 +21,7 @@ internal sealed class LoginRequestConfiguration : IEntityTypeConfiguration<Login
                 guid => LoginRequestId.UnsafeFromGuid(guid)
             )
             .HasColumnType("uuid");
-        
+
         b.Property(lr => lr.UserId)
             .IsRequired()
             .HasConversion
@@ -33,23 +35,23 @@ internal sealed class LoginRequestConfiguration : IEntityTypeConfiguration<Login
             .IsRequired()
             .HasMaxLength(DataConfigurationConstants.DefaultStringMaxLength)
             .HasColumnType("varchar");
-        
+
         b.Property(lr => lr.OtpTokenHash)
             .IsRequired()
             .HasMaxLength(DataConfigurationConstants.DefaultStringMaxLength)
             .HasColumnType("varchar");
-        
+
         b.Property(lr => lr.MagicLinkTokenHash)
             .IsRequired()
             .HasMaxLength(DataConfigurationConstants.DefaultStringMaxLength)
             .HasColumnType("varchar");
 
         b.ComplexProperty(lr => lr.Fingerprint, fp => fp.ConfigureFingerprint());
-        
+
         b.Property(lr => lr.CreatedAt)
             .IsRequired()
             .HasColumnType("timestamptz");
-        
+
         b.Property(lr => lr.ExpiresAt)
             .IsRequired()
             .HasColumnType("timestamptz");
@@ -59,14 +61,14 @@ internal sealed class LoginRequestConfiguration : IEntityTypeConfiguration<Login
             .HasColumnType("timestamptz");
 
         b.HasIndex(lr => lr.UserId);
-        
+
         b.HasIndex(lr => lr.TokenKey)
             .IsUnique();
-        
+
         b.HasIndex(lr => lr.ExpiresAt);
-        
+
         b.HasIndex(lr => lr.ConsumedAt);
-        
+
         b.HasIndex(lr => new { lr.TokenKey, lr.ConsumedAt, lr.ExpiresAt });
     }
 }

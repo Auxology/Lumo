@@ -1,10 +1,12 @@
 using FastEndpoints;
 using FastEndpoints.Swagger;
+
 using Gateway.Api.Authentication;
 using Gateway.Api.Caching;
 using Gateway.Api.HttpClients;
 using Gateway.Api.Options;
 using Gateway.Api.Transforms;
+
 using SharedKernel.Api;
 using SharedKernel.Infrastructure;
 

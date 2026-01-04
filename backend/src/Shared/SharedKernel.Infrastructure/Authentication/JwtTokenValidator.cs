@@ -1,7 +1,9 @@
 using System.Text;
+
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
+
 using SharedKernel.Application.Authentication;
 using SharedKernel.Infrastructure.Options;
 
@@ -14,12 +16,12 @@ public sealed class JwtTokenValidator(IOptions<JwtOptions> jwtOptions) : IJwtTok
 
     private readonly SecurityKey _securityKey =
         new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Value.SecretKey));
-    
+
     public async Task<bool> IsValidAsync(string accessToken, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(accessToken))
             return false;
-        
+
         TokenValidationParameters tokenValidationParameters = new()
         {
             ValidateIssuer = true,
@@ -33,7 +35,7 @@ public sealed class JwtTokenValidator(IOptions<JwtOptions> jwtOptions) : IJwtTok
 
         TokenValidationResult result =
             await _jsonWebTokenHandler.ValidateTokenAsync(accessToken, tokenValidationParameters);
-        
+
         return result.IsValid;
     }
 }

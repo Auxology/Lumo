@@ -1,8 +1,11 @@
 using System.Globalization;
+
 using Amazon.S3;
 using Amazon.S3.Model;
+
 using Auth.Application.Abstractions.Storage;
 using Auth.Infrastructure.Options;
+
 using Microsoft.Extensions.Options;
 
 namespace Auth.Infrastructure.Storage;

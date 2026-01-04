@@ -1,8 +1,11 @@
 using Contracts.Requests;
 using Contracts.Responses;
+
 using FastEndpoints;
+
 using Gateway.Api.Authentication;
 using Gateway.Api.Extensions;
+
 using SharedKernel;
 using SharedKernel.Api.Infrastructure;
 

@@ -1,4 +1,5 @@
 using Auth.Domain.Constants;
+
 using FluentValidation;
 
 namespace Auth.Application.Users.UpdateProfile;
@@ -26,4 +27,3 @@ internal sealed class UpdateProfileValidator : AbstractValidator<UpdateProfileCo
         });
     }
 }
-

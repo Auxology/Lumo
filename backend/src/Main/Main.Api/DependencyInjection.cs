@@ -1,6 +1,8 @@
 using FastEndpoints;
 using FastEndpoints.Swagger;
+
 using Main.Api.Options;
+
 using SharedKernel.Api;
 
 namespace Main.Api;

@@ -10,7 +10,7 @@ public sealed record ValidationFault : Fault
             Kind: FaultKind.Validation
         )
     {
-        Faults = [..faults];
+        Faults = [.. faults];
     }
 
     public IReadOnlyList<Fault> Faults { get; }

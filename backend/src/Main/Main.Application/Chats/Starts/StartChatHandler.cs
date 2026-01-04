@@ -1,10 +1,13 @@
 using Contracts.IntegrationEvents.Chat;
+
 using Main.Application.Abstractions.AI;
 using Main.Application.Abstractions.Data;
 using Main.Application.Faults;
 using Main.Domain.Aggregates;
 using Main.Domain.ReadModels;
+
 using Microsoft.EntityFrameworkCore;
+
 using SharedKernel;
 using SharedKernel.Application.Authentication;
 using SharedKernel.Application.Messaging;

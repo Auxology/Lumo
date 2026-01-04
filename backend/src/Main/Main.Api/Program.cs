@@ -1,13 +1,18 @@
 using System.Text.Json;
+
 using FastEndpoints;
 using FastEndpoints.Swagger;
+
 using Main.Api;
 using Main.Api.Options;
 using Main.Application;
 using Main.Infrastructure;
 using Main.Infrastructure.Extensions;
+
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+
 using Scalar.AspNetCore;
+
 using SharedKernel.Infrastructure.Observability;
 
 var builder = WebApplication.CreateBuilder(args);

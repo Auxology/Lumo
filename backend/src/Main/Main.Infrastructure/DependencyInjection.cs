@@ -1,17 +1,22 @@
 using System.ClientModel;
 using System.ComponentModel.DataAnnotations;
+
 using Main.Application.Abstractions.AI;
 using Main.Application.Abstractions.Data;
 using Main.Infrastructure.AI;
 using Main.Infrastructure.Consumers;
 using Main.Infrastructure.Data;
 using Main.Infrastructure.Options;
+
 using MassTransit;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+
 using OpenAI;
+
 using SharedKernel.Application.Messaging;
 using SharedKernel.Infrastructure;
 using SharedKernel.Infrastructure.Messaging;

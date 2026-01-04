@@ -1,6 +1,9 @@
 using FluentValidation;
+
 using Mediator;
+
 using Microsoft.Extensions.DependencyInjection;
+
 using SharedKernel.Application.Pipelines;
 
 namespace Auth.Application;
@@ -11,7 +14,7 @@ public static class DependencyInjection
         services
             .AddMessaging()
             .AddFluentValidation();
-    
+
     private static IServiceCollection AddMessaging(this IServiceCollection services)
     {
         services.AddMediator(options =>
@@ -22,11 +25,11 @@ public static class DependencyInjection
 
         return services;
     }
-    
+
     private static IServiceCollection AddFluentValidation(this IServiceCollection services)
     {
         services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly, includeInternalTypes: true);
-        
+
         return services;
     }
 }

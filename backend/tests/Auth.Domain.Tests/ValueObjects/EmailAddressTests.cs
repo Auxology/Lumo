@@ -1,5 +1,7 @@
 using Auth.Domain.ValueObjects;
+
 using FluentAssertions;
+
 using SharedKernel;
 
 namespace Auth.Domain.Tests.ValueObjects;
@@ -140,4 +142,3 @@ public sealed class EmailAddressTests
         email1.Should().NotBe(email2);
     }
 }
-

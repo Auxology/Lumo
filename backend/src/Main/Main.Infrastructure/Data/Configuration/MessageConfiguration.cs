@@ -1,7 +1,9 @@
 using Main.Domain.Entities;
 using Main.Domain.ValueObjects;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
 using SharedKernel.Infrastructure.Data;
 
 namespace Main.Infrastructure.Data.Configuration;

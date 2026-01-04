@@ -1,7 +1,10 @@
 using System.Reflection;
+
 using FluentValidation;
 using FluentValidation.Results;
+
 using Mediator;
+
 using ValidationResult = FluentValidation.Results.ValidationResult;
 
 namespace SharedKernel.Application.Pipelines;

@@ -1,7 +1,9 @@
 using Auth.Domain.Entities;
 using Auth.Domain.ValueObjects;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
 using SharedKernel.Infrastructure.Data;
 
 namespace Auth.Infrastructure.Data.Configuration;
@@ -42,14 +44,13 @@ internal sealed class RecoveryKeyConfiguration : IEntityTypeConfiguration<Recove
         b.ComplexProperty(rk => rk.Fingerprint, fp => fp.ConfigureFingerprint());
 
         b.HasIndex(rk => rk.RecoveryKeyChainId);
-        
+
         b.HasIndex(rk => rk.Identifier);
-        
+
         b.HasIndex(rk => rk.IsUsed);
-        
+
         b.HasIndex(rk => new { rk.RecoveryKeyChainId, rk.IsUsed });
-        
+
         b.HasIndex(rk => new { rk.Identifier, rk.IsUsed });
     }
 }
-
