@@ -5,4 +5,6 @@ public static class ChatConstants
     public const int MaxTitleLength = 100;
 
     public const int MaxModelNameLength = 64;
+
+    public const int MaxContextMessages = 20;
 }

@@ -6,8 +6,9 @@ using OpenAI.Chat;
 
 namespace Main.Infrastructure.AI;
 
-internal sealed class ChatCompletionService(ChatClient chatClient, ILogger<ChatCompletionService> logger)
-    : IChatCompletionService
+internal sealed class ChatCompletionService(
+    ChatClient chatClient,
+    ILogger<ChatCompletionService> logger) : IChatCompletionService
 {
     private static readonly string TitleSystemPrompt =
         $"Generate a concise title (max {ChatConstants.MaxTitleLength} characters) for this conversation. " +
@@ -48,5 +49,10 @@ internal sealed class ChatCompletionService(ChatClient chatClient, ILogger<ChatC
             logger.LogWarning(exception, "Failed to generate chat title due to API error, using fallback");
             return "New Chat";
         }
+    }
+
+    public Task StreamCompletionAsync(Guid chatId, IReadOnlyList<ChatCompletionMessage> messages, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
     }
 }

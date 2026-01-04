@@ -65,7 +65,7 @@ internal sealed class SignUpHandler(
             EventId = Guid.NewGuid(),
             OccurredAt = dateTimeProvider.UtcNow,
             CorrelationId = Guid.Parse(requestContext.CorrelationId),
-            UserId = user.Id,
+            UserId = user.Id.Value,
             EmailAddress = user.EmailAddress.Value,
             DisplayName = user.DisplayName
         };

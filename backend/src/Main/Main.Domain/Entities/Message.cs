@@ -14,7 +14,7 @@ public sealed class Message : Entity<int>
 
     public string MessageContent { get; private set; } = string.Empty;
 
-    public long TokenCount { get; private set; }
+    public long? TokenCount { get; private set; }
 
     public DateTimeOffset CreatedAt { get; private set; }
 
@@ -26,23 +26,21 @@ public sealed class Message : Entity<int>
         ChatId chatId,
         MessageRole messageRole,
         string messageContent,
-        long tokenCount,
         DateTimeOffset utcNow
     )
     {
         ChatId = chatId;
         MessageRole = messageRole;
         MessageContent = messageContent;
-        TokenCount = tokenCount;
+        TokenCount = null;
         CreatedAt = utcNow;
     }
 
-    public static Outcome<Message> Create
+    internal static Outcome<Message> Create
     (
         ChatId chatId,
         MessageRole messageRole,
         string messageContent,
-        long tokenCount,
         DateTimeOffset utcNow
     )
     {
@@ -55,15 +53,12 @@ public sealed class Message : Entity<int>
         if (string.IsNullOrWhiteSpace(messageContent))
             return MessageFaults.MessageContentRequired;
 
-        if (tokenCount < 0)
-            return MessageFaults.NegativeTokenCount;
 
         Message message = new
         (
             chatId: chatId,
             messageRole: messageRole,
             messageContent: messageContent,
-            tokenCount: tokenCount,
             utcNow: utcNow
         );
 

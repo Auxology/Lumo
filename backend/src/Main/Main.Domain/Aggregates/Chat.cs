@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Main.Domain.Constants;
 using Main.Domain.Entities;
+using Main.Domain.Enums;
 using Main.Domain.Faults;
 using Main.Domain.ValueObjects;
 using SharedKernel;
@@ -80,5 +81,29 @@ public sealed class Chat : AggregateRoot<ChatId>
         UpdatedAt = utcNow;
 
         return true;
+    }
+
+    public Outcome AddUserMessage(string messageContent, DateTimeOffset utcNow)
+    {
+        if (IsArchived)
+            return ChatFaults.CannotModifyArchivedChat;
+
+        Outcome<Message> messageOutcome = Message.Create
+        (
+            chatId: Id,
+            messageRole: MessageRole.User,
+            messageContent: messageContent,
+            utcNow: utcNow
+        );
+
+        if (messageOutcome.IsFailure)
+            return messageOutcome.Fault;
+
+        Message message = messageOutcome.Value;
+
+        _messages.Add(message);
+        UpdatedAt = utcNow;
+
+        return Outcome.Success();
     }
 }

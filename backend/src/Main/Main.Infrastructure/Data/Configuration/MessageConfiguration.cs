@@ -36,7 +36,7 @@ internal sealed class MessageConfiguration : IEntityTypeConfiguration<Message>
             .HasColumnType("text");
 
         b.Property(m => m.TokenCount)
-            .IsRequired()
+            .IsRequired(false)
             .HasColumnType("bigint");
 
         b.Property(m => m.CreatedAt)

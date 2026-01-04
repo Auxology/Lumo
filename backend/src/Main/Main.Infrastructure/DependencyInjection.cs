@@ -81,6 +81,7 @@ public static class DependencyInjection
         services.AddMassTransit(bus =>
         {
             bus.AddConsumer<UserSignedUpConsumer>();
+            bus.AddConsumer<ChatStartedConsumer>();
 
             bus.AddEntityFrameworkOutbox<MainDbContext>(outbox =>
             {

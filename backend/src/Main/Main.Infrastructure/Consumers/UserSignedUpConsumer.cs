@@ -11,29 +11,19 @@ namespace Main.Infrastructure.Consumers;
 
 internal sealed class UserSignedUpConsumer(
     IMainDbContext dbContext,
-    ILogger<UserSignedUpConsumer> logger,
-    IDateTimeProvider dateTimeProvider) : IConsumer<UserSignedUp>
+    IDateTimeProvider dateTimeProvider,
+    ILogger<UserSignedUpConsumer> logger) : IConsumer<UserSignedUp>
 {
     public async Task Consume(ConsumeContext<UserSignedUp> context)
     {
         CancellationToken cancellationToken = context.CancellationToken;
         Guid eventId = context.Message.EventId;
 
-        logger.LogInformation(
-            "Received UserSignedUp event: EventId={EventId}, UserId={UserId}, Email={Email}, DisplayName={DisplayName}",
-            eventId,
-            context.Message.UserId,
-            context.Message.EmailAddress,
-            context.Message.DisplayName);
-
         bool alreadyProcessed = await dbContext.ProcessedEvents
             .AnyAsync(e => e.EventId == eventId, cancellationToken);
 
         if (alreadyProcessed)
-        {
-            logger.LogInformation("Event with ID {EventId} has already been processed. Skipping.", eventId);
             return;
-        }
 
         ProcessedEvent processedEvent = ProcessedEvent.Create(eventId, dateTimeProvider.UtcNow);
 
@@ -48,19 +38,14 @@ internal sealed class UserSignedUpConsumer(
         {
             await dbContext.ProcessedEvents.AddAsync(processedEvent, cancellationToken);
             await dbContext.Users.AddAsync(newUser, cancellationToken);
-
-            logger.LogInformation("About to save User {UserId} and ProcessedEvent {EventId}", newUser.UserId, eventId);
-
-            int savedCount = await dbContext.SaveChangesAsync(cancellationToken);
-
-            logger.LogInformation("SaveChangesAsync completed. Rows affected: {SavedCount}", savedCount);
+            await dbContext.SaveChangesAsync(cancellationToken);
         }
-        catch (DbUpdateException ex)
+        catch (DbUpdateException)
         {
-            logger.LogError(ex, "Database error while saving User {UserId} for event {EventId}", context.Message.UserId, eventId);
-            throw;
+            return;
         }
 
-        logger.LogInformation("Successfully processed UserSignedUp event with ID {EventId}.", eventId);
+        logger.LogInformation("User read model created. UserId: {UserId}, EventId: {EventId}", context.Message.UserId,
+            eventId);
     }
 }

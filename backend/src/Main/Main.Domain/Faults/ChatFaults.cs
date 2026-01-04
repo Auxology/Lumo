@@ -21,4 +21,10 @@ public static class ChatFaults
         title: "Chat.TitleTooLong",
         detail: "The title exceeds the maximum allowed length."
     );
+
+    public static readonly Fault CannotModifyArchivedChat = Fault.Conflict
+    (
+        title: "Chat.CannotModifyArchivedChat",
+        detail: "Cannot modify an archived chat."
+    );
 }

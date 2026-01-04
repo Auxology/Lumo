@@ -1,3 +1,4 @@
+using Contracts.IntegrationEvents.Chat;
 using Main.Application.Abstractions.AI;
 using Main.Application.Abstractions.Data;
 using Main.Application.Faults;
@@ -13,7 +14,9 @@ namespace Main.Application.Chats.Starts;
 internal sealed class StartChatHandler(
     IMainDbContext dbContext,
     IUserContext userContext,
+    IRequestContext requestContext,
     IChatCompletionService chatCompletionService,
+    IMessageBus messageBus,
     IDateTimeProvider dateTimeProvider) : ICommandHandler<StartChatCommand, StartChatResponse>
 {
     public async ValueTask<Outcome<StartChatResponse>> Handle(StartChatCommand request, CancellationToken cancellationToken)
@@ -41,7 +44,27 @@ internal sealed class StartChatHandler(
 
         chat.AddTitle(title, dateTimeProvider.UtcNow);
 
+        Outcome messageOutcome = chat.AddUserMessage
+        (
+            messageContent: request.Message,
+            utcNow: dateTimeProvider.UtcNow
+        );
+
+        if (messageOutcome.IsFailure)
+            return messageOutcome.Fault;
+
+        ChatStarted chatStarted = new()
+        {
+            EventId = Guid.NewGuid(),
+            OccurredAt = dateTimeProvider.UtcNow,
+            CorrelationId = Guid.Parse(requestContext.CorrelationId),
+            ChatId = chat.Id.Value,
+            UserId = user.UserId,
+            InitialMessage = request.Message
+        };
+
         await dbContext.Chats.AddAsync(chat, cancellationToken);
+        await messageBus.PublishAsync(chatStarted, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
 
         StartChatResponse response = new
