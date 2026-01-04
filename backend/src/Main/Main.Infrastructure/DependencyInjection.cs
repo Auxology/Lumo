@@ -97,6 +97,11 @@ public static class DependencyInjection
                 outbox.QueryDelay = TimeSpan.FromSeconds(1);
             });
 
+            bus.AddConfigureEndpointsCallback((context, name, cfg) =>
+            {
+                cfg.UseEntityFrameworkOutbox<MainDbContext>(context);
+            });
+
             bus.UsingRabbitMq((context, cfg) =>
             {
                 cfg.Host(rabbitMqOptions.Host, rabbitMqOptions.Port, rabbitMqOptions.VirtualHost, h =>

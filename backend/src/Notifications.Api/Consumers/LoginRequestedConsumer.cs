@@ -2,6 +2,7 @@ using Contracts.IntegrationEvents.Auth;
 
 using MassTransit;
 
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using Notifications.Api.Models;
@@ -12,31 +13,37 @@ namespace Notifications.Api.Consumers;
 
 internal sealed class LoginRequestedConsumer(
     IEmailService emailService,
-    IOptions<EmailOptions> emailOptions) : IConsumer<LoginRequested>
+    IOptions<EmailOptions> emailOptions,
+    ILogger<LoginRequestedConsumer> logger) : IConsumer<LoginRequested>
 {
     private readonly EmailOptions _emailOptions = emailOptions.Value;
 
     public async Task Consume(ConsumeContext<LoginRequested> context)
     {
         CancellationToken cancellationToken = context.CancellationToken;
+        LoginRequested message = context.Message;
 
         LoginRequestedEmailTemplateData templateData = new()
         {
-            OtpToken = context.Message.OtpToken,
-            MagicLinkToken = context.Message.MagicLinkToken,
-            ExpiresAt = context.Message.ExpiresAt,
-            IpAddress = context.Message.IpAddress,
-            UserAgent = context.Message.UserAgent,
+            OtpToken = message.OtpToken,
+            MagicLinkToken = message.MagicLinkToken,
+            ExpiresAt = message.ExpiresAt,
+            IpAddress = message.IpAddress,
+            UserAgent = message.UserAgent,
             ApplicationName = _emailOptions.ApplicationName,
             FrontendUrl = _emailOptions.FrontendUrl
         };
 
         await emailService.SendTemplatedEmailAsync
         (
-            recipientEmailAddress: context.Message.EmailAddress,
+            recipientEmailAddress: message.EmailAddress,
             templateName: _emailOptions.LoginRequestedTemplateName,
             templateData: templateData,
             cancellationToken: cancellationToken
         );
+
+        logger.LogInformation(
+            "Consumed {EventType}: {EventId}, CorrelationId: {CorrelationId}, OccurredAt: {OccurredAt}, Email: {Email}",
+            nameof(LoginRequested), message.EventId, message.CorrelationId, message.OccurredAt, message.EmailAddress);
     }
 }

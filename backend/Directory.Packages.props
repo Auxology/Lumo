@@ -56,7 +56,7 @@
         <PackageVersion Include="UAParser" Version="3.1.47" />
 
         <!-- AWS SDK -->
-        <PackageVersion Include="AWSSDK.S3" Version="4.0.16" />
+        <PackageVersion Include="AWSSDK.S3" Version="4.0.16.2" />
         <PackageVersion Include="AWSSDK.Extensions.NETCore.Setup" Version="4.0.3.17" />
         <PackageVersion Include="AWSSDK.SimpleEmailV2" Version="4.0.11" />
 

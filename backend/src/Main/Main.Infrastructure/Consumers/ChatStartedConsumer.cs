@@ -22,12 +22,15 @@ internal sealed class ChatStartedConsumer(
     public async Task Consume(ConsumeContext<ChatStarted> context)
     {
         CancellationToken cancellationToken = context.CancellationToken;
+        ChatStarted message = context.Message;
 
-        Outcome<ChatId> chatIdOutcome = ChatId.FromGuid(context.Message.ChatId);
+        Outcome<ChatId> chatIdOutcome = ChatId.FromGuid(message.ChatId);
 
         if (chatIdOutcome.IsFailure)
         {
-            logger.LogError("Invalid ChatId in ChatStarted event: {ChatId}", context.Message.ChatId);
+            logger.LogError(
+                "Invalid ChatId in {EventType}: {EventId}, CorrelationId: {CorrelationId}, ChatId: {ChatId}",
+                nameof(ChatStarted), message.EventId, message.CorrelationId, message.ChatId);
             return;
         }
 
@@ -45,7 +48,6 @@ internal sealed class ChatStartedConsumer(
             ))
             .ToListAsync(cancellationToken);
 
-        // TODO: Critical architecture issues to be decided here
         await chatCompletionService.StreamCompletionAsync
         (
             chatId: chatId.Value,
@@ -53,6 +55,8 @@ internal sealed class ChatStartedConsumer(
             cancellationToken: cancellationToken
         );
 
-        logger.LogInformation("Processed ChatStarted event: {EventId}", context.Message.EventId);
+        logger.LogInformation(
+            "Consumed {EventType}: {EventId}, CorrelationId: {CorrelationId}, OccurredAt: {OccurredAt}, ChatId: {ChatId}",
+            nameof(ChatStarted), message.EventId, message.CorrelationId, message.OccurredAt, message.ChatId);
     }
 }

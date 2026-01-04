@@ -16,18 +16,20 @@ internal sealed class UserSignedUpConsumer(
     public async Task Consume(ConsumeContext<UserSignedUp> context)
     {
         CancellationToken cancellationToken = context.CancellationToken;
+        UserSignedUp message = context.Message;
 
         User newUser = new()
         {
-            UserId = context.Message.UserId,
-            DisplayName = context.Message.DisplayName,
-            EmailAddress = context.Message.EmailAddress,
+            UserId = message.UserId,
+            DisplayName = message.DisplayName,
+            EmailAddress = message.EmailAddress,
         };
 
         await dbContext.Users.AddAsync(newUser, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        logger.LogInformation("User read model created. UserId: {UserId}, EventId: {EventId}",
-            context.Message.UserId, context.Message.EventId);
+        logger.LogInformation(
+            "Consumed {EventType}: {EventId}, CorrelationId: {CorrelationId}, OccurredAt: {OccurredAt}, UserId: {UserId}",
+            nameof(UserSignedUp), message.EventId, message.CorrelationId, message.OccurredAt, message.UserId);
     }
 }

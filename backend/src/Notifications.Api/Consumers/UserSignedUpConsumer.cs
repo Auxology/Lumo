@@ -2,6 +2,7 @@ using Contracts.IntegrationEvents.Auth;
 
 using MassTransit;
 
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using Notifications.Api.Models;
@@ -12,26 +13,32 @@ namespace Notifications.Api.Consumers;
 
 internal sealed class UserSignedUpConsumer(
     IEmailService emailService,
-    IOptions<EmailOptions> emailOptions) : IConsumer<UserSignedUp>
+    IOptions<EmailOptions> emailOptions,
+    ILogger<UserSignedUpConsumer> logger) : IConsumer<UserSignedUp>
 {
     private readonly EmailOptions _emailOptions = emailOptions.Value;
 
     public async Task Consume(ConsumeContext<UserSignedUp> context)
     {
         CancellationToken cancellationToken = context.CancellationToken;
+        UserSignedUp message = context.Message;
 
         WelcomeEmailTemplateData templateData = new()
         {
-            DisplayName = context.Message.DisplayName,
+            DisplayName = message.DisplayName,
             ApplicationName = _emailOptions.ApplicationName
         };
 
         await emailService.SendTemplatedEmailAsync
         (
-            recipientEmailAddress: context.Message.EmailAddress,
+            recipientEmailAddress: message.EmailAddress,
             templateName: _emailOptions.WelcomeEmailTemplateName,
             templateData: templateData,
             cancellationToken: cancellationToken
         );
+
+        logger.LogInformation(
+            "Consumed {EventType}: {EventId}, CorrelationId: {CorrelationId}, OccurredAt: {OccurredAt}, UserId: {UserId}",
+            nameof(UserSignedUp), message.EventId, message.CorrelationId, message.OccurredAt, message.UserId);
     }
 }
