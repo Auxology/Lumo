@@ -1,16 +1,26 @@
 using System.ClientModel;
+using System.Text;
+
+using Contracts.IntegrationEvents.Chat;
 
 using Main.Application.Abstractions.AI;
 using Main.Domain.Constants;
+using Main.Domain.Entities;
+using Main.Domain.Enums;
 
 using Microsoft.Extensions.Logging;
 
 using OpenAI.Chat;
 
+using SharedKernel;
+using SharedKernel.Application.Messaging;
+
 namespace Main.Infrastructure.AI;
 
 internal sealed class ChatCompletionService(
     ChatClient chatClient,
+    IMessageBus messageBus,
+    IDateTimeProvider dateTimeProvider,
     ILogger<ChatCompletionService> logger) : IChatCompletionService
 {
     private static readonly string TitleSystemPrompt =
@@ -57,8 +67,56 @@ internal sealed class ChatCompletionService(
         }
     }
 
-    public Task StreamCompletionAsync(Guid chatId, IReadOnlyList<ChatCompletionMessage> messages, CancellationToken cancellationToken)
+    public async Task StreamCompletionAsync(Guid chatId, IReadOnlyList<ChatCompletionMessage> messages, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        StringBuilder messageContent = new();
+
+        try
+        {
+            List<ChatMessage> chatMessages = messages.Select<ChatCompletionMessage, ChatMessage>(m =>
+                {
+                    return m.Role switch
+                    {
+                        MessageRole.User => new UserChatMessage(m.Content),
+                        MessageRole.Assistant => new AssistantChatMessage(m.Content),
+                        MessageRole.System => new SystemChatMessage(m.Content),
+                        _ => new UserChatMessage(m.Content)
+                    };
+                })
+                .ToList();
+
+#pragma warning disable S3267
+            await foreach (StreamingChatCompletionUpdate update in chatClient.CompleteChatStreamingAsync(
+                               chatMessages, cancellationToken: cancellationToken))
+#pragma warning restore S3267
+            {
+                if (update.ContentUpdate.Count > 0)
+                {
+                    string chunk = update.ContentUpdate[0].Text;
+                    messageContent.Append(chunk);
+                }
+                else
+                {
+                    logger.LogWarning("Received empty content update for chat {ChatId}", chatId);
+                }
+            }
+            
+            AssistantMessageGenerated assistantMessageGenerated = new()
+            {
+                EventId = Guid.NewGuid(),
+                OccurredAt = dateTimeProvider.UtcNow,
+                CorrelationId = chatId,
+                ChatId = chatId,
+                MessageContent = messageContent.ToString(),
+            };
+
+            await messageBus.PublishAsync(assistantMessageGenerated, cancellationToken);
+        }
+        catch (Exception exception)
+        {
+            logger.LogError(exception, "Streaming failed for chat {ChatId}", chatId);
+
+            throw;
+        }
     }
 }

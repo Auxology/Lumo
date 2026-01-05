@@ -76,7 +76,8 @@ internal static class DependencyInjection
 
         services.AddMassTransit(bus =>
         {
-            bus.AddConsumer<UserSignedUpConsumer>();
+            bus.AddConsumer<UserSignedUpConsumer>()
+                .Endpoint(e => e.Name = "notifications-user-signed-up");
             bus.AddConsumer<LoginRequestedConsumer>();
 
             bus.AddEntityFrameworkOutbox<NotificationDbContext>(outbox =>

@@ -85,8 +85,10 @@ public static class DependencyInjection
 
         services.AddMassTransit(bus =>
         {
-            bus.AddConsumer<UserSignedUpConsumer>();
+            bus.AddConsumer<UserSignedUpConsumer>()
+                .Endpoint(e => e.Name = "main-user-signed-up");
             bus.AddConsumer<ChatStartedConsumer>();
+            bus.AddConsumer<AssistantMessageGeneratedConsumer>();
 
             bus.AddEntityFrameworkOutbox<MainDbContext>(outbox =>
             {
@@ -95,11 +97,6 @@ public static class DependencyInjection
                 outbox.UseBusOutbox();
 
                 outbox.QueryDelay = TimeSpan.FromSeconds(1);
-            });
-
-            bus.AddConfigureEndpointsCallback((context, name, cfg) =>
-            {
-                cfg.UseEntityFrameworkOutbox<MainDbContext>(context);
             });
 
             bus.UsingRabbitMq((context, cfg) =>
@@ -164,7 +161,7 @@ public static class DependencyInjection
             return client.GetChatClient(openRouterOptions.DefaultModel);
         });
 
-        services.AddSingleton<IChatCompletionService, ChatCompletionService>();
+        services.AddScoped<IChatCompletionService, ChatCompletionService>();
 
         return services;
     }

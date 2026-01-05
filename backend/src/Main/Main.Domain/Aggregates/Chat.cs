@@ -111,4 +111,28 @@ public sealed class Chat : AggregateRoot<ChatId>
 
         return Outcome.Success();
     }
+    
+    public Outcome AddAssistantMessage(string messageContent, DateTimeOffset utcNow)
+    {
+        if (IsArchived)
+            return ChatFaults.CannotModifyArchivedChat;
+
+        Outcome<Message> messageOutcome = Message.Create
+        (
+            chatId: Id,
+            messageRole: MessageRole.Assistant,
+            messageContent: messageContent,
+            utcNow: utcNow
+        );
+
+        if (messageOutcome.IsFailure)
+            return messageOutcome.Fault;
+
+        Message message = messageOutcome.Value;
+
+        _messages.Add(message);
+        UpdatedAt = utcNow;
+
+        return Outcome.Success();
+    }
 }
