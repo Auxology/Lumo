@@ -18,27 +18,27 @@ internal sealed class DeleteChatHandler(IMainDbContext dbContext, IUserContext u
     {
         Guid userId = userContext.UserId;
         Outcome<ChatId> chatIdOutcome = ChatId.FromGuid(request.ChatId);
-        
+
         if (chatIdOutcome.IsFailure)
             return chatIdOutcome.Fault;
-        
+
         ChatId chatId = chatIdOutcome.Value;
-        
+
         bool userExists = await dbContext.Users
             .AnyAsync(u => u.UserId == userId, cancellationToken);
 
         if (!userExists)
             return UserOperationFaults.NotFound;
-        
+
         Chat? chat = await dbContext.Chats
-            .FirstOrDefaultAsync(c => c.Id == chatId, cancellationToken);
-        
+            .FirstOrDefaultAsync(c => c.Id == chatId && c.UserId == userId, cancellationToken);
+
         if (chat is null)
             return ChatOperationFaults.NotFound;
-        
+
         dbContext.Chats.Remove(chat);
         await dbContext.SaveChangesAsync(cancellationToken);
-        
+
         return Outcome.Success();
     }
 }

@@ -1,6 +1,6 @@
-using Main.Domain.ValueObjects;
-
 using FluentAssertions;
+
+using Main.Domain.ValueObjects;
 
 using SharedKernel;
 
@@ -161,4 +161,3 @@ public sealed class ChatIdTests
         id1.Should().NotBe(id2);
     }
 }
-

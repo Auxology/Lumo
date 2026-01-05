@@ -16,7 +16,7 @@ public sealed class Chat : AggregateRoot<ChatId>
 
     public Guid UserId { get; private set; }
 
-    public string? Title { get; private set; }
+    public string Title { get; private set; } = string.Empty;
 
     public string? ModelName { get; private set; }
 
@@ -34,36 +34,28 @@ public sealed class Chat : AggregateRoot<ChatId>
     private Chat
     (
         Guid userId,
+        string title,
         DateTimeOffset utcNow
     )
     {
         Id = ChatId.New();
         UserId = userId;
-        Title = null;
+        Title = title;
         ModelName = null;
         IsArchived = false;
         CreatedAt = utcNow;
         UpdatedAt = null;
     }
 
-    public static Outcome<Chat> Create(Guid userId, DateTimeOffset utcNow)
+    public static Outcome<Chat> Create
+    (
+        Guid userId,
+        string title,
+        DateTimeOffset utcNow
+    )
     {
         if (userId == Guid.Empty)
             return ChatFaults.UserIdRequired;
-
-        Chat chat = new
-        (
-            userId: userId,
-            utcNow: utcNow
-        );
-
-        return chat;
-    }
-
-    public Outcome AddTitle(string title, DateTimeOffset utcNow)
-    {
-        if (IsArchived)
-            return ChatFaults.CannotModifyArchivedChat;
 
         if (string.IsNullOrWhiteSpace(title))
             return ChatFaults.TitleRequired;
@@ -71,26 +63,30 @@ public sealed class Chat : AggregateRoot<ChatId>
         if (title.Length > ChatConstants.MaxTitleLength)
             return ChatFaults.TitleTooLong;
 
-        Title = title;
-        UpdatedAt = utcNow;
+        Chat chat = new
+        (
+            userId: userId,
+            title: title,
+            utcNow: utcNow
+        );
 
-        return Outcome.Success();
+        return chat;
     }
 
-    public Outcome UpdateTitle(string newTitle, DateTimeOffset utcNow)
+    public Outcome RenameTitle(string newTitle, DateTimeOffset utcNow)
     {
         if (IsArchived)
             return ChatFaults.CannotModifyArchivedChat;
-        
+
         if (string.IsNullOrWhiteSpace(newTitle))
             return ChatFaults.TitleRequired;
-        
+
         if (newTitle.Length > ChatConstants.MaxTitleLength)
             return ChatFaults.TitleTooLong;
-        
+
         Title = newTitle;
         UpdatedAt = utcNow;
-        
+
         return Outcome.Success();
     }
 
@@ -104,7 +100,7 @@ public sealed class Chat : AggregateRoot<ChatId>
 
         return Outcome.Success();
     }
-    
+
     public Outcome Unarchive(DateTimeOffset utcNow)
     {
         if (!IsArchived)
@@ -116,51 +112,33 @@ public sealed class Chat : AggregateRoot<ChatId>
         return Outcome.Success();
     }
 
+    private Outcome AddMessage(string messageContent, MessageRole role, DateTimeOffset utcNow)
+    {
+        if (IsArchived)
+            return ChatFaults.CannotModifyArchivedChat;
+
+        Outcome<Message> messageOutcome = Message.Create
+        (
+            chatId: Id,
+            messageRole: role,
+            messageContent: messageContent,
+            utcNow: utcNow
+        );
+
+        if (messageOutcome.IsFailure)
+            return messageOutcome.Fault;
+
+        Message message = messageOutcome.Value;
+
+        _messages.Add(message);
+        UpdatedAt = utcNow;
+
+        return Outcome.Success();
+    }
+
     public Outcome AddUserMessage(string messageContent, DateTimeOffset utcNow)
-    {
-        if (IsArchived)
-            return ChatFaults.CannotModifyArchivedChat;
+        => AddMessage(messageContent, MessageRole.User, utcNow);
 
-        Outcome<Message> messageOutcome = Message.Create
-        (
-            chatId: Id,
-            messageRole: MessageRole.User,
-            messageContent: messageContent,
-            utcNow: utcNow
-        );
-
-        if (messageOutcome.IsFailure)
-            return messageOutcome.Fault;
-
-        Message message = messageOutcome.Value;
-
-        _messages.Add(message);
-        UpdatedAt = utcNow;
-
-        return Outcome.Success();
-    }
-    
-    public Outcome AddAssistantMessage(string messageContent, DateTimeOffset utcNow)
-    {
-        if (IsArchived)
-            return ChatFaults.CannotModifyArchivedChat;
-
-        Outcome<Message> messageOutcome = Message.Create
-        (
-            chatId: Id,
-            messageRole: MessageRole.Assistant,
-            messageContent: messageContent,
-            utcNow: utcNow
-        );
-
-        if (messageOutcome.IsFailure)
-            return messageOutcome.Fault;
-
-        Message message = messageOutcome.Value;
-
-        _messages.Add(message);
-        UpdatedAt = utcNow;
-
-        return Outcome.Success();
-    }
+    public Outcome AddAssistantMessage(string messageContent, DateTimeOffset utcNow) =>
+        AddMessage(messageContent, MessageRole.Assistant, utcNow);
 }

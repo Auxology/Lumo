@@ -38,11 +38,11 @@ internal sealed class Endpoint : BaseEndpoint<Request, Response>
         await SendOutcomeAsync
         (
             outcome: await _sender.Send(command, ct),
-            mapper: r => new Response
+            mapper: scr => new Response
             (
-                ChatId: r.ChatId,
-                ChatTitle: r.ChatTitle,
-                CreatedAt: r.CreatedAt
+                ChatId: scr.ChatId,
+                ChatTitle: scr.ChatTitle,
+                CreatedAt: scr.CreatedAt
             ),
             successStatusCode: 202,
             ct

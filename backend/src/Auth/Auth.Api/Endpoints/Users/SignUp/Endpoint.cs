@@ -43,7 +43,7 @@ internal sealed class Endpoint : BaseEndpoint<Request, Response>
         await SendOutcomeAsync
         (
             outcome: await _sender.Send(command, ct),
-            mapper: r => new Response(UserFriendlyRecoveryKeys: r.UserFriendlyRecoveryKeys),
+            mapper: sur => new Response(UserFriendlyRecoveryKeys: sur.UserFriendlyRecoveryKeys),
             successStatusCode: 201,
             ct
         );

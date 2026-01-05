@@ -31,9 +31,9 @@ internal sealed class AssistantMessageGeneratedConsumer(
                 nameof(AssistantMessageGenerated), message.EventId, message.CorrelationId, message.ChatId);
             return;
         }
-        
+
         ChatId chatId = chatIdOutcome.Value;
-        
+
         if (string.IsNullOrWhiteSpace(message.MessageContent))
         {
             logger.LogError(
@@ -52,13 +52,13 @@ internal sealed class AssistantMessageGeneratedConsumer(
                 nameof(AssistantMessageGenerated), message.EventId, message.CorrelationId, message.ChatId);
             return;
         }
-        
+
         Outcome messageOutcome = chat.AddAssistantMessage
         (
             messageContent: message.MessageContent,
             utcNow: message.OccurredAt
         );
-        
+
         if (messageOutcome.IsFailure)
         {
             logger.LogError(
@@ -67,7 +67,7 @@ internal sealed class AssistantMessageGeneratedConsumer(
                 messageOutcome.Fault);
             return;
         }
-        
+
         await dbContext.SaveChangesAsync(cancellationToken);
 
         logger.LogInformation("Consumed {EventType}: {EventId}, CorrelationId: {CorrelationId}, ChatId: {ChatId}",

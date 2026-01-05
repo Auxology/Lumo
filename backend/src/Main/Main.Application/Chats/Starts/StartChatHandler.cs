@@ -32,9 +32,12 @@ internal sealed class StartChatHandler(
         if (user is null)
             return UserOperationFaults.NotFound;
 
+        string title = await chatCompletionService.GetTitleAsync(request.Message, cancellationToken);
+
         Outcome<Chat> chatOutcome = Chat.Create
         (
             userId: user.UserId,
+            title: title,
             utcNow: dateTimeProvider.UtcNow
         );
 
@@ -42,10 +45,6 @@ internal sealed class StartChatHandler(
             return chatOutcome.Fault;
 
         Chat chat = chatOutcome.Value;
-
-        string title = await chatCompletionService.GetTitleAsync(request.Message, cancellationToken);
-
-        chat.AddTitle(title, dateTimeProvider.UtcNow);
 
         Outcome messageOutcome = chat.AddUserMessage
         (

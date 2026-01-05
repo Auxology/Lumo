@@ -14,7 +14,7 @@ internal sealed class Endpoint : BaseEndpoint<Request>
     {
         _sender = sender;
     }
-    
+
     public override void Configure()
     {
         Delete("/api/chats/{chatId}");

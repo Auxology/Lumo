@@ -100,7 +100,7 @@ internal sealed class ChatCompletionService(
                     logger.LogWarning("Received empty content update for chat {ChatId}", chatId);
                 }
             }
-            
+
             AssistantMessageGenerated assistantMessageGenerated = new()
             {
                 EventId = Guid.NewGuid(),

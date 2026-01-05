@@ -27,7 +27,7 @@ internal sealed class ChatConfiguration : IEntityTypeConfiguration<Chat>
             .HasColumnType("uuid");
 
         b.Property(c => c.Title)
-            .IsRequired(false)
+            .IsRequired()
             .HasMaxLength(ChatConstants.MaxTitleLength)
             .HasColumnType($"varchar({ChatConstants.MaxTitleLength})");
 
