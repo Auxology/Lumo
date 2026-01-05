@@ -34,3 +34,4 @@ public static class LoginRequestFaults
         detail: "The provided token is invalid or has expired."
     );
 }
+

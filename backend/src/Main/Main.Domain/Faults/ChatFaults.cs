@@ -27,4 +27,16 @@ public static class ChatFaults
         title: "Chat.CannotModifyArchivedChat",
         detail: "Cannot modify an archived chat."
     );
+
+    public static readonly Fault AlreadyArchived = Fault.Conflict
+    (
+        title: "Chat.AlreadyArchived",
+        detail: "The chat is already archived."
+    );
+
+    public static readonly Fault NotArchived = Fault.Conflict
+    (
+        title: "Chat.NotArchived",
+        detail: "The chat is not archived."
+    );
 }

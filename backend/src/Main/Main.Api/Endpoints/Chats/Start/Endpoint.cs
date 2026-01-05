@@ -31,9 +31,9 @@ internal sealed class Endpoint : BaseEndpoint<Request, Response>
         });
     }
 
-    public override async Task HandleAsync(Request req, CancellationToken ct)
+    public override async Task HandleAsync(Request endpointRequest, CancellationToken ct)
     {
-        StartChatCommand command = new(req.Message);
+        StartChatCommand command = new(endpointRequest.Message);
 
         await SendOutcomeAsync
         (

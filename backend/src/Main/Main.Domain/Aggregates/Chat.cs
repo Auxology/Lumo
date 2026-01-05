@@ -77,15 +77,43 @@ public sealed class Chat : AggregateRoot<ChatId>
         return Outcome.Success();
     }
 
-    public bool Archive(DateTimeOffset utcNow)
+    public Outcome UpdateTitle(string newTitle, DateTimeOffset utcNow)
     {
         if (IsArchived)
-            return false;
+            return ChatFaults.CannotModifyArchivedChat;
+        
+        if (string.IsNullOrWhiteSpace(newTitle))
+            return ChatFaults.TitleRequired;
+        
+        if (newTitle.Length > ChatConstants.MaxTitleLength)
+            return ChatFaults.TitleTooLong;
+        
+        Title = newTitle;
+        UpdatedAt = utcNow;
+        
+        return Outcome.Success();
+    }
+
+    public Outcome Archive(DateTimeOffset utcNow)
+    {
+        if (IsArchived)
+            return ChatFaults.AlreadyArchived;
 
         IsArchived = true;
         UpdatedAt = utcNow;
 
-        return true;
+        return Outcome.Success();
+    }
+    
+    public Outcome Unarchive(DateTimeOffset utcNow)
+    {
+        if (!IsArchived)
+            return ChatFaults.NotArchived;
+
+        IsArchived = false;
+        UpdatedAt = utcNow;
+
+        return Outcome.Success();
     }
 
     public Outcome AddUserMessage(string messageContent, DateTimeOffset utcNow)
