@@ -3,10 +3,12 @@ using System.ComponentModel.DataAnnotations;
 
 using Main.Application.Abstractions.AI;
 using Main.Application.Abstractions.Data;
+using Main.Application.Abstractions.Stream;
 using Main.Infrastructure.AI;
 using Main.Infrastructure.Consumers;
 using Main.Infrastructure.Data;
 using Main.Infrastructure.Options;
+using Main.Infrastructure.Stream;
 
 using MassTransit;
 
@@ -160,6 +162,8 @@ public static class DependencyInjection
             OpenAIClient client = sp.GetRequiredService<OpenAIClient>();
             return client.GetChatClient(openRouterOptions.DefaultModel);
         });
+
+        services.AddSingleton<IStreamPublisher, StreamPublisher>();
 
         services.AddScoped<IChatCompletionService, ChatCompletionService>();
 

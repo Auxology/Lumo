@@ -4,6 +4,7 @@ using System.Text;
 using Contracts.IntegrationEvents.Chat;
 
 using Main.Application.Abstractions.AI;
+using Main.Application.Abstractions.Stream;
 using Main.Domain.Constants;
 using Main.Domain.Entities;
 using Main.Domain.Enums;
@@ -15,10 +16,13 @@ using OpenAI.Chat;
 using SharedKernel;
 using SharedKernel.Application.Messaging;
 
+using StackExchange.Redis;
+
 namespace Main.Infrastructure.AI;
 
 internal sealed class ChatCompletionService(
     ChatClient chatClient,
+    IStreamPublisher streamPublisher,
     IMessageBus messageBus,
     IDateTimeProvider dateTimeProvider,
     ILogger<ChatCompletionService> logger) : IChatCompletionService
@@ -26,6 +30,8 @@ internal sealed class ChatCompletionService(
     private static readonly string TitleSystemPrompt =
         $"Generate a concise title (max {ChatConstants.MaxTitleLength} characters) for this conversation. " +
         "Return ONLY the title text, no quotes, no explanation.";
+
+    private static readonly TimeSpan StreamExpiration = TimeSpan.FromHours(1);
 
     public async Task<string> GetTitleAsync(string message, CancellationToken cancellationToken)
     {
@@ -73,6 +79,19 @@ internal sealed class ChatCompletionService(
 
         try
         {
+            await streamPublisher.PublishStatusAsync
+            (
+                chatId: chatId,
+                status: StreamStatus.Pending,
+                cancellationToken: cancellationToken
+            );
+            await streamPublisher.SetStreamExpirationAsync
+            (
+                chatId: chatId,
+                expiration: StreamExpiration,
+                cancellationToken: cancellationToken
+            );
+
             List<ChatMessage> chatMessages = messages.Select<ChatCompletionMessage, ChatMessage>(m =>
                 {
                     return m.Role switch
@@ -85,21 +104,34 @@ internal sealed class ChatCompletionService(
                 })
                 .ToList();
 
-#pragma warning disable S3267
-            await foreach (StreamingChatCompletionUpdate update in chatClient.CompleteChatStreamingAsync(
-                               chatMessages, cancellationToken: cancellationToken))
-#pragma warning restore S3267
+            await foreach (StreamingChatCompletionUpdate update in chatClient.CompleteChatStreamingAsync(chatMessages, cancellationToken: cancellationToken))
             {
-                if (update.ContentUpdate.Count > 0)
+#pragma warning disable S3267
+                foreach (ChatMessageContentPart? part in update.ContentUpdate)
+#pragma warning restore S3267
                 {
-                    string chunk = update.ContentUpdate[0].Text;
-                    messageContent.Append(chunk);
-                }
-                else
-                {
-                    logger.LogWarning("Received empty content update for chat {ChatId}", chatId);
+                    string? chunk = part.Text;
+
+                    if (!string.IsNullOrWhiteSpace(chunk))
+                    {
+                        messageContent.Append(chunk);
+
+                        await streamPublisher.PublishChunkAsync
+                        (
+                            chatId: chatId,
+                            messageContent: chunk,
+                            cancellationToken: cancellationToken
+                        );
+                    }
                 }
             }
+
+            await streamPublisher.PublishStatusAsync
+            (
+                chatId: chatId,
+                status: StreamStatus.Done,
+                cancellationToken: cancellationToken
+            );
 
             AssistantMessageGenerated assistantMessageGenerated = new()
             {
@@ -115,6 +147,21 @@ internal sealed class ChatCompletionService(
         catch (Exception exception)
         {
             logger.LogError(exception, "Streaming failed for chat {ChatId}", chatId);
+
+            try
+            {
+                await streamPublisher.PublishStatusAsync
+                (
+                    chatId: chatId,
+                    status: StreamStatus.Failed,
+                    cancellationToken: cancellationToken,
+                    fault: exception.Message
+                );
+            }
+            catch (RedisException redisException)
+            {
+                logger.LogError(redisException, "Failed to publish faulted status for chat {ChatId}", chatId);
+            }
 
             throw;
         }

@@ -6,7 +6,7 @@ using NetArchTest.Rules;
 
 namespace ArchitectureTests;
 
-public sealed class LayerTests : BaseTest
+internal sealed class LayerTests : BaseTest
 {
     private static IEnumerable<Assembly> GetFeatureAssemblies()
     {
