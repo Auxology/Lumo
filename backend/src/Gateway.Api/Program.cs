@@ -20,6 +20,8 @@ builder.Host.ConfigureSerilog();
 
 var app = builder.Build();
 
+app.UseCors();
+
 bool isDevelopment = app.Environment.IsDevelopment();
 
 HealthCheckOptions healthCheckOptions = new()

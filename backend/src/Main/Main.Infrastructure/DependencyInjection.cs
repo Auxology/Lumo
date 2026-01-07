@@ -23,6 +23,7 @@ using OpenAI;
 
 using SharedKernel.Application.Messaging;
 using SharedKernel.Infrastructure;
+using SharedKernel.Infrastructure.Data;
 using SharedKernel.Infrastructure.Messaging;
 using SharedKernel.Infrastructure.Options;
 
@@ -71,6 +72,8 @@ public static class DependencyInjection
         });
 
         services.AddScoped<IMainDbContext>(sp => sp.GetRequiredService<MainDbContext>());
+
+        services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>();
 
         services.AddHealthChecks()
             .AddNpgSql

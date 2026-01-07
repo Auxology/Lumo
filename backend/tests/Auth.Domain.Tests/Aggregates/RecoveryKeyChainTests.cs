@@ -9,7 +9,7 @@ using SharedKernel;
 
 namespace Auth.Domain.Tests.Aggregates;
 
-internal sealed class RecoveryKeyChainTests
+public sealed class RecoveryKeyChainTests
 {
     private static readonly DateTimeOffset UtcNow = DateTimeOffset.UtcNow;
     private static readonly UserId ValidUserId = UserId.New();

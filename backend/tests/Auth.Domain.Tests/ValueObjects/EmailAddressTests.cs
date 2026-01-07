@@ -6,7 +6,7 @@ using SharedKernel;
 
 namespace Auth.Domain.Tests.ValueObjects;
 
-internal sealed class EmailAddressTests
+public sealed class EmailAddressTests
 {
     [Fact]
     public void Create_WithValidEmail_ShouldReturnSuccess()

@@ -19,6 +19,7 @@
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" />
         <PackageReference Include="EFCore.NamingConventions" />
+        <PackageReference Include="Dapper" />
         <PackageReference Include="AspNetCore.HealthChecks.NpgSql" />
         <PackageReference Include="MassTransit" />
         <PackageReference Include="MassTransit.RabbitMQ" />

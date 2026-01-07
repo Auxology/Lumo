@@ -10,7 +10,7 @@ using SharedKernel;
 
 namespace Auth.Domain.Tests.Aggregates;
 
-internal sealed class UserTests
+public sealed class UserTests
 {
     private static readonly DateTimeOffset UtcNow = DateTimeOffset.UtcNow;
     private static readonly EmailAddress ValidEmail = EmailAddress.UnsafeFromString("test@example.com");

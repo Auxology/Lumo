@@ -20,6 +20,7 @@ using Microsoft.IdentityModel.JsonWebTokens;
 
 using SharedKernel.Application.Messaging;
 using SharedKernel.Infrastructure;
+using SharedKernel.Infrastructure.Data;
 using SharedKernel.Infrastructure.Messaging;
 using SharedKernel.Infrastructure.Options;
 
@@ -60,6 +61,8 @@ public static class DependencyInjection
         });
 
         services.AddScoped<IAuthDbContext>(sp => sp.GetRequiredService<AuthDbContext>());
+
+        services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>();
 
         services.AddHealthChecks()
             .AddNpgSql

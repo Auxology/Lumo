@@ -21,6 +21,18 @@ internal static class DependencyInjection
             .AddSharedKernelInfrastructure(configuration)
             .AddSharedHealthChecks(configuration);
 
+        services.AddCors(options =>
+        {
+            options.AddDefaultPolicy(policy =>
+            {
+                policy
+                    .WithOrigins(configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [])
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials();
+            });
+        });
+
         services.AddOptions<GatewayApiOptions>()
             .Bind(configuration.GetSection(GatewayApiOptions.SectionName))
             .ValidateDataAnnotations()

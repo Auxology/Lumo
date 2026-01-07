@@ -6,7 +6,7 @@ using SharedKernel;
 
 namespace Auth.Domain.Tests.ValueObjects;
 
-internal sealed class FingerprintTests
+public sealed class FingerprintTests
 {
     private const string ValidIpAddress = "192.168.1.1";
     private const string ValidUserAgent = "Mozilla/5.0";
