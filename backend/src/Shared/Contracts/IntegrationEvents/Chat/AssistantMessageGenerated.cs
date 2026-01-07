@@ -8,7 +8,7 @@ public sealed record AssistantMessageGenerated
 
     public required Guid CorrelationId { get; init; }
 
-    public required Guid ChatId { get; init; }
+    public required string ChatId { get; init; }
 
     public required string MessageContent { get; init; }
 }

@@ -2,7 +2,7 @@ namespace Main.Api.Endpoints.Chats.Start;
 
 internal sealed record Response
 (
-    Guid ChatId,
+    string ChatId,
     string ChatTitle,
     DateTimeOffset CreatedAt
 );

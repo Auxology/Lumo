@@ -4,7 +4,7 @@ namespace Main.Application.Chats.Update;
 
 public sealed record UpdateChatCommand
 (
-    Guid ChatId,
+    string ChatId,
     string? NewTitle,
     bool? IsArchived
 ) : ICommand<UpdateChatResponse>;

@@ -18,9 +18,9 @@ internal sealed class ChatConfiguration : IEntityTypeConfiguration<Chat>
             .HasConversion
             (
                 id => id.Value,
-                guid => ChatId.UnsafeFromGuid(guid)
+                s => ChatId.UnsafeFrom(s)
             )
-            .HasColumnType("uuid");
+            .HasColumnType($"varchar({ChatId.Length})");
 
         b.Property(c => c.UserId)
             .IsRequired()

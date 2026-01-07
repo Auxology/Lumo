@@ -18,7 +18,7 @@ internal sealed class StreamPublisher(
     private const string StreamKeyPrefix = "chat:stream:";
     private const string NotifyChannelPrefix = "chat:notify:";
 
-    public async Task PublishStatusAsync(Guid chatId, StreamStatus status, CancellationToken cancellationToken, string? fault = null)
+    public async Task PublishStatusAsync(string chatId, StreamStatus status, CancellationToken cancellationToken, string? fault = null)
     {
         string streamKey = $"{StreamKeyPrefix}{chatId}";
         string notifyChannel = $"{NotifyChannelPrefix}{chatId}";
@@ -52,7 +52,7 @@ internal sealed class StreamPublisher(
         }
     }
 
-    public async Task SetStreamExpirationAsync(Guid chatId, TimeSpan expiration, CancellationToken cancellationToken)
+    public async Task SetStreamExpirationAsync(string chatId, TimeSpan expiration, CancellationToken cancellationToken)
     {
         string streamKey = $"{StreamKeyPrefix}{chatId}";
 
@@ -61,7 +61,7 @@ internal sealed class StreamPublisher(
         await db.KeyExpireAsync(streamKey, expiration);
     }
 
-    public async Task PublishChunkAsync(Guid chatId, string messageContent, CancellationToken cancellationToken)
+    public async Task PublishChunkAsync(string chatId, string messageContent, CancellationToken cancellationToken)
     {
         string streamKey = $"{StreamKeyPrefix}{chatId}";
         string notifyChannel = $"{NotifyChannelPrefix}{chatId}";

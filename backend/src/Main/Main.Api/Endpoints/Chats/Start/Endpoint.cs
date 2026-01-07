@@ -1,6 +1,6 @@
 using FastEndpoints;
 
-using Main.Application.Chats.Starts;
+using Main.Application.Chats.Start;
 
 using Mediator;
 

@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Main.Infrastructure.Migrations
 {
     [DbContext(typeof(MainDbContext))]
-    [Migration("20260105133907_InitialCreate")]
+    [Migration("20260107072704_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -27,8 +27,8 @@ namespace Main.Infrastructure.Migrations
 
             modelBuilder.Entity("Main.Domain.Aggregates.Chat", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid")
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(30)")
                         .HasColumnName("id");
 
                     b.Property<DateTimeOffset>("CreatedAt")
@@ -45,6 +45,7 @@ namespace Main.Infrastructure.Migrations
                         .HasColumnName("model_name");
 
                     b.Property<string>("Title")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)")
                         .HasColumnName("title");
@@ -75,8 +76,9 @@ namespace Main.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<Guid>("ChatId")
-                        .HasColumnType("uuid")
+                    b.Property<string>("ChatId")
+                        .IsRequired()
+                        .HasColumnType("varchar(30)")
                         .HasColumnName("chat_id");
 
                     b.Property<DateTimeOffset>("CreatedAt")

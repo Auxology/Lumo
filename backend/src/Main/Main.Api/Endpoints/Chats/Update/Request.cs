@@ -2,7 +2,7 @@ namespace Main.Api.Endpoints.Chats.Update;
 
 internal sealed record Request
 (
-    Guid ChatId,
+    string ChatId,
     string? NewTitle,
     bool? IsArchived
 );

@@ -1,3 +1,3 @@
 namespace Main.Api.Endpoints.Chats.Delete;
 
-internal sealed record Request(Guid ChatId);
+internal sealed record Request(string ChatId);

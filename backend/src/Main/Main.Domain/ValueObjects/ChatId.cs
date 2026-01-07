@@ -4,61 +4,52 @@ namespace Main.Domain.ValueObjects;
 
 public readonly record struct ChatId
 {
-    public Guid Value { get; }
+    private const string Prefix = "cht_";
+    private const int TotalLength = 30;
 
-    private ChatId(Guid value)
+    public string Value { get; }
+
+    private ChatId(string value)
     {
         Value = value;
     }
 
-    public static ChatId New() => new(Guid.NewGuid());
-
-    public static Outcome<ChatId> FromGuid(Guid value)
+    public static Outcome<ChatId> From(string? value)
     {
-        if (value == Guid.Empty)
-            return Faults.Invalid;
+        if (string.IsNullOrWhiteSpace(value))
+            return Faults.Required;
+
+        if (!IsValid(value!))
+            return Faults.InvalidFormat;
 
         return new ChatId(value);
     }
 
-    public static ChatId UnsafeFromGuid(Guid value) => new(value);
+    public static ChatId UnsafeFrom(string value) => new(value);
 
-    public static Outcome<ChatId> FromString(string value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-            return Faults.StringRequired;
+    public static string PrefixValue => Prefix;
+    
+    public static int Length => TotalLength;
 
-        if (!Guid.TryParse(value, out var guid))
-            return Faults.InvalidFormat;
+    private static bool IsValid(string value) =>
+        value.Length == TotalLength && value.StartsWith(Prefix, StringComparison.Ordinal);
 
-        return FromGuid(guid);
-    }
-
-    public override string ToString() => Value.ToString();
-
-    public bool IsEmpty => Value == Guid.Empty;
-
-    public static implicit operator Guid(ChatId chatId) => chatId.Value;
-
-    public static explicit operator ChatId(Guid value) => UnsafeFromGuid(value);
+    public override string ToString() => Value;
+    
+    public bool IsEmpty => string.IsNullOrEmpty(Value);
 
     private static class Faults
     {
-        public static readonly Fault Invalid = Fault.Validation
+        public static readonly Fault Required = Fault.Validation
         (
-            "ChatId.Invalid",
-            "ChatId cannot be an empty GUID."
+            title: "ChatId.Required",
+            detail: "ChatId is required."
         );
 
         public static readonly Fault InvalidFormat = Fault.Validation
         (
-            "ChatId.InvalidFormat",
-            "The provided string is not a valid GUID format.");
-
-        public static readonly Fault StringRequired = Fault.Validation
-        (
-            "ChatId.StringRequired",
-            "ChatId requires a non-empty string."
+            title: "ChatId.InvalidFormat",
+            detail: $"ChatId must start with '{Prefix}' and be {TotalLength} characters."
         );
     }
 }

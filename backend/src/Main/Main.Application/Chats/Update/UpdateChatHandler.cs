@@ -19,7 +19,7 @@ internal sealed class UpdateChatHandler(
     public async ValueTask<Outcome<UpdateChatResponse>> Handle(UpdateChatCommand request, CancellationToken cancellationToken)
     {
         Guid userId = userContext.UserId;
-        Outcome<ChatId> chatIdOutcome = ChatId.FromGuid(request.ChatId);
+        Outcome<ChatId> chatIdOutcome = ChatId.From(request.ChatId);
 
         if (chatIdOutcome.IsFailure)
             return chatIdOutcome.Fault;

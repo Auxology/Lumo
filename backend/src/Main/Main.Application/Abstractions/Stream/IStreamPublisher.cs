@@ -2,10 +2,10 @@ namespace Main.Application.Abstractions.Stream;
 
 public interface IStreamPublisher
 {
-    Task PublishStatusAsync(Guid chatId, StreamStatus status, CancellationToken cancellationToken,
+    Task PublishStatusAsync(string chatId, StreamStatus status, CancellationToken cancellationToken,
         string? fault = null);
 
-    Task SetStreamExpirationAsync(Guid chatId, TimeSpan expiration, CancellationToken cancellationToken);
+    Task SetStreamExpirationAsync(string chatId, TimeSpan expiration, CancellationToken cancellationToken);
 
-    Task PublishChunkAsync(Guid chatId, string messageContent, CancellationToken cancellationToken);
+    Task PublishChunkAsync(string chatId, string messageContent, CancellationToken cancellationToken);
 }

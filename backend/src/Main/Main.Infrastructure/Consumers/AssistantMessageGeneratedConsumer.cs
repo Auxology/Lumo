@@ -22,7 +22,7 @@ internal sealed class AssistantMessageGeneratedConsumer(
         CancellationToken cancellationToken = context.CancellationToken;
         AssistantMessageGenerated message = context.Message;
 
-        Outcome<ChatId> chatIdOutcome = ChatId.FromGuid(message.ChatId);
+        Outcome<ChatId> chatIdOutcome = ChatId.From(message.ChatId);
 
         if (chatIdOutcome.IsFailure)
         {

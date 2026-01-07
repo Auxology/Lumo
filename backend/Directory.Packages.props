@@ -67,6 +67,8 @@
 
         <!-- OpenAI -->
         <PackageVersion Include="OpenAI" Version="2.8.0" />
+      
+        <PackageVersion Include="Ulid" Version="1.4.1" />
         <!-- Web.Api -->
         <PackageVersion Include="Yarp.ReverseProxy" Version="2.3.0" />
         <PackageVersion Include="FastEndpoints" Version="7.1.1" />

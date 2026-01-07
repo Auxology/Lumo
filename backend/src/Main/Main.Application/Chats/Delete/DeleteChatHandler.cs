@@ -17,7 +17,7 @@ internal sealed class DeleteChatHandler(IMainDbContext dbContext, IUserContext u
     public async ValueTask<Outcome> Handle(DeleteChatCommand request, CancellationToken cancellationToken)
     {
         Guid userId = userContext.UserId;
-        Outcome<ChatId> chatIdOutcome = ChatId.FromGuid(request.ChatId);
+        Outcome<ChatId> chatIdOutcome = ChatId.From(request.ChatId);
 
         if (chatIdOutcome.IsFailure)
             return chatIdOutcome.Fault;

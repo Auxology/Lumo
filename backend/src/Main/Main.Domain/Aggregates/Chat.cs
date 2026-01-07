@@ -33,12 +33,13 @@ public sealed class Chat : AggregateRoot<ChatId>
     [SetsRequiredMembers]
     private Chat
     (
+        ChatId id,
         Guid userId,
         string title,
         DateTimeOffset utcNow
     )
     {
-        Id = ChatId.New();
+        Id = id;
         UserId = userId;
         Title = title;
         ModelName = null;
@@ -49,6 +50,7 @@ public sealed class Chat : AggregateRoot<ChatId>
 
     public static Outcome<Chat> Create
     (
+        ChatId id,
         Guid userId,
         string title,
         DateTimeOffset utcNow
@@ -65,6 +67,7 @@ public sealed class Chat : AggregateRoot<ChatId>
 
         Chat chat = new
         (
+            id: id,
             userId: userId,
             title: title,
             utcNow: utcNow

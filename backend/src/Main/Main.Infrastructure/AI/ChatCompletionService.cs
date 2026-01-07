@@ -73,7 +73,7 @@ internal sealed class ChatCompletionService(
         }
     }
 
-    public async Task StreamCompletionAsync(Guid chatId, IReadOnlyList<ChatCompletionMessage> messages, CancellationToken cancellationToken)
+    public async Task StreamCompletionAsync(string chatId, IReadOnlyList<ChatCompletionMessage> messages, CancellationToken cancellationToken)
     {
         StringBuilder messageContent = new();
 
@@ -137,7 +137,7 @@ internal sealed class ChatCompletionService(
             {
                 EventId = Guid.NewGuid(),
                 OccurredAt = dateTimeProvider.UtcNow,
-                CorrelationId = chatId,
+                CorrelationId = Guid.NewGuid(),
                 ChatId = chatId,
                 MessageContent = messageContent.ToString(),
             };

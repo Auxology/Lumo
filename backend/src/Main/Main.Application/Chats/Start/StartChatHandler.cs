@@ -2,9 +2,11 @@ using Contracts.IntegrationEvents.Chat;
 
 using Main.Application.Abstractions.AI;
 using Main.Application.Abstractions.Data;
+using Main.Application.Abstractions.Generators;
 using Main.Application.Faults;
 using Main.Domain.Aggregates;
 using Main.Domain.ReadModels;
+using Main.Domain.ValueObjects;
 
 using Microsoft.EntityFrameworkCore;
 
@@ -12,11 +14,12 @@ using SharedKernel;
 using SharedKernel.Application.Authentication;
 using SharedKernel.Application.Messaging;
 
-namespace Main.Application.Chats.Starts;
+namespace Main.Application.Chats.Start;
 
 internal sealed class StartChatHandler(
     IMainDbContext dbContext,
     IUserContext userContext,
+    IIdGenerator idGenerator,
     IRequestContext requestContext,
     IChatCompletionService chatCompletionService,
     IMessageBus messageBus,
@@ -34,8 +37,11 @@ internal sealed class StartChatHandler(
 
         string title = await chatCompletionService.GetTitleAsync(request.Message, cancellationToken);
 
+        ChatId chatId = idGenerator.NewChatId();
+
         Outcome<Chat> chatOutcome = Chat.Create
         (
+            id: chatId,
             userId: user.UserId,
             title: title,
             utcNow: dateTimeProvider.UtcNow

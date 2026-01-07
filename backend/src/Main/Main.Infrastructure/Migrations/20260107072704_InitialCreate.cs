@@ -16,9 +16,9 @@ namespace Main.Infrastructure.Migrations
                 name: "chats",
                 columns: table => new
                 {
-                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    id = table.Column<string>(type: "varchar(30)", nullable: false),
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    title = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true),
+                    title = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false),
                     model_name = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: true),
                     is_archived = table.Column<bool>(type: "boolean", nullable: false),
                     created_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: false),
@@ -88,7 +88,7 @@ namespace Main.Infrastructure.Migrations
                 {
                     id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    chat_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    chat_id = table.Column<string>(type: "varchar(30)", nullable: false),
                     message_role = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: false),
                     message_content = table.Column<string>(type: "text", nullable: false),
                     token_count = table.Column<long>(type: "bigint", nullable: true),

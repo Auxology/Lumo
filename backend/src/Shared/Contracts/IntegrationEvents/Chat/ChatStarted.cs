@@ -8,7 +8,7 @@ public sealed record ChatStarted
 
     public required Guid CorrelationId { get; init; }
 
-    public required Guid ChatId { get; init; }
+    public required string ChatId { get; init; }
 
     public required Guid UserId { get; init; }
 

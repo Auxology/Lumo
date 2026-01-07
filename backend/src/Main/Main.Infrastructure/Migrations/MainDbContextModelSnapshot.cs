@@ -24,8 +24,8 @@ namespace Main.Infrastructure.Migrations
 
             modelBuilder.Entity("Main.Domain.Aggregates.Chat", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid")
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(30)")
                         .HasColumnName("id");
 
                     b.Property<DateTimeOffset>("CreatedAt")
@@ -73,8 +73,9 @@ namespace Main.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<Guid>("ChatId")
-                        .HasColumnType("uuid")
+                    b.Property<string>("ChatId")
+                        .IsRequired()
+                        .HasColumnType("varchar(30)")
                         .HasColumnName("chat_id");
 
                     b.Property<DateTimeOffset>("CreatedAt")

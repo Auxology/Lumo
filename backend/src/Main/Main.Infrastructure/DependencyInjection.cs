@@ -3,10 +3,12 @@ using System.ComponentModel.DataAnnotations;
 
 using Main.Application.Abstractions.AI;
 using Main.Application.Abstractions.Data;
+using Main.Application.Abstractions.Generators;
 using Main.Application.Abstractions.Stream;
 using Main.Infrastructure.AI;
 using Main.Infrastructure.Consumers;
 using Main.Infrastructure.Data;
+using Main.Infrastructure.Generators;
 using Main.Infrastructure.Options;
 using Main.Infrastructure.Stream;
 
@@ -31,11 +33,19 @@ public static class DependencyInjection
     public static IServiceCollection
         AddInfrastructure(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment) =>
         services
+            .AddServices()
             .AddSharedKernelInfrastructure(configuration)
             .AddDatabase(configuration, environment)
             .AddAuthorization()
             .AddMessaging(configuration)
             .AddAi(configuration);
+
+    private static IServiceCollection AddServices(this IServiceCollection services)
+    {
+        services.AddSingleton<IIdGenerator, IdGenerator>();
+        
+        return services;
+    }
 
     private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration,
         IHostEnvironment environment)

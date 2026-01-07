@@ -20,13 +20,13 @@ internal sealed class MessageConfiguration : IEntityTypeConfiguration<Message>
             .HasColumnType("bigint");
 
         b.Property(c => c.ChatId)
-            .IsRequired()
+            .ValueGeneratedNever()
             .HasConversion
             (
                 id => id.Value,
-                guid => ChatId.UnsafeFromGuid(guid)
+                s => ChatId.UnsafeFrom(s)
             )
-            .HasColumnType("uuid");
+            .HasColumnType($"varchar({ChatId.Length})");
 
         b.Property(m => m.MessageRole)
             .IsRequired()
