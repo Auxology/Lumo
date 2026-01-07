@@ -1,6 +1,7 @@
 using Main.Application.Abstractions.Data;
 using Main.Application.Faults;
 using Main.Domain.Aggregates;
+using Main.Domain.ReadModels;
 using Main.Domain.ValueObjects;
 
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +20,13 @@ internal sealed class UpdateChatHandler(
     public async ValueTask<Outcome<UpdateChatResponse>> Handle(UpdateChatCommand request, CancellationToken cancellationToken)
     {
         Guid userId = userContext.UserId;
+
+        User? user = await dbContext.Users
+            .FirstOrDefaultAsync(u => u.UserId == userId, cancellationToken);
+
+        if (user is null)
+            return UserOperationFaults.NotFound;
+        
         Outcome<ChatId> chatIdOutcome = ChatId.From(request.ChatId);
 
         if (chatIdOutcome.IsFailure)

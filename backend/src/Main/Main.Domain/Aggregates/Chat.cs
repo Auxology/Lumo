@@ -115,7 +115,7 @@ public sealed class Chat : AggregateRoot<ChatId>
         return Outcome.Success();
     }
 
-    private Outcome AddMessage(string messageContent, MessageRole role, DateTimeOffset utcNow)
+    private Outcome<Message> AddMessage(string messageContent, MessageRole role, DateTimeOffset utcNow)
     {
         if (IsArchived)
             return ChatFaults.CannotModifyArchivedChat;
@@ -136,12 +136,12 @@ public sealed class Chat : AggregateRoot<ChatId>
         _messages.Add(message);
         UpdatedAt = utcNow;
 
-        return Outcome.Success();
+        return message;
     }
 
-    public Outcome AddUserMessage(string messageContent, DateTimeOffset utcNow)
+    public Outcome<Message> AddUserMessage(string messageContent, DateTimeOffset utcNow)
         => AddMessage(messageContent, MessageRole.User, utcNow);
 
-    public Outcome AddAssistantMessage(string messageContent, DateTimeOffset utcNow) =>
+    public Outcome<Message> AddAssistantMessage(string messageContent, DateTimeOffset utcNow) =>
         AddMessage(messageContent, MessageRole.Assistant, utcNow);
 }
