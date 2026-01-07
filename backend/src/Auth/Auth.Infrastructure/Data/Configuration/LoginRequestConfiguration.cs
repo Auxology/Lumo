@@ -18,9 +18,9 @@ internal sealed class LoginRequestConfiguration : IEntityTypeConfiguration<Login
             .HasConversion
             (
                 id => id.Value,
-                guid => LoginRequestId.UnsafeFromGuid(guid)
+                s => LoginRequestId.UnsafeFrom(s)
             )
-            .HasColumnType("uuid");
+            .HasColumnType($"varchar({LoginRequestId.Length})");
 
         b.Property(lr => lr.UserId)
             .IsRequired()

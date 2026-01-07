@@ -7,4 +7,10 @@ internal sealed class IdGenerator : IIdGenerator
 {
     public SessionId NewSessionId() =>
         SessionId.UnsafeFrom($"{SessionId.PrefixValue}{Ulid.NewUlid()}");
+
+    public LoginRequestId NewLoginRequestId() =>
+        LoginRequestId.UnsafeFrom($"{LoginRequestId.PrefixValue}{Ulid.NewUlid()}");
+
+    public RecoveryKeyChainId NewRecoveryKeyChainId() =>
+        RecoveryKeyChainId.UnsafeFrom($"{RecoveryKeyChainId.PrefixValue}{Ulid.NewUlid()}");
 }

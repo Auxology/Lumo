@@ -19,9 +19,9 @@ internal sealed class RecoveryKeyConfiguration : IEntityTypeConfiguration<Recove
             .HasConversion
             (
                 id => id.Value,
-                guid => RecoveryKeyChainId.UnsafeFromGuid(guid)
+                value => RecoveryKeyChainId.UnsafeFrom(value)
             )
-            .HasColumnType("uuid");
+            .HasColumnType($"varchar({RecoveryKeyChainId.Length})");
 
         b.Property(rk => rk.Identifier)
             .IsRequired()

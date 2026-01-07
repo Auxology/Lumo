@@ -4,62 +4,52 @@ namespace Auth.Domain.ValueObjects;
 
 public readonly record struct RecoveryKeyChainId
 {
-    public Guid Value { get; }
+    private const string Prefix = "rkc_";
+    private const int TotalLength = 30;
 
-    private RecoveryKeyChainId(Guid value)
+    public string Value { get; }
+
+    private RecoveryKeyChainId(string value)
     {
         Value = value;
     }
 
-    public static RecoveryKeyChainId New() => new(Guid.NewGuid());
-
-    public static Outcome<RecoveryKeyChainId> FromGuid(Guid value)
+    public static Outcome<RecoveryKeyChainId> From(string? value)
     {
-        if (value == Guid.Empty)
-            return Faults.Invalid;
+        if (string.IsNullOrWhiteSpace(value))
+            return Faults.Required;
+
+        if (!IsValid(value!))
+            return Faults.InvalidFormat;
 
         return new RecoveryKeyChainId(value);
     }
 
-    public static RecoveryKeyChainId UnsafeFromGuid(Guid value) => new(value);
+    public static RecoveryKeyChainId UnsafeFrom(string value) => new(value);
 
-    public static Outcome<RecoveryKeyChainId> FromString(string value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-            return Faults.StringRequired;
+    public static string PrefixValue => Prefix;
 
-        if (!Guid.TryParse(value, out var guid))
-            return Faults.InvalidFormat;
+    public static int Length => TotalLength;
 
-        return FromGuid(guid);
-    }
+    private static bool IsValid(string value) =>
+        value.Length == TotalLength && value.StartsWith(Prefix, StringComparison.Ordinal);
 
-    public override string ToString() => Value.ToString();
+    public override string ToString() => Value;
 
-    public bool IsEmpty => Value == Guid.Empty;
-
-    public static implicit operator Guid(RecoveryKeyChainId recoveryKeyChainId) => recoveryKeyChainId.Value;
-
-    public static explicit operator RecoveryKeyChainId(Guid value) => UnsafeFromGuid(value);
+    public bool IsEmpty => string.IsNullOrEmpty(Value);
 
     private static class Faults
     {
-        public static readonly Fault Invalid = Fault.Validation
+        public static readonly Fault Required = Fault.Validation
         (
-            title: "RecoveryKeyChainId.Invalid",
-            detail: "RecoveryKeyChainId cannot be an empty GUID."
+            title: "RecoveryKeyChainId.Required",
+            detail: "RecoveryKeyChainId is required."
         );
 
         public static readonly Fault InvalidFormat = Fault.Validation
         (
             title: "RecoveryKeyChainId.InvalidFormat",
-            detail: "The provided string is not a valid GUID format."
-        );
-
-        public static readonly Fault StringRequired = Fault.Validation
-        (
-            title: "RecoveryKeyChainId.StringRequired",
-            detail: "RecoveryKeyChainId requires a non-empty string."
+            detail: $"RecoveryKeyChainId must start with '{Prefix}' and be {TotalLength} characters."
         );
     }
 }

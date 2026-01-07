@@ -1,5 +1,6 @@
 using Auth.Application.Abstractions.Authentication;
 using Auth.Application.Abstractions.Data;
+using Auth.Application.Abstractions.Generators;
 using Auth.Domain.Aggregates;
 using Auth.Domain.Constants;
 using Auth.Domain.ValueObjects;
@@ -18,6 +19,7 @@ internal sealed class CreateLoginHandler(
     IAuthDbContext dbContext,
     ISecureTokenGenerator secureTokenGenerator,
     IRequestContext requestContext,
+    IIdGenerator idGenerator,
     IMessageBus messageBus,
     IDateTimeProvider dateTimeProvider) : ICommandHandler<CreateLoginCommand, CreateLoginResponse>
 {
@@ -61,8 +63,11 @@ internal sealed class CreateLoginHandler(
                 ExpiresAt: dateTimeProvider.UtcNow.AddMinutes(LoginRequestConstants.ExpirationMinutes)
             );
 
+        LoginRequestId id = idGenerator.NewLoginRequestId();
+        
         Outcome<LoginRequest> loginRequestOutcome = LoginRequest.Create
         (
+            id: id,
             userId: user.Id,
             tokenKey: tokenKey,
             otpTokenHash: otpTokenHash,

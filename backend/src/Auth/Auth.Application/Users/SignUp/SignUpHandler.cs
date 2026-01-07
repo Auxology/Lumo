@@ -1,5 +1,6 @@
 using Auth.Application.Abstractions.Authentication;
 using Auth.Application.Abstractions.Data;
+using Auth.Application.Abstractions.Generators;
 using Auth.Application.Faults;
 using Auth.Domain.Aggregates;
 using Auth.Domain.Constants;
@@ -19,8 +20,10 @@ internal sealed class SignUpHandler(
     IAuthDbContext dbContext,
     IRequestContext requestContext,
     ISecureTokenGenerator secureTokenGenerator,
+    IIdGenerator idGenerator,
     IMessageBus messageBus,
-    IDateTimeProvider dateTimeProvider) : ICommandHandler<SignUpCommand, SignUpResponse>
+    IDateTimeProvider dateTimeProvider
+    ) : ICommandHandler<SignUpCommand, SignUpResponse>
 {
     public async ValueTask<Outcome<SignUpResponse>> Handle(SignUpCommand request, CancellationToken cancellationToken)
     {
@@ -51,8 +54,11 @@ internal sealed class SignUpHandler(
 
         (List<RecoverKeyInput> recoverKeyInputs, List<string> userFriendlyKeys) = GenerateRecoveryKeys();
 
+        RecoveryKeyChainId recoveryKeyChainId = idGenerator.NewRecoveryKeyChainId();
+        
         Outcome<RecoveryKeyChain> recoveryKeyChainOutcome = RecoveryKeyChain.Create
         (
+            id: recoveryKeyChainId,
             userId: user.Id,
             recoverKeyInputs: recoverKeyInputs,
             utcNow: dateTimeProvider.UtcNow
