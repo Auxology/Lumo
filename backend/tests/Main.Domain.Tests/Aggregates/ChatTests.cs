@@ -8,6 +8,7 @@ using Main.Domain.ValueObjects;
 using SharedKernel;
 
 namespace Main.Domain.Tests.Aggregates;
+
 public sealed class ChatTests
 {
     private static readonly DateTimeOffset UtcNow = DateTimeOffset.UtcNow;

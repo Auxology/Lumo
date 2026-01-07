@@ -33,27 +33,27 @@ internal sealed class SendMessageHandler(
             return UserOperationFaults.NotFound;
 
         Outcome<ChatId> chatIdOutcome = ChatId.From(request.ChatId);
-        
+
         if (chatIdOutcome.IsFailure)
             return chatIdOutcome.Fault;
-        
+
         ChatId chatId = chatIdOutcome.Value;
-        
+
         Chat? chat = await dbContext.Chats
             .FirstOrDefaultAsync(c => c.Id == chatId && c.UserId == userId, cancellationToken);
 
         if (chat is null)
             return ChatOperationFaults.NotFound;
-        
+
         Outcome<Message> messageOutcome = chat.AddUserMessage
         (
             messageContent: request.Message,
             utcNow: dateTimeProvider.UtcNow
         );
-        
+
         if (messageOutcome.IsFailure)
             return messageOutcome.Fault;
-        
+
         Message message = messageOutcome.Value;
 
         MessageSent messageSent = new()
@@ -65,7 +65,7 @@ internal sealed class SendMessageHandler(
             UserId = user.UserId,
             Message = request.Message
         };
-        
+
         await messageBus.PublishAsync(messageSent, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
 
@@ -77,7 +77,7 @@ internal sealed class SendMessageHandler(
             MessageContent: message.MessageContent,
             CreatedAt: message.CreatedAt
         );
-        
+
         return response;
     }
 }

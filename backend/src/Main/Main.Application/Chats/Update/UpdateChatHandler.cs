@@ -26,7 +26,7 @@ internal sealed class UpdateChatHandler(
 
         if (user is null)
             return UserOperationFaults.NotFound;
-        
+
         Outcome<ChatId> chatIdOutcome = ChatId.From(request.ChatId);
 
         if (chatIdOutcome.IsFailure)

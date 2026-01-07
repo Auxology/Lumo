@@ -10,7 +10,7 @@ using SharedKernel;
 
 namespace Auth.Domain.Tests.Aggregates;
 
-public sealed class SessionTests
+internal sealed class SessionTests
 {
     private static readonly DateTimeOffset UtcNow = DateTimeOffset.UtcNow;
     private static readonly UserId ValidUserId = UserId.New();

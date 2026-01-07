@@ -24,7 +24,7 @@ internal sealed class DeleteChatHandler(IMainDbContext dbContext, IUserContext u
 
         if (user is null)
             return UserOperationFaults.NotFound;
-        
+
         Outcome<ChatId> chatIdOutcome = ChatId.From(request.ChatId);
 
         if (chatIdOutcome.IsFailure)

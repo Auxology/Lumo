@@ -28,14 +28,14 @@ public readonly record struct ChatId
     public static ChatId UnsafeFrom(string value) => new(value);
 
     public static string PrefixValue => Prefix;
-    
+
     public static int Length => TotalLength;
 
     private static bool IsValid(string value) =>
         value.Length == TotalLength && value.StartsWith(Prefix, StringComparison.Ordinal);
 
     public override string ToString() => Value;
-    
+
     public bool IsEmpty => string.IsNullOrEmpty(Value);
 
     private static class Faults

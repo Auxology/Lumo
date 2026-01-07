@@ -6,7 +6,7 @@ using SharedKernel;
 
 namespace Auth.Domain.Tests.ValueObjects;
 
-public sealed class UserIdTests
+internal sealed class UserIdTests
 {
     [Fact]
     public void New_ShouldCreateUniqueId()

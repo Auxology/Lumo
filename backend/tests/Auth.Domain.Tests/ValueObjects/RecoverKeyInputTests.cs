@@ -4,7 +4,7 @@ using FluentAssertions;
 
 namespace Auth.Domain.Tests.ValueObjects;
 
-public sealed class RecoverKeyInputTests
+internal sealed class RecoverKeyInputTests
 {
     [Fact]
     public void Create_ShouldSetProperties()

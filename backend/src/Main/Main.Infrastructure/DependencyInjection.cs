@@ -43,7 +43,7 @@ public static class DependencyInjection
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
         services.AddSingleton<IIdGenerator, IdGenerator>();
-        
+
         return services;
     }
 
@@ -101,6 +101,7 @@ public static class DependencyInjection
                 .Endpoint(e => e.Name = "main-user-signed-up");
             bus.AddConsumer<ChatStartedConsumer>();
             bus.AddConsumer<AssistantMessageGeneratedConsumer>();
+            bus.AddConsumer<MessageSentConsumer>();
 
             bus.AddEntityFrameworkOutbox<MainDbContext>(outbox =>
             {
