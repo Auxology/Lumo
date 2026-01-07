@@ -170,8 +170,8 @@ namespace Auth.Infrastructure.Migrations
 
             modelBuilder.Entity("Auth.Domain.Aggregates.Session", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid")
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(30)")
                         .HasColumnName("id");
 
                     b.Property<DateTimeOffset>("CreatedAt")

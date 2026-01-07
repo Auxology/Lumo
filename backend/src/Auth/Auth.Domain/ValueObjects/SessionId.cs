@@ -4,62 +4,52 @@ namespace Auth.Domain.ValueObjects;
 
 public readonly record struct SessionId
 {
-    public Guid Value { get; }
+    private const string Prefix = "sid_";
+    private const int TotalLength = 30;
 
-    private SessionId(Guid value)
+    public string Value { get; }
+
+    private SessionId(string value)
     {
         Value = value;
     }
 
-    public static SessionId New() => new(Guid.NewGuid());
-
-    public static Outcome<SessionId> FromGuid(Guid value)
+    public static Outcome<SessionId> From(string? value)
     {
-        if (value == Guid.Empty)
-            return Faults.Invalid;
+        if (string.IsNullOrWhiteSpace(value))
+            return Faults.Required;
+
+        if (!IsValid(value!))
+            return Faults.InvalidFormat;
 
         return new SessionId(value);
     }
 
-    public static SessionId UnsafeFromGuid(Guid value) => new(value);
+    public static SessionId UnsafeFrom(string value) => new(value);
 
-    public static Outcome<SessionId> FromString(string value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-            return Faults.StringRequired;
+    public static string PrefixValue => Prefix;
 
-        if (!Guid.TryParse(value, out var guid))
-            return Faults.InvalidFormat;
+    public static int Length => TotalLength;
 
-        return FromGuid(guid);
-    }
+    private static bool IsValid(string value) =>
+        value.Length == TotalLength && value.StartsWith(Prefix, StringComparison.Ordinal);
 
-    public override string ToString() => Value.ToString();
+    public override string ToString() => Value;
 
-    public bool IsEmpty => Value == Guid.Empty;
-
-    public static implicit operator Guid(SessionId sessionId) => sessionId.Value;
-
-    public static explicit operator SessionId(Guid value) => UnsafeFromGuid(value);
+    public bool IsEmpty => string.IsNullOrEmpty(Value);
 
     private static class Faults
     {
-        public static readonly Fault Invalid = Fault.Validation
+        public static readonly Fault Required = Fault.Validation
         (
-            title: "SessionId.Invalid",
-            detail: "SessionId cannot be an empty GUID."
+            title: "SessionId.Required",
+            detail: "SessionId is required."
         );
 
         public static readonly Fault InvalidFormat = Fault.Validation
         (
-            title: "SessionId.InvalidFormat",
-            detail: "The provided string is not a valid GUID format."
-        );
-
-        public static readonly Fault StringRequired = Fault.Validation
-        (
-            title: "SessionId.StringRequired",
-            detail: "SessionId requires a non-empty string."
+            title: "Session.InvalidFormat",
+            detail: $"SessionId must start with '{Prefix}' and be {TotalLength} characters."
         );
     }
 }

@@ -36,6 +36,7 @@ public sealed class Session : AggregateRoot<SessionId>
     [SetsRequiredMembers]
     private Session
     (
+        SessionId id,
         UserId userId,
         string refreshTokenKey,
         string refreshTokenHash,
@@ -43,7 +44,7 @@ public sealed class Session : AggregateRoot<SessionId>
         DateTimeOffset utcNow
     )
     {
-        Id = SessionId.New();
+        Id = id;
         UserId = userId;
         RefreshTokenKey = refreshTokenKey;
         RefreshTokenHash = refreshTokenHash;
@@ -58,6 +59,7 @@ public sealed class Session : AggregateRoot<SessionId>
 
     public static Outcome<Session> Create
     (
+        SessionId id,
         UserId userId,
         string refreshTokenKey,
         string refreshTokenHash,
@@ -76,6 +78,7 @@ public sealed class Session : AggregateRoot<SessionId>
 
         Session session = new
         (
+            id: id,
             userId: userId,
             refreshTokenKey: refreshTokenKey,
             refreshTokenHash: refreshTokenHash,

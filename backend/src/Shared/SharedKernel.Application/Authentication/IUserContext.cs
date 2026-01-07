@@ -4,5 +4,5 @@ public interface IUserContext
 {
     Guid UserId { get; }
 
-    Guid SessionId { get; }
+    string SessionId { get; }
 }

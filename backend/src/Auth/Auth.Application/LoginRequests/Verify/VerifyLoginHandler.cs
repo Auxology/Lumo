@@ -1,5 +1,6 @@
 using Auth.Application.Abstractions.Authentication;
 using Auth.Application.Abstractions.Data;
+using Auth.Application.Abstractions.Generators;
 using Auth.Domain.Aggregates;
 using Auth.Domain.Constants;
 using Auth.Domain.Faults;
@@ -19,6 +20,7 @@ internal sealed class VerifyLoginHandler(
     IAuthDbContext dbContext,
     IRequestContext requestContext,
     ISecureTokenGenerator secureTokenGenerator,
+    IIdGenerator idGenerator,
     ITokenProvider tokenProvider,
     IMessageBus messageBus,
     IDateTimeProvider dateTimeProvider) : ICommandHandler<VerifyLoginCommand, VerifyLoginResponse>
@@ -76,8 +78,11 @@ internal sealed class VerifyLoginHandler(
         string refreshToken = secureTokenGenerator.GenerateToken(SessionConstants.RefreshTokenLength);
         string refreshTokenHash = secureTokenGenerator.HashToken(refreshToken);
 
+        SessionId sessionId = idGenerator.NewSessionId();
+
         Outcome<Session> sessionOutcome = Session.Create
         (
+            id: sessionId,
             userId: loginRequest.UserId,
             refreshTokenKey: refreshTokenKey,
             refreshTokenHash: refreshTokenHash,

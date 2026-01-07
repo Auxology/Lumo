@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Auth.Infrastructure.Migrations
 {
     [DbContext(typeof(AuthDbContext))]
-    [Migration("20260105133924_InitialCreate")]
+    [Migration("20260107204617_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -173,8 +173,8 @@ namespace Auth.Infrastructure.Migrations
 
             modelBuilder.Entity("Auth.Domain.Aggregates.Session", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid")
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(30)")
                         .HasColumnName("id");
 
                     b.Property<DateTimeOffset>("CreatedAt")

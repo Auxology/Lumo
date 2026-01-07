@@ -19,14 +19,14 @@ internal sealed class TokenProvider(JsonWebTokenHandler jsonWebTokenHandler, IOp
         new(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Value.SecretKey)),
             SecurityAlgorithms.HmacSha256);
 
-    public string CreateToken(Guid userId, Guid sessionId)
+    public string CreateToken(Guid userId, string sessionId)
     {
         SecurityTokenDescriptor tokenDescriptor = new()
         {
             Subject = new ClaimsIdentity
             ([
                 new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
-                new Claim(JwtRegisteredClaimNames.Sid, sessionId.ToString())
+                new Claim(JwtRegisteredClaimNames.Sid, sessionId)
             ]),
             Expires = DateTime.UtcNow.Add(_jwtOptions.AccessTokenExpiration),
             SigningCredentials = _signingCredentials,

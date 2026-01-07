@@ -9,6 +9,6 @@ public sealed class UserContext(IHttpContextAccessor httpContextAccessor) : IUse
     public Guid UserId => httpContextAccessor.HttpContext?.User.GetUserId() ??
                           throw new InvalidOperationException("User context is unavailable");
 
-    public Guid SessionId => httpContextAccessor.HttpContext?.User.GetSessionId() ??
-                              throw new InvalidOperationException("User context is unavailable");
+    public string SessionId => httpContextAccessor.HttpContext?.User.GetSessionId() ??
+                            throw new InvalidOperationException("Session id is unavailable");
 }

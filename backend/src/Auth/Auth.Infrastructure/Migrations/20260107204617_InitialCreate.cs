@@ -95,7 +95,7 @@ namespace Auth.Infrastructure.Migrations
                 name: "sessions",
                 columns: table => new
                 {
-                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    id = table.Column<string>(type: "varchar(30)", nullable: false),
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
                     refresh_token_key = table.Column<string>(type: "varchar", maxLength: 512, nullable: false),
                     refresh_token_hash = table.Column<string>(type: "varchar", maxLength: 512, nullable: false),
