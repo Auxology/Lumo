@@ -1,5 +1,7 @@
 using System.Diagnostics;
+
 using Mediator;
+
 using Microsoft.Extensions.Logging;
 
 namespace SharedKernel.Application.Pipelines;
@@ -16,7 +18,7 @@ public sealed class LoggingPipeline<TRequest, TResponse>(ILogger<LoggingPipeline
         string requestName = typeof(TRequest).Name;
 
         logger.LogInformation("Handling {RequestName} {@Request}", requestName, message);
-        
+
         Stopwatch stopwatch = Stopwatch.StartNew();
 
         TResponse response = await next(message, cancellationToken);

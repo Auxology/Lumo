@@ -240,23 +240,6 @@ namespace Notifications.Api.Migrations
                     b.ToTable("outbox_state", (string)null);
                 });
 
-            modelBuilder.Entity("Notifications.Api.Entities.ProcessedEvent", b =>
-                {
-                    b.Property<Guid>("EventId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("event_id");
-
-                    b.Property<DateTimeOffset>("ProcessedAt")
-                        .HasColumnType("timestamptz")
-                        .HasColumnName("processed_at");
-
-                    b.HasKey("EventId")
-                        .HasName("pk_processed_events");
-
-                    b.ToTable("processed_events", (string)null);
-                });
-
             modelBuilder.Entity("MassTransit.EntityFrameworkCoreIntegration.OutboxMessage", b =>
                 {
                     b.HasOne("MassTransit.EntityFrameworkCoreIntegration.OutboxState", null)

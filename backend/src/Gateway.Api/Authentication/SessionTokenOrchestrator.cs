@@ -1,7 +1,9 @@
 using Contracts.Requests;
 using Contracts.Responses;
+
 using Gateway.Api.Caching;
 using Gateway.Api.HttpClients;
+
 using SharedKernel;
 using SharedKernel.Application.Authentication;
 

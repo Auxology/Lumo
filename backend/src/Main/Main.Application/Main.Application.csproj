@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\Shared\Contracts\Contracts.csproj" />
+      <ProjectReference Include="..\..\Shared\SharedKernel.Application\SharedKernel.Application.csproj" />
+      <ProjectReference Include="..\..\Shared\SharedKernel\SharedKernel.csproj" />
+      <ProjectReference Include="..\Main.Domain\Main.Domain.csproj" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <PackageReference Include="Microsoft.EntityFrameworkCore" />
+        <PackageReference Include="Mediator.SourceGenerator" PrivateAssets="all" />
+        <PackageReference Include="Mediator.Abstractions" />
+    </ItemGroup>
+
+</Project>

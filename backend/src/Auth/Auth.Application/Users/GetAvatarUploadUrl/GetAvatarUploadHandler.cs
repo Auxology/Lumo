@@ -3,7 +3,9 @@ using Auth.Application.Abstractions.Storage;
 using Auth.Application.Faults;
 using Auth.Domain.Aggregates;
 using Auth.Domain.ValueObjects;
+
 using Microsoft.EntityFrameworkCore;
+
 using SharedKernel;
 using SharedKernel.Application.Authentication;
 using SharedKernel.Application.Messaging;

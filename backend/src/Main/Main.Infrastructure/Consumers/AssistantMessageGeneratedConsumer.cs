@@ -1,0 +1,76 @@
+using Contracts.IntegrationEvents.Chat;
+
+using Main.Application.Abstractions.Data;
+using Main.Domain.Aggregates;
+using Main.Domain.ValueObjects;
+
+using MassTransit;
+
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+
+using SharedKernel;
+
+namespace Main.Infrastructure.Consumers;
+
+internal sealed class AssistantMessageGeneratedConsumer(
+    IMainDbContext dbContext,
+    ILogger<AssistantMessageGeneratedConsumer> logger) : IConsumer<AssistantMessageGenerated>
+{
+    public async Task Consume(ConsumeContext<AssistantMessageGenerated> context)
+    {
+        CancellationToken cancellationToken = context.CancellationToken;
+        AssistantMessageGenerated message = context.Message;
+
+        Outcome<ChatId> chatIdOutcome = ChatId.From(message.ChatId);
+
+        if (chatIdOutcome.IsFailure)
+        {
+            logger.LogError(
+                "Invalid ChatId in {EventType}: {EventId}, CorrelationId: {CorrelationId}, ChatId: {ChatId}",
+                nameof(AssistantMessageGenerated), message.EventId, message.CorrelationId, message.ChatId);
+            return;
+        }
+
+        ChatId chatId = chatIdOutcome.Value;
+
+        if (string.IsNullOrWhiteSpace(message.MessageContent))
+        {
+            logger.LogError(
+                "Empty MessageContent in {EventType}: {EventId}, CorrelationId: {CorrelationId}, ChatId: {ChatId}",
+                nameof(AssistantMessageGenerated), message.EventId, message.CorrelationId, message.ChatId);
+            return;
+        }
+
+        Chat? chat = await dbContext.Chats
+            .FirstOrDefaultAsync(c => c.Id == chatId, cancellationToken);
+
+        if (chat is null)
+        {
+            logger.LogError(
+                "Chat not found in {EventType}: {EventId}, CorrelationId: {CorrelationId}, ChatId: {ChatId}",
+                nameof(AssistantMessageGenerated), message.EventId, message.CorrelationId, message.ChatId);
+            return;
+        }
+
+        Outcome messageOutcome = chat.AddAssistantMessage
+        (
+            messageContent: message.MessageContent,
+            utcNow: message.OccurredAt
+        );
+
+        if (messageOutcome.IsFailure)
+        {
+            logger.LogError(
+                "Failed to create message in {EventType}: {EventId}, CorrelationId: {CorrelationId}, ChatId: {ChatId}, Fault: {Fault}",
+                nameof(AssistantMessageGenerated), message.EventId, message.CorrelationId, message.ChatId,
+                messageOutcome.Fault);
+            return;
+        }
+
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        logger.LogInformation("Consumed {EventType}: {EventId}, CorrelationId: {CorrelationId}, ChatId: {ChatId}",
+            nameof(AssistantMessageGenerated), message.EventId, message.CorrelationId, message.ChatId);
+    }
+}

@@ -1,4 +1,5 @@
 using Contracts.Requests;
+
 using SharedKernel;
 
 namespace Gateway.Api.Authentication;

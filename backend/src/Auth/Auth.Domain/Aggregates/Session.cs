@@ -1,8 +1,10 @@
 using System.Diagnostics.CodeAnalysis;
+
 using Auth.Domain.Constants;
 using Auth.Domain.Enums;
 using Auth.Domain.Faults;
 using Auth.Domain.ValueObjects;
+
 using SharedKernel;
 
 namespace Auth.Domain.Aggregates;
@@ -29,7 +31,7 @@ public sealed class Session : AggregateRoot<SessionId>
 
     public int Version { get; private set; }
 
-    private Session() {} // For EF Core
+    private Session() { } // For EF Core
 
     [SetsRequiredMembers]
     private Session

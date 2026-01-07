@@ -5,12 +5,12 @@ namespace SharedKernel.Infrastructure.Options;
 public sealed class SerilogOptions
 {
     public const string SectionName = "Serilog";
-    
+
     [Required]
     public string MinimumLevel { get; init; } = "Information";
 
     public SeqOptions Seq { get; init; } = new();
-    
+
     public ConsoleOptions Console { get; init; } = new();
 
     public Dictionary<string, string> OverrideMinimumLevels { get; init; } = new()

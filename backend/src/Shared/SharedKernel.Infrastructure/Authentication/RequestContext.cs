@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Http;
+
 using SharedKernel.Application.Authentication;
+
 using UAParser;
 
 namespace SharedKernel.Infrastructure.Authentication;

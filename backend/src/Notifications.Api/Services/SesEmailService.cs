@@ -1,7 +1,10 @@
 using System.Text.Json;
+
 using Amazon.SimpleEmailV2;
 using Amazon.SimpleEmailV2.Model;
+
 using Microsoft.Extensions.Options;
+
 using Notifications.Api.Options;
 
 namespace Notifications.Api.Services;

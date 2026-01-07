@@ -1,10 +1,12 @@
 using FastEndpoints;
 using FastEndpoints.Swagger;
+
 using Gateway.Api.Authentication;
 using Gateway.Api.Caching;
 using Gateway.Api.HttpClients;
 using Gateway.Api.Options;
 using Gateway.Api.Transforms;
+
 using SharedKernel.Api;
 using SharedKernel.Infrastructure;
 
@@ -18,6 +20,18 @@ internal static class DependencyInjection
             .AddSharedKernelApi()
             .AddSharedKernelInfrastructure(configuration)
             .AddSharedHealthChecks(configuration);
+
+        services.AddCors(options =>
+        {
+            options.AddDefaultPolicy(policy =>
+            {
+                policy
+                    .WithOrigins(configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [])
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials();
+            });
+        });
 
         services.AddOptions<GatewayApiOptions>()
             .Bind(configuration.GetSection(GatewayApiOptions.SectionName))

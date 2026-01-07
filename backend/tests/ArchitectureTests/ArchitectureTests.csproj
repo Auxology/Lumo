@@ -20,4 +20,15 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Auth\Auth.Api\Auth.Api.csproj" />
+    <ProjectReference Include="..\..\src\Auth\Auth.Application\Auth.Application.csproj" />
+    <ProjectReference Include="..\..\src\Auth\Auth.Domain\Auth.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Auth\Auth.Infrastructure\Auth.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Main\Main.Api\Main.Api.csproj" />
+    <ProjectReference Include="..\..\src\Main\Main.Application\Main.Application.csproj" />
+    <ProjectReference Include="..\..\src\Main\Main.Domain\Main.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Main\Main.Infrastructure\Main.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>

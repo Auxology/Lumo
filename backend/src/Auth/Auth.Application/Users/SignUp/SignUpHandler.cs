@@ -4,8 +4,11 @@ using Auth.Application.Faults;
 using Auth.Domain.Aggregates;
 using Auth.Domain.Constants;
 using Auth.Domain.ValueObjects;
+
 using Contracts.IntegrationEvents.Auth;
+
 using Microsoft.EntityFrameworkCore;
+
 using SharedKernel;
 using SharedKernel.Application.Authentication;
 using SharedKernel.Application.Messaging;
@@ -65,6 +68,7 @@ internal sealed class SignUpHandler(
             EventId = Guid.NewGuid(),
             OccurredAt = dateTimeProvider.UtcNow,
             CorrelationId = Guid.Parse(requestContext.CorrelationId),
+            UserId = user.Id.Value,
             EmailAddress = user.EmailAddress.Value,
             DisplayName = user.DisplayName
         };

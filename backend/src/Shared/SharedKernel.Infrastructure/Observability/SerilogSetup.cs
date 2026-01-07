@@ -1,10 +1,13 @@
 using System.Globalization;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+
 using Serilog;
 using Serilog.Enrichers.Span;
 using Serilog.Events;
 using Serilog.Exceptions;
+
 using SharedKernel.Infrastructure.Options;
 
 namespace SharedKernel.Infrastructure.Observability;
@@ -19,9 +22,9 @@ public static class SerilogSetup
             context.Configuration.GetSection(SerilogOptions.SectionName).Bind(serilogOptions);
 
             ConfigureSerilog(configuration, serilogOptions, context.HostingEnvironment);
-        });    
+        });
     }
-    
+
     private static void ConfigureSerilog
     (
         LoggerConfiguration configuration,
@@ -30,7 +33,7 @@ public static class SerilogSetup
     )
     {
         LogEventLevel minimumLevel = ParseLogLevel(options.MinimumLevel);
-        
+
         configuration
             .MinimumLevel.Is(minimumLevel)
             .Enrich.FromLogContext()
@@ -48,7 +51,7 @@ public static class SerilogSetup
         {
             configuration.MinimumLevel.Override(source, ParseLogLevel(level));
         }
-        
+
         if (options.Console.Enabled)
         {
             configuration.WriteTo.Console
@@ -70,7 +73,7 @@ public static class SerilogSetup
             );
         }
     }
-    
+
     private static LogEventLevel ParseLogLevel(string level) =>
         Enum.TryParse<LogEventLevel>(level, ignoreCase: true, out var result)
             ? result

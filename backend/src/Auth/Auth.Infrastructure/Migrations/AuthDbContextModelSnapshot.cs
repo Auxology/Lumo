@@ -310,6 +310,7 @@ namespace Auth.Infrastructure.Migrations
 
                     b.Property<string>("EmailAddress")
                         .IsRequired()
+                        .HasMaxLength(254)
                         .HasColumnType("varchar")
                         .HasColumnName("email_address");
 

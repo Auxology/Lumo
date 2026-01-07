@@ -1,4 +1,5 @@
 using System.Diagnostics;
+
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
@@ -12,7 +13,7 @@ public sealed class GlobalExceptionHandler(IProblemDetailsService problemDetails
     {
         ArgumentNullException.ThrowIfNull(httpContext);
         ArgumentNullException.ThrowIfNull(exception);
-        
+
         httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
 
         Activity? activity = httpContext.Features.Get<IHttpActivityFeature>()?.Activity;

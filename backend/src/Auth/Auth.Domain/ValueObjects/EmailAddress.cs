@@ -49,7 +49,7 @@ public readonly record struct EmailAddress
     }
 
     public override string ToString() => Value;
-    
+
     public bool IsEmpty() => string.IsNullOrEmpty(Value);
 
     public static implicit operator string(EmailAddress email) => email.Value;

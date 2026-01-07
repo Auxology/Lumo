@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http;
+
 using SharedKernel.Application.Authentication;
 
 namespace SharedKernel.Infrastructure.Authentication;

@@ -9,7 +9,7 @@ public static class RecoveryKeyFaults
         title: "RecoveryKey.RecoveryKeyChainIdRequiredForCreation",
         detail: "A recovery key chain ID is required to create a recovery key."
     );
-    
+
     public static readonly Fault IdentifierRequiredForCreation = Fault.Validation
     (
         title: "RecoveryKey.IdentifierRequiredForCreation",

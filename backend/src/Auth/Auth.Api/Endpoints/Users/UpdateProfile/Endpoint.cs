@@ -1,5 +1,7 @@
 using Auth.Application.Users.UpdateProfile;
+
 using FastEndpoints;
+
 using Mediator;
 
 namespace Auth.Api.Endpoints.Users.UpdateProfile;

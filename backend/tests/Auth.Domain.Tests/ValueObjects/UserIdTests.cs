@@ -1,5 +1,7 @@
 using Auth.Domain.ValueObjects;
+
 using FluentAssertions;
+
 using SharedKernel;
 
 namespace Auth.Domain.Tests.ValueObjects;
@@ -159,4 +161,3 @@ public sealed class UserIdTests
         id1.Should().NotBe(id2);
     }
 }
-

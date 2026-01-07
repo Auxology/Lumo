@@ -1,4 +1,5 @@
 using MassTransit;
+
 using SharedKernel.Application.Messaging;
 
 namespace SharedKernel.Infrastructure.Messaging;

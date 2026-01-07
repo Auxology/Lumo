@@ -52,4 +52,3 @@ public static class SessionFaults
         detail: "The refresh token is invalid or has expired."
     );
 }
-

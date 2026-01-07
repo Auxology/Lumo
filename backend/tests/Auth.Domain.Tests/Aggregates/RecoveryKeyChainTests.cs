@@ -2,7 +2,9 @@ using Auth.Domain.Aggregates;
 using Auth.Domain.Constants;
 using Auth.Domain.Faults;
 using Auth.Domain.ValueObjects;
+
 using FluentAssertions;
+
 using SharedKernel;
 
 namespace Auth.Domain.Tests.Aggregates;
@@ -244,4 +246,3 @@ public sealed class RecoveryKeyChainTests
         chain.Version.Should().Be(4);
     }
 }
-

@@ -19,4 +19,11 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
+
+  <!-- Exclude EF Migrations from code analysis -->
+  <ItemGroup>
+    <Compile Update="**/Migrations/*.cs">
+      <ExcludeFromCodeAnalysis>true</ExcludeFromCodeAnalysis>
+    </Compile>
+  </ItemGroup>
 </Project>

@@ -1,8 +1,10 @@
 using System.Diagnostics.CodeAnalysis;
+
 using Auth.Domain.Constants;
 using Auth.Domain.Entities;
 using Auth.Domain.Faults;
 using Auth.Domain.ValueObjects;
+
 using SharedKernel;
 
 namespace Auth.Domain.Aggregates;
@@ -10,19 +12,19 @@ namespace Auth.Domain.Aggregates;
 public sealed class RecoveryKeyChain : AggregateRoot<RecoveryKeyChainId>
 {
     private readonly List<RecoveryKey> _recoveryKeys = [];
-    
+
     public UserId UserId { get; private set; }
-    
+
     public DateTimeOffset CreatedAt { get; private set; }
-    
+
     public DateTimeOffset? LastRotatedAt { get; private set; }
-    
+
     public int Version { get; private set; }
-    
-    public IReadOnlyCollection<RecoveryKey> RecoveryKeys => [.._recoveryKeys];
-    
-    private RecoveryKeyChain() {} // For EF Core
-    
+
+    public IReadOnlyCollection<RecoveryKey> RecoveryKeys => [.. _recoveryKeys];
+
+    private RecoveryKeyChain() { } // For EF Core
+
     [SetsRequiredMembers]
     private RecoveryKeyChain
     (
@@ -48,7 +50,7 @@ public sealed class RecoveryKeyChain : AggregateRoot<RecoveryKeyChainId>
     )
     {
         ArgumentNullException.ThrowIfNull(recoverKeyInputs);
-        
+
         if (userId.IsEmpty)
             return RecoveryKeyChainFaults.UserIdRequiredForCreation;
 
@@ -56,7 +58,7 @@ public sealed class RecoveryKeyChain : AggregateRoot<RecoveryKeyChainId>
             return RecoveryKeyChainFaults.InvalidRecoveryKeyCount;
 
         RecoveryKeyChainId recoveryKeyChainId = RecoveryKeyChainId.New();
-        
+
         List<RecoveryKey> recoveryKeys = new(capacity: RecoveryKeyConstants.MaxKeysPerChain);
 
         foreach (RecoverKeyInput recoverKeyInput in recoverKeyInputs)
@@ -67,10 +69,10 @@ public sealed class RecoveryKeyChain : AggregateRoot<RecoveryKeyChainId>
                 identifier: recoverKeyInput.Identifier,
                 verifierHash: recoverKeyInput.VerifierHash
             );
-            
+
             if (recoveryKeyOutcome.IsFailure)
                 return recoveryKeyOutcome.Fault;
-            
+
             recoveryKeys.Add(recoveryKeyOutcome.Value);
         }
 
@@ -92,10 +94,10 @@ public sealed class RecoveryKeyChain : AggregateRoot<RecoveryKeyChainId>
     )
     {
         ArgumentNullException.ThrowIfNull(newRecoveryKeyPairs);
-        
+
         if (newRecoveryKeyPairs.Count != RecoveryKeyConstants.MaxKeysPerChain)
             return RecoveryKeyChainFaults.InvalidRecoveryKeyCount;
-        
+
         List<RecoveryKey> newRecoveryKeys = new(capacity: RecoveryKeyConstants.MaxKeysPerChain);
 
         foreach ((string identifier, string verifierHash) newRecoveryKeyPair in newRecoveryKeyPairs)
@@ -106,18 +108,18 @@ public sealed class RecoveryKeyChain : AggregateRoot<RecoveryKeyChainId>
                 identifier: newRecoveryKeyPair.identifier,
                 verifierHash: newRecoveryKeyPair.verifierHash
             );
-            
+
             if (newRecoveryKeyOutcome.IsFailure)
                 return newRecoveryKeyOutcome.Fault;
-            
+
             newRecoveryKeys.Add(newRecoveryKeyOutcome.Value);
         }
-        
+
         _recoveryKeys.Clear();
         _recoveryKeys.AddRange(newRecoveryKeys);
         LastRotatedAt = utcNow;
         Version += 1;
-        
+
         return Outcome.Success();
     }
 }

@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
+
 using SharedKernel;
 
 namespace Auth.Domain.ValueObjects;
@@ -7,17 +8,17 @@ namespace Auth.Domain.ValueObjects;
 public readonly record struct Fingerprint
 {
     public string IpAddress { get; }
-    
+
     public string UserAgent { get; }
-    
+
     public string Timezone { get; }
-    
+
     public string Language { get; }
-    
+
     public string ComputedHash { get; }
-    
+
     public string NormalizedBrowser { get; }
-    
+
     public string NormalizedOs { get; }
 
     private Fingerprint
@@ -52,22 +53,22 @@ public readonly record struct Fingerprint
     {
         if (string.IsNullOrWhiteSpace(ipAddress))
             return Faults.IpAddressRequired;
-        
+
         if (string.IsNullOrWhiteSpace(userAgent))
             return Faults.UserAgentRequired;
-        
+
         if (string.IsNullOrWhiteSpace(timezone))
             return Faults.TimezoneRequired;
-        
+
         if (string.IsNullOrWhiteSpace(language))
             return Faults.LanguageRequired;
-        
+
         if (string.IsNullOrWhiteSpace(normalizedBrowser))
             return Faults.NormalizedBrowserRequired;
-        
+
         if (string.IsNullOrWhiteSpace(normalizedOs))
             return Faults.NormalizedOsRequired;
-        
+
         string computedHash = ComputeHash(ipAddress, userAgent, timezone, language);
 
         Fingerprint fingerprint = new
@@ -80,7 +81,7 @@ public readonly record struct Fingerprint
             normalizedBrowser: normalizedBrowser,
             normalizedOs: normalizedOs
         );
-        
+
         return fingerprint;
     }
 
@@ -94,10 +95,10 @@ public readonly record struct Fingerprint
     {
         string rawData = $"{ipAddress}|{userAgent}|{timezone}|{language}";
         byte[] hashedBytes = SHA256.HashData(Encoding.UTF8.GetBytes(rawData));
-        
+
         return Convert.ToBase64String(hashedBytes);
     }
-    
+
     private static class Faults
     {
         public static readonly Fault IpAddressRequired = Fault.Validation
@@ -105,31 +106,31 @@ public readonly record struct Fingerprint
             title: "Fingerprint.IpAddressRequired",
             detail: "An IP address is required for the fingerprint."
         );
-        
+
         public static readonly Fault UserAgentRequired = Fault.Validation
         (
             title: "Fingerprint.UserAgentRequired",
             detail: "A user agent is required for the fingerprint."
         );
-        
+
         public static readonly Fault TimezoneRequired = Fault.Validation
         (
             title: "Fingerprint.TimezoneRequired",
             detail: "A timezone is required for the fingerprint."
         );
-        
+
         public static readonly Fault LanguageRequired = Fault.Validation
         (
             title: "Fingerprint.LanguageRequired",
             detail: "A language is required for the fingerprint."
         );
-        
+
         public static readonly Fault NormalizedBrowserRequired = Fault.Validation
         (
             title: "Fingerprint.NormalizedBrowserRequired",
             detail: "A normalized browser is required for the fingerprint."
         );
-        
+
         public static readonly Fault NormalizedOsRequired = Fault.Validation
         (
             title: "Fingerprint.NormalizedOsRequired",

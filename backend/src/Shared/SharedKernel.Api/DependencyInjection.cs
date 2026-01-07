@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+
 using SharedKernel.Api.Infrastructure;
 
 namespace SharedKernel.Api;
@@ -9,7 +10,7 @@ public static class DependencyInjection
     {
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddProblemDetails();
-        
+
         return services;
     }
 }

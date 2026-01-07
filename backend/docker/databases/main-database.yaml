@@ -1,0 +1,36 @@
+services:
+    main-database:
+        image: postgres:${POSTGRES_VERSION:-17-alpine}
+        container_name: lumo-main-database
+        ports:
+            - "${MAIN_DATABASE_PORT:-5434}:5432"
+        volumes:
+            - main-database-data:/var/lib/postgresql/data
+        networks:
+            - lumo-network
+        restart: unless-stopped
+        environment:
+            # PostgreSQL Configuration
+            - POSTGRES_DB=${MAIN_DATABASE_NAME:-main}
+            - POSTGRES_USER=${MAIN_DATABASE_USER:-main_user}
+            - POSTGRES_PASSWORD=${MAIN_DATABASE_PASSWORD:?MAIN_DATABASE_PASSWORD is required}
+            - PGDATA=${MAIN_DATABASE_PGDATA:-/var/lib/postgresql/data/pgdata}
+        deploy:
+            resources:
+                limits:
+                    memory: ${MAIN_DATABASE_MEMORY_LIMIT:-512M}
+                reservations:
+                    memory: ${MAIN_DATABASE_MEMORY_RESERVATION:-256M}
+        labels:
+            - "lumo.service=main-database"
+            - "lumo.tier=infrastructure"
+        healthcheck:
+            test:
+                [
+                    "CMD-SHELL",
+                    "pg_isready -U ${MAIN_DATABASE_USER:-main_user} -d ${MAIN_DATABASE_NAME:-main}",
+                ]
+            interval: ${MAIN_DATABASE_HEALTHCHECK_INTERVAL:-10s}
+            timeout: ${MAIN_DATABASE_HEALTHCHECK_TIMEOUT:-5s}
+            retries: ${MAIN_DATABASE_HEALTHCHECK_RETRIES:-5}
+            start_period: ${MAIN_DATABASE_HEALTHCHECK_START_PERIOD:-15s}

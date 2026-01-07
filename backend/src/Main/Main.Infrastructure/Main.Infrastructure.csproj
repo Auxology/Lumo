@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\Shared\Contracts\Contracts.csproj" />
+      <ProjectReference Include="..\..\Shared\SharedKernel.Application\SharedKernel.Application.csproj" />
+      <ProjectReference Include="..\..\Shared\SharedKernel.Infrastructure\SharedKernel.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\Shared\SharedKernel\SharedKernel.csproj" />
+      <ProjectReference Include="..\Main.Application\Main.Application.csproj" />
+      <ProjectReference Include="..\Main.Domain\Main.Domain.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" />
+        <PackageReference Include="EFCore.NamingConventions" />
+        <PackageReference Include="Dapper" />
+        <PackageReference Include="AspNetCore.HealthChecks.NpgSql" />
+        <PackageReference Include="MassTransit" />
+        <PackageReference Include="MassTransit.RabbitMQ" />
+        <PackageReference Include="MassTransit.EntityFrameworkCore" />
+        <PackageReference Include="OpenAI" />
+        <PackageReference Include="Ulid" />
+    </ItemGroup>
+
+</Project>

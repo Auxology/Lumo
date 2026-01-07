@@ -1,4 +1,5 @@
 using Auth.Domain.Constants;
+
 using FluentValidation;
 
 namespace Auth.Application.LoginRequests.Create;

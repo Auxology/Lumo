@@ -1,4 +1,5 @@
 using FluentAssertions;
+
 using SharedKernel;
 
 namespace SharedKernel.Tests;
@@ -120,4 +121,3 @@ public sealed class OutcomeOfTTests
         outcome.Fault.Should().Be(fault);
     }
 }
-

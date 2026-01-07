@@ -1,5 +1,7 @@
 using Auth.Application.LoginRequests.Create;
+
 using FastEndpoints;
+
 using Mediator;
 
 namespace Auth.Api.Endpoints.LoginRequests.Create;
@@ -13,7 +15,7 @@ internal sealed class
     {
         _sender = sender;
     }
-    
+
     public override void Configure()
     {
         Post("/api/login-requests");
@@ -29,7 +31,7 @@ internal sealed class
                 .WithTags(CustomTags.LoginRequests);
         });
     }
-    
+
     public override async Task HandleAsync(Request endpointRequest, CancellationToken ct)
     {
         CreateLoginCommand command = new(endpointRequest.EmailAddress);

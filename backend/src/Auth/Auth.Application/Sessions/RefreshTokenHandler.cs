@@ -4,7 +4,9 @@ using Auth.Domain.Aggregates;
 using Auth.Domain.Constants;
 using Auth.Domain.Faults;
 using Auth.Domain.ValueObjects;
+
 using Microsoft.EntityFrameworkCore;
+
 using SharedKernel;
 using SharedKernel.Application.Authentication;
 using SharedKernel.Application.Messaging;

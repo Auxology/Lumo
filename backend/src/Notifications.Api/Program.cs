@@ -1,7 +1,10 @@
 using System.Text.Json;
+
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+
 using Notifications.Api;
 using Notifications.Api.Extensions;
+
 using SharedKernel.Infrastructure.Observability;
 
 var builder = WebApplication.CreateBuilder(args);

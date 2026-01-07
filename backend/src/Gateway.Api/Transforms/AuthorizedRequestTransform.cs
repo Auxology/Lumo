@@ -1,7 +1,10 @@
 using System.Net.Http.Headers;
+
 using Gateway.Api.Authentication;
 using Gateway.Api.Extensions;
+
 using SharedKernel;
+
 using Yarp.ReverseProxy.Transforms;
 
 namespace Gateway.Api.Transforms;

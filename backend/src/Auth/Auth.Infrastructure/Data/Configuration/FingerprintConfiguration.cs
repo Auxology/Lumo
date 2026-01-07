@@ -1,6 +1,8 @@
 using Auth.Domain.ValueObjects;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
 using SharedKernel.Infrastructure.Data;
 
 namespace Auth.Infrastructure.Data.Configuration;
@@ -45,4 +47,3 @@ internal static class FingerprintConfiguration
             .HasColumnType("varchar");
     }
 }
-

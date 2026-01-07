@@ -1,5 +1,7 @@
 using Auth.Domain.ValueObjects;
+
 using FluentAssertions;
+
 using SharedKernel;
 
 namespace Auth.Domain.Tests.ValueObjects;
@@ -250,4 +252,3 @@ public sealed class FingerprintTests
         outcome1.Value.Should().Be(outcome2.Value);
     }
 }
-

@@ -1,16 +1,20 @@
 using System.ComponentModel.DataAnnotations;
+
 using Amazon.SimpleEmailV2;
+
 using MassTransit;
+
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
+
+using Notifications.Api.Consumers;
 using Notifications.Api.Data;
 using Notifications.Api.Options;
+using Notifications.Api.Services;
+
 using SharedKernel.Api;
 using SharedKernel.Infrastructure;
 using SharedKernel.Infrastructure.Options;
-
-using Microsoft.Extensions.Hosting;
-using Notifications.Api.Consumers;
-using Notifications.Api.Services;
 
 namespace Notifications.Api;
 
@@ -72,7 +76,8 @@ internal static class DependencyInjection
 
         services.AddMassTransit(bus =>
         {
-            bus.AddConsumer<UserSignedUpConsumer>();
+            bus.AddConsumer<UserSignedUpConsumer>()
+                .Endpoint(e => e.Name = "notifications-user-signed-up");
             bus.AddConsumer<LoginRequestedConsumer>();
 
             bus.AddEntityFrameworkOutbox<NotificationDbContext>(outbox =>

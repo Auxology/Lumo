@@ -1,8 +1,10 @@
 using System.Diagnostics.CodeAnalysis;
+
 using Auth.Domain.Constants;
 using Auth.Domain.Events.User;
 using Auth.Domain.Faults;
 using Auth.Domain.ValueObjects;
+
 using SharedKernel;
 
 namespace Auth.Domain.Aggregates;
@@ -10,20 +12,20 @@ namespace Auth.Domain.Aggregates;
 public sealed class User : AggregateRoot<UserId>
 {
     public string DisplayName { get; private set; } = string.Empty;
-    
+
     public EmailAddress EmailAddress { get; private set; }
-    
+
     public string? AvatarKey { get; private set; }
-    
+
     public bool IsVerified { get; private set; }
-    
+
     public DateTimeOffset CreatedAt { get; private set; }
-    
+
     public DateTimeOffset? UpdatedAt { get; private set; }
-    
+
     public DateTimeOffset? VerifiedAt { get; private set; }
-    
-    private User() {} // For EF Core
+
+    private User() { } // For EF Core
 
     [SetsRequiredMembers]
     private User
@@ -72,7 +74,7 @@ public sealed class User : AggregateRoot<UserId>
             EmailAddress: user.EmailAddress.Value,
             CreatedAt: user.CreatedAt
         );
-        
+
         user.AddDomainEvent(domainEvent);
 
         return user;
@@ -96,13 +98,13 @@ public sealed class User : AggregateRoot<UserId>
     {
         if (string.IsNullOrWhiteSpace(avatarKey))
             return UserFaults.AvatarKeyRequiredForUpdate;
-        
+
         AvatarKey = avatarKey;
         UpdatedAt = utcNow;
 
         return Outcome.Success();
     }
-    
+
     public void RemoveAvatarKey(DateTimeOffset utcNow)
     {
         AvatarKey = null;
