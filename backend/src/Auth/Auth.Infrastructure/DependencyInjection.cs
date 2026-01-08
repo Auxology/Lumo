@@ -21,6 +21,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.JsonWebTokens;
 
+using SharedKernel.Application.Data;
 using SharedKernel.Application.Messaging;
 using SharedKernel.Infrastructure;
 using SharedKernel.Infrastructure.Data;

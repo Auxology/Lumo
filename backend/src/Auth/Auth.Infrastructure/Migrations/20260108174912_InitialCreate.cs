@@ -39,7 +39,7 @@ namespace Auth.Infrastructure.Migrations
                 name: "login_requests",
                 columns: table => new
                 {
-                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    id = table.Column<string>(type: "varchar(30)", nullable: false),
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
                     token_key = table.Column<string>(type: "varchar", maxLength: 512, nullable: false),
                     otp_token_hash = table.Column<string>(type: "varchar", maxLength: 512, nullable: false),
@@ -80,7 +80,7 @@ namespace Auth.Infrastructure.Migrations
                 name: "recovery_key_chains",
                 columns: table => new
                 {
-                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    id = table.Column<string>(type: "varchar(30)", nullable: false),
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
                     created_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: false),
                     last_rotated_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: true),
@@ -184,7 +184,7 @@ namespace Auth.Infrastructure.Migrations
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    recovery_key_chain_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    recovery_key_chain_id = table.Column<string>(type: "varchar(30)", nullable: false),
                     identifier = table.Column<string>(type: "varchar", maxLength: 512, nullable: false),
                     verifier_hash = table.Column<string>(type: "varchar", maxLength: 512, nullable: false),
                     is_used = table.Column<bool>(type: "boolean", nullable: false),

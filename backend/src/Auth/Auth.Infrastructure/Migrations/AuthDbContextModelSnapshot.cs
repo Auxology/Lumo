@@ -25,8 +25,8 @@ namespace Auth.Infrastructure.Migrations
 
             modelBuilder.Entity("Auth.Domain.Aggregates.LoginRequest", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid")
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(30)")
                         .HasColumnName("id");
 
                     b.Property<DateTimeOffset?>("ConsumedAt")
@@ -134,8 +134,8 @@ namespace Auth.Infrastructure.Migrations
 
             modelBuilder.Entity("Auth.Domain.Aggregates.RecoveryKeyChain", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid")
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(30)")
                         .HasColumnName("id");
 
                     b.Property<DateTimeOffset>("CreatedAt")
@@ -361,8 +361,9 @@ namespace Auth.Infrastructure.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("is_used");
 
-                    b.Property<Guid>("RecoveryKeyChainId")
-                        .HasColumnType("uuid")
+                    b.Property<string>("RecoveryKeyChainId")
+                        .IsRequired()
+                        .HasColumnType("varchar(30)")
                         .HasColumnName("recovery_key_chain_id");
 
                     b.Property<DateTimeOffset?>("UsedAt")
