@@ -24,7 +24,7 @@ internal sealed class GetCurrentUserHandler(IDbConnectionFactory dbConnectionFac
                                FROM users
                                where id = @UserId
                                """;
-    
+
     public async ValueTask<Outcome<UserReadModel>> Handle(GetCurrentUserQuery request,
         CancellationToken cancellationToken)
     {
@@ -45,7 +45,7 @@ internal sealed class GetCurrentUserHandler(IDbConnectionFactory dbConnectionFac
 
         if (user is null)
             return UserOperationFaults.NotFound;
-        
+
         return user;
     }
 }

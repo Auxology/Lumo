@@ -27,7 +27,7 @@ internal sealed class Endpoint : BaseEndpoint<EmptyRequest, Response>
                 .WithTags(CustomTags.Users);
         });
     }
-    
+
     public override async Task HandleAsync(EmptyRequest endpointRequest, CancellationToken ct)
     {
         GetCurrentUserQuery query = new();

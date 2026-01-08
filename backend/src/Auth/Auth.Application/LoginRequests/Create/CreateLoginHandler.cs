@@ -64,7 +64,7 @@ internal sealed class CreateLoginHandler(
             );
 
         LoginRequestId id = idGenerator.NewLoginRequestId();
-        
+
         Outcome<LoginRequest> loginRequestOutcome = LoginRequest.Create
         (
             id: id,

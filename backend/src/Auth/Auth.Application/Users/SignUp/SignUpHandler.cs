@@ -55,7 +55,7 @@ internal sealed class SignUpHandler(
         (List<RecoverKeyInput> recoverKeyInputs, List<string> userFriendlyKeys) = GenerateRecoveryKeys();
 
         RecoveryKeyChainId recoveryKeyChainId = idGenerator.NewRecoveryKeyChainId();
-        
+
         Outcome<RecoveryKeyChain> recoveryKeyChainOutcome = RecoveryKeyChain.Create
         (
             id: recoveryKeyChainId,
