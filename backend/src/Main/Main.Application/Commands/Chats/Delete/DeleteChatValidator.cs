@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace Main.Application.Chats.Delete;
+namespace Main.Application.Commands.Chats.Delete;
 
 internal sealed class DeleteChatValidator : AbstractValidator<DeleteChatCommand>
 {

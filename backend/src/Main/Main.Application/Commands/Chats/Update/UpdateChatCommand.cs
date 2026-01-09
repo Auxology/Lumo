@@ -1,6 +1,6 @@
 using SharedKernel.Application.Messaging;
 
-namespace Main.Application.Chats.Update;
+namespace Main.Application.Commands.Chats.Update;
 
 public sealed record UpdateChatCommand
 (

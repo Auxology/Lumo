@@ -10,7 +10,7 @@ using SharedKernel;
 using SharedKernel.Application.Authentication;
 using SharedKernel.Application.Messaging;
 
-namespace Main.Application.Chats.Update;
+namespace Main.Application.Commands.Chats.Update;
 
 internal sealed class UpdateChatHandler(
     IMainDbContext dbContext,

@@ -1,6 +1,6 @@
 using FastEndpoints;
 
-using Main.Application.Chats.SendMessage;
+using Main.Application.Commands.Chats.SendMessage;
 
 using Mediator;
 

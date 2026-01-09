@@ -13,7 +13,7 @@ using SharedKernel;
 using SharedKernel.Application.Authentication;
 using SharedKernel.Application.Messaging;
 
-namespace Main.Application.Chats.SendMessage;
+namespace Main.Application.Commands.Chats.SendMessage;
 
 internal sealed class SendMessageHandler(
     IMainDbContext dbContext,

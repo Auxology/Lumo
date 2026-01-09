@@ -1,4 +1,4 @@
-namespace Main.Application.Chats.Update;
+namespace Main.Application.Commands.Chats.Update;
 
 public sealed record UpdateChatResponse
 (

@@ -2,7 +2,7 @@ using FluentValidation;
 
 using Main.Domain.Constants;
 
-namespace Main.Application.Chats.Update;
+namespace Main.Application.Commands.Chats.Update;
 
 internal sealed class UpdateChatValidator : AbstractValidator<UpdateChatCommand>
 {

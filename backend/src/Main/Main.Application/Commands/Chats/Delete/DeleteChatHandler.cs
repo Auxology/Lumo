@@ -10,7 +10,7 @@ using SharedKernel;
 using SharedKernel.Application.Authentication;
 using SharedKernel.Application.Messaging;
 
-namespace Main.Application.Chats.Delete;
+namespace Main.Application.Commands.Chats.Delete;
 
 internal sealed class DeleteChatHandler(IMainDbContext dbContext, IUserContext userContext)
     : ICommandHandler<DeleteChatCommand>

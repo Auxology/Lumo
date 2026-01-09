@@ -1,4 +1,4 @@
-namespace Main.Application.Chats.Start;
+namespace Main.Application.Commands.Chats.Start;
 
 public sealed record StartChatResponse
 (

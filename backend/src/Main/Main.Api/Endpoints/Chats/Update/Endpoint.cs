@@ -1,6 +1,6 @@
 using FastEndpoints;
 
-using Main.Application.Chats.Update;
+using Main.Application.Commands.Chats.Update;
 
 using Mediator;
 

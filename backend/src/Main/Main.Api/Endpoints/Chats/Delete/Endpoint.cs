@@ -1,6 +1,6 @@
 using FastEndpoints;
 
-using Main.Application.Chats.Delete;
+using Main.Application.Commands.Chats.Delete;
 
 using Mediator;
 

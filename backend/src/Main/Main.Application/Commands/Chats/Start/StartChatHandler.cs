@@ -14,7 +14,7 @@ using SharedKernel;
 using SharedKernel.Application.Authentication;
 using SharedKernel.Application.Messaging;
 
-namespace Main.Application.Chats.Start;
+namespace Main.Application.Commands.Chats.Start;
 
 internal sealed class StartChatHandler(
     IMainDbContext dbContext,

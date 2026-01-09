@@ -1,6 +1,6 @@
 using SharedKernel.Application.Messaging;
 
-namespace Main.Application.Chats.SendMessage;
+namespace Main.Application.Commands.Chats.SendMessage;
 
 public sealed record SendMessageCommand
 (

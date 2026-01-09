@@ -1,4 +1,4 @@
-namespace Main.Application.Chats.SendMessage;
+namespace Main.Application.Commands.Chats.SendMessage;
 
 public sealed record SendMessageResponse
 (
