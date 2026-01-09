@@ -11,7 +11,7 @@ using SharedKernel;
 using SharedKernel.Application.Authentication;
 using SharedKernel.Application.Messaging;
 
-namespace Auth.Application.Sessions;
+namespace Auth.Application.Commands.Sessions.RefreshToken;
 
 internal sealed class RefreshTokenHandler(
     IAuthDbContext dbContext,

@@ -1,4 +1,4 @@
-namespace Auth.Application.Users.SignUp;
+namespace Auth.Application.Commands.Users.SignUp;
 
 public sealed record SignUpResponse
 (

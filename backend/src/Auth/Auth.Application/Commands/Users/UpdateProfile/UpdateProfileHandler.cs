@@ -12,7 +12,7 @@ using SharedKernel;
 using SharedKernel.Application.Authentication;
 using SharedKernel.Application.Messaging;
 
-namespace Auth.Application.Users.UpdateProfile;
+namespace Auth.Application.Commands.Users.UpdateProfile;
 
 internal sealed class UpdateProfileHandler(
     IAuthDbContext dbContext,

@@ -2,7 +2,7 @@ using Auth.Domain.Constants;
 
 using FluentValidation;
 
-namespace Auth.Application.Users.SignUp;
+namespace Auth.Application.Commands.Users.SignUp;
 
 internal sealed class SignUpValidator : AbstractValidator<SignUpCommand>
 {

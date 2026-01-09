@@ -1,6 +1,6 @@
 using SharedKernel.Application.Messaging;
 
-namespace Auth.Application.Sessions;
+namespace Auth.Application.Commands.Sessions.RefreshToken;
 
 public sealed record RefreshTokenCommand
 (

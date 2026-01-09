@@ -1,4 +1,4 @@
-using Auth.Application.Users.GetAvatarUploadUrl;
+using Auth.Application.Commands.Users.GetAvatarUploadUrl;
 
 using FastEndpoints;
 

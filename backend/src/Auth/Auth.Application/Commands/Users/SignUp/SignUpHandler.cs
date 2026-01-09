@@ -14,7 +14,7 @@ using SharedKernel;
 using SharedKernel.Application.Authentication;
 using SharedKernel.Application.Messaging;
 
-namespace Auth.Application.Users.SignUp;
+namespace Auth.Application.Commands.Users.SignUp;
 
 internal sealed class SignUpHandler(
     IAuthDbContext dbContext,

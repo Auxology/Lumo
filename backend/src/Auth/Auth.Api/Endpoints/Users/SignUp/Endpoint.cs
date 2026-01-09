@@ -1,4 +1,4 @@
-using Auth.Application.Users.SignUp;
+using Auth.Application.Commands.Users.SignUp;
 
 using FastEndpoints;
 

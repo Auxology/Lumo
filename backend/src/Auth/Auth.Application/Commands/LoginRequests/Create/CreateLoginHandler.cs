@@ -13,7 +13,7 @@ using SharedKernel;
 using SharedKernel.Application.Authentication;
 using SharedKernel.Application.Messaging;
 
-namespace Auth.Application.LoginRequests.Create;
+namespace Auth.Application.Commands.LoginRequests.Create;
 
 internal sealed class CreateLoginHandler(
     IAuthDbContext dbContext,

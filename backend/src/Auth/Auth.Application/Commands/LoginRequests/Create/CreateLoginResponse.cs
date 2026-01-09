@@ -1,4 +1,4 @@
-namespace Auth.Application.LoginRequests.Create;
+namespace Auth.Application.Commands.LoginRequests.Create;
 
 public sealed record CreateLoginResponse
 (

@@ -1,4 +1,4 @@
-namespace Auth.Application.Users.GetAvatarUploadUrl;
+namespace Auth.Application.Commands.Users.GetAvatarUploadUrl;
 
 public sealed record GetAvatarUploadUrlResponse
 (

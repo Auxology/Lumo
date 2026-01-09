@@ -1,4 +1,4 @@
-using Auth.Application.LoginRequests.Create;
+using Auth.Application.Commands.LoginRequests.Create;
 
 using FastEndpoints;
 

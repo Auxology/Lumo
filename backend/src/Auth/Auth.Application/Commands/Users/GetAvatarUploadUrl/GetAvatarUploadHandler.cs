@@ -1,7 +1,6 @@
 using Auth.Application.Abstractions.Data;
 using Auth.Application.Abstractions.Storage;
 using Auth.Application.Faults;
-using Auth.Domain.Aggregates;
 using Auth.Domain.ValueObjects;
 
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +9,7 @@ using SharedKernel;
 using SharedKernel.Application.Authentication;
 using SharedKernel.Application.Messaging;
 
-namespace Auth.Application.Users.GetAvatarUploadUrl;
+namespace Auth.Application.Commands.Users.GetAvatarUploadUrl;
 
 internal sealed class GetAvatarUploadHandler(
     IAuthDbContext dbContext,

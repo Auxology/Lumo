@@ -2,7 +2,7 @@ using Auth.Application.Abstractions.Storage;
 
 using FluentValidation;
 
-namespace Auth.Application.Users.GetAvatarUploadUrl;
+namespace Auth.Application.Commands.Users.GetAvatarUploadUrl;
 
 internal sealed class GetAvatarUploadUrlValidator : AbstractValidator<GetAvatarUploadUrlCommand>
 {
