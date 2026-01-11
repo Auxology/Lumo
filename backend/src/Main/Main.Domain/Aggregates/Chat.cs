@@ -128,7 +128,7 @@ public sealed class Chat : AggregateRoot<ChatId>
     {
         if (IsArchived)
             return ChatFaults.CannotModifyArchivedChat;
-        
+
         int sequenceNumber = NextSequenceNumber;
         NextSequenceNumber++;
 

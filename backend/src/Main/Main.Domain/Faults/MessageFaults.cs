@@ -9,7 +9,7 @@ public static class MessageFaults
         title: "Message.MessageIdRequired",
         detail: "MessageId is required."
     );
-    
+
     public static readonly Fault ChatIdRequired = Fault.Validation
     (
         title: "Message.ChatIdRequired",

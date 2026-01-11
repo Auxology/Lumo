@@ -11,7 +11,7 @@ public sealed record MessageReadModel
     public required string MessageContent { get; init; }
 
     public long? TokenCount { get; init; }
-    
+
     public int SequenceNumber { get; init; }
 
     public DateTimeOffset CreatedAt { get; init; }

@@ -17,7 +17,7 @@ public sealed class Message : Entity<MessageId>
     public string MessageContent { get; private set; } = string.Empty;
 
     public long? TokenCount { get; private set; }
-    
+
     public int SequenceNumber { get; private set; }
 
     public DateTimeOffset CreatedAt { get; private set; }
@@ -56,7 +56,7 @@ public sealed class Message : Entity<MessageId>
     {
         if (id.IsEmpty)
             return MessageFaults.MessageIdRequired;
-        
+
         if (chatId.IsEmpty)
             return MessageFaults.ChatIdRequired;
 
@@ -68,7 +68,7 @@ public sealed class Message : Entity<MessageId>
 
         if (sequenceNumber < 0)
             return MessageFaults.InvalidSequenceNumber;
-        
+
         Message message = new
         (
             id: id,

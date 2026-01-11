@@ -53,9 +53,9 @@ internal sealed class StartChatHandler(
             return chatOutcome.Fault;
 
         Chat chat = chatOutcome.Value;
-        
+
         MessageId messageId = idGenerator.NewMessageId();
-        
+
         Outcome messageOutcome = chat.AddUserMessage
         (
             messageId: messageId,
@@ -65,9 +65,9 @@ internal sealed class StartChatHandler(
 
         if (messageOutcome.IsFailure)
             return messageOutcome.Fault;
-        
+
         await chatLockService.TryAcquireLockAsync(chat.Id.Value, cancellationToken);
-        
+
         ChatStarted chatStarted = new()
         {
             EventId = Guid.NewGuid(),

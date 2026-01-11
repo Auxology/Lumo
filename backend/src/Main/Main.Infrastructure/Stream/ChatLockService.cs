@@ -14,11 +14,11 @@ internal sealed class ChatLockService(
     ILogger<ChatLockService> logger) : IChatLockService
 {
     private readonly ChatStreamingOptions _chatStreamingOptions = chatStreamingOptions.Value;
-    
+
     private const string LockKeyPrefix = "chat:lock:";
     private const string LockValue = "generating";
 
-    
+
     public async Task<bool> TryAcquireLockAsync(string chatId, CancellationToken cancellationToken)
     {
         string lockKey = $"{LockKeyPrefix}{chatId}";
@@ -34,7 +34,7 @@ internal sealed class ChatLockService(
                 expiry: _chatStreamingOptions.GenerationLockExpiration,
                 when: When.NotExists
             );
-            
+
             if (acquired)
             {
                 logger.LogInformation("Acquired lock for chatId: {ChatId}", chatId);
@@ -43,7 +43,7 @@ internal sealed class ChatLockService(
             {
                 logger.LogInformation("Failed to acquire lock for chatId: {ChatId}", chatId);
             }
-            
+
             return acquired;
         }
         catch (RedisException exception)
@@ -76,7 +76,7 @@ internal sealed class ChatLockService(
         string lockKey = $"{LockKeyPrefix}{chatId}";
 
         IDatabase db = connectionMultiplexer.GetDatabase();
-        
+
         try
         {
             return await db.KeyExistsAsync(lockKey);

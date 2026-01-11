@@ -2,6 +2,7 @@ using FluentAssertions;
 
 using Main.Domain.Aggregates;
 using Main.Domain.Constants;
+using Main.Domain.Entities;
 using Main.Domain.Faults;
 using Main.Domain.ValueObjects;
 
@@ -16,6 +17,7 @@ public sealed class ChatTests
     private const string ValidTitle = "My Chat";
     private static readonly ChatId ValidChatId = ChatId.UnsafeFrom("test-chat-id");
     private static readonly ChatId AnotherChatId = ChatId.UnsafeFrom("another-chat-id");
+    private static readonly MessageId ValidMessageId = MessageId.UnsafeFrom("msg_01JGX123456789012345678901");
 
     [Fact]
     public void Create_WithValidData_ShouldReturnSuccess()
@@ -184,7 +186,7 @@ public sealed class ChatTests
         string messageContent = "Hello, World!";
         DateTimeOffset updateTime = UtcNow.AddHours(1);
 
-        Outcome outcome = chat.AddUserMessage(messageContent, updateTime);
+        Outcome<Message> outcome = chat.AddUserMessage(ValidMessageId, messageContent, updateTime);
 
         outcome.IsSuccess.Should().BeTrue();
         chat.Messages.Should().HaveCount(1);
@@ -197,9 +199,9 @@ public sealed class ChatTests
     {
         Chat chat = Chat.Create(ValidChatId, ValidUserId, ValidTitle, UtcNow).Value;
 
-        chat.AddUserMessage("First message", UtcNow.AddMinutes(1));
-        chat.AddUserMessage("Second message", UtcNow.AddMinutes(2));
-        chat.AddUserMessage("Third message", UtcNow.AddMinutes(3));
+        chat.AddUserMessage(MessageId.UnsafeFrom("msg_01JGX123456789012345678901"), "First message", UtcNow.AddMinutes(1));
+        chat.AddUserMessage(MessageId.UnsafeFrom("msg_01JGX123456789012345678902"), "Second message", UtcNow.AddMinutes(2));
+        chat.AddUserMessage(MessageId.UnsafeFrom("msg_01JGX123456789012345678903"), "Third message", UtcNow.AddMinutes(3));
 
         chat.Messages.Should().HaveCount(3);
     }
@@ -212,7 +214,7 @@ public sealed class ChatTests
     {
         Chat chat = Chat.Create(ValidChatId, ValidUserId, ValidTitle, UtcNow).Value;
 
-        Outcome outcome = chat.AddUserMessage(content!, UtcNow);
+        Outcome<Message> outcome = chat.AddUserMessage(ValidMessageId, content!, UtcNow);
 
         outcome.IsFailure.Should().BeTrue();
         outcome.Fault.Should().Be(MessageFaults.MessageContentRequired);
@@ -224,7 +226,7 @@ public sealed class ChatTests
         Chat chat = Chat.Create(ValidChatId, ValidUserId, ValidTitle, UtcNow).Value;
         chat.Archive(UtcNow);
 
-        Outcome outcome = chat.AddUserMessage("Hello", UtcNow);
+        Outcome<Message> outcome = chat.AddUserMessage(ValidMessageId, "Hello", UtcNow);
 
         outcome.IsFailure.Should().BeTrue();
         outcome.Fault.Should().Be(ChatFaults.CannotModifyArchivedChat);
@@ -237,7 +239,7 @@ public sealed class ChatTests
         string messageContent = "I'm here to help!";
         DateTimeOffset updateTime = UtcNow.AddHours(1);
 
-        Outcome outcome = chat.AddAssistantMessage(messageContent, updateTime);
+        Outcome<Message> outcome = chat.AddAssistantMessage(ValidMessageId, messageContent, updateTime);
 
         outcome.IsSuccess.Should().BeTrue();
         chat.Messages.Should().HaveCount(1);
@@ -251,7 +253,7 @@ public sealed class ChatTests
         Chat chat = Chat.Create(ValidChatId, ValidUserId, ValidTitle, UtcNow).Value;
         chat.Archive(UtcNow);
 
-        Outcome outcome = chat.AddAssistantMessage("Hello", UtcNow);
+        Outcome<Message> outcome = chat.AddAssistantMessage(ValidMessageId, "Hello", UtcNow);
 
         outcome.IsFailure.Should().BeTrue();
         outcome.Fault.Should().Be(ChatFaults.CannotModifyArchivedChat);
