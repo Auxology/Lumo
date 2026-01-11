@@ -4,6 +4,12 @@ namespace Main.Domain.Faults;
 
 public static class MessageFaults
 {
+    public static readonly Fault MessageIdRequired = Fault.Validation
+    (
+        title: "Message.MessageIdRequired",
+        detail: "MessageId is required."
+    );
+    
     public static readonly Fault ChatIdRequired = Fault.Validation
     (
         title: "Message.ChatIdRequired",
@@ -26,5 +32,11 @@ public static class MessageFaults
     (
         title: "Message.NegativeTokenCount",
         detail: "The token count cannot be negative."
+    );
+
+    public static readonly Fault InvalidSequenceNumber = Fault.Validation
+    (
+        title: "Message.InvalidSequenceNumber",
+        detail: "The sequence number must be a non-negative integer."
     );
 }

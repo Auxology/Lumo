@@ -20,9 +20,9 @@ namespace Main.Application.Commands.Chats.Start;
 internal sealed class StartChatHandler(
     IMainDbContext dbContext,
     IUserContext userContext,
-    IIdGenerator idGenerator,
     IRequestContext requestContext,
     IChatLockService chatLockService,
+    IIdGenerator idGenerator,
     IChatCompletionService chatCompletionService,
     IMessageBus messageBus,
     IDateTimeProvider dateTimeProvider) : ICommandHandler<StartChatCommand, StartChatResponse>
@@ -54,8 +54,11 @@ internal sealed class StartChatHandler(
 
         Chat chat = chatOutcome.Value;
         
+        MessageId messageId = idGenerator.NewMessageId();
+        
         Outcome messageOutcome = chat.AddUserMessage
         (
+            messageId: messageId,
             messageContent: request.Message,
             utcNow: dateTimeProvider.UtcNow
         );

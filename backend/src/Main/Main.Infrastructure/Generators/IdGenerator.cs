@@ -7,4 +7,7 @@ internal sealed class IdGenerator : IIdGenerator
 {
     public ChatId NewChatId() =>
         ChatId.UnsafeFrom($"{ChatId.PrefixValue}{Ulid.NewUlid()}");
+
+    public MessageId NewMessageId() =>
+        MessageId.UnsafeFrom($"{MessageId.PrefixValue}{Ulid.NewUlid()}");
 }

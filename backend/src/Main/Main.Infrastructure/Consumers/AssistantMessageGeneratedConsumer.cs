@@ -1,6 +1,7 @@
 using Contracts.IntegrationEvents.Chat;
 
 using Main.Application.Abstractions.Data;
+using Main.Application.Abstractions.Generators;
 using Main.Domain.Aggregates;
 using Main.Domain.ValueObjects;
 
@@ -15,6 +16,7 @@ namespace Main.Infrastructure.Consumers;
 
 internal sealed class AssistantMessageGeneratedConsumer(
     IMainDbContext dbContext,
+    IIdGenerator idGenerator,
     ILogger<AssistantMessageGeneratedConsumer> logger) : IConsumer<AssistantMessageGenerated>
 {
     public async Task Consume(ConsumeContext<AssistantMessageGenerated> context)
@@ -53,8 +55,11 @@ internal sealed class AssistantMessageGeneratedConsumer(
             return;
         }
 
+        MessageId messageId = idGenerator.NewMessageId();
+
         Outcome messageOutcome = chat.AddAssistantMessage
         (
+            messageId: messageId,
             messageContent: message.MessageContent,
             utcNow: message.OccurredAt
         );

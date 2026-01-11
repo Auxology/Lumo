@@ -21,6 +21,7 @@ namespace Main.Infrastructure.Migrations
                     title = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false),
                     model_name = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: true),
                     is_archived = table.Column<bool>(type: "boolean", nullable: false),
+                    next_sequence_number = table.Column<int>(type: "integer", nullable: false),
                     created_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: false),
                     updated_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: true)
                 },
@@ -86,12 +87,12 @@ namespace Main.Infrastructure.Migrations
                 name: "messages",
                 columns: table => new
                 {
-                    id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    id = table.Column<string>(type: "varchar(30)", nullable: false),
                     chat_id = table.Column<string>(type: "varchar(30)", nullable: false),
                     message_role = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: false),
                     message_content = table.Column<string>(type: "text", nullable: false),
                     token_count = table.Column<long>(type: "bigint", nullable: true),
+                    sequence_number = table.Column<int>(type: "integer", nullable: false),
                     created_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: false)
                 },
                 constraints: table =>
@@ -163,9 +164,10 @@ namespace Main.Infrastructure.Migrations
                 column: "chat_id");
 
             migrationBuilder.CreateIndex(
-                name: "ix_messages_chat_id_id",
+                name: "ix_messages_chat_id_sequence_number",
                 table: "messages",
-                columns: new[] { "chat_id", "id" });
+                columns: new[] { "chat_id", "sequence_number" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "ix_outbox_message_enqueue_time",

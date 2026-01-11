@@ -41,6 +41,10 @@ namespace Main.Infrastructure.Migrations
                         .HasColumnType("varchar(64)")
                         .HasColumnName("model_name");
 
+                    b.Property<int>("NextSequenceNumber")
+                        .HasColumnType("integer")
+                        .HasColumnName("next_sequence_number");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -66,12 +70,9 @@ namespace Main.Infrastructure.Migrations
 
             modelBuilder.Entity("Main.Domain.Entities.Message", b =>
                 {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(30)")
                         .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<string>("ChatId")
                         .IsRequired()
@@ -93,6 +94,10 @@ namespace Main.Infrastructure.Migrations
                         .HasColumnType("character varying(512)")
                         .HasColumnName("message_role");
 
+                    b.Property<int>("SequenceNumber")
+                        .HasColumnType("integer")
+                        .HasColumnName("sequence_number");
+
                     b.Property<long?>("TokenCount")
                         .HasColumnType("bigint")
                         .HasColumnName("token_count");
@@ -103,8 +108,9 @@ namespace Main.Infrastructure.Migrations
                     b.HasIndex("ChatId")
                         .HasDatabaseName("ix_messages_chat_id");
 
-                    b.HasIndex("ChatId", "Id")
-                        .HasDatabaseName("ix_messages_chat_id_id");
+                    b.HasIndex("ChatId", "SequenceNumber")
+                        .IsUnique()
+                        .HasDatabaseName("ix_messages_chat_id_sequence_number");
 
                     b.ToTable("messages", (string)null);
                 });

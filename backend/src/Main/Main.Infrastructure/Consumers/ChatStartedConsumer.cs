@@ -38,9 +38,9 @@ internal sealed class ChatStartedConsumer(
 
         List<ChatCompletionMessage> messages = await dbContext.Messages
             .Where(c => c.ChatId == chatId)
-            .OrderByDescending(c => c.CreatedAt)
+            .OrderByDescending(c => c.SequenceNumber)
             .Take(ChatConstants.MaxContextMessages)
-            .OrderBy(c => c.CreatedAt)
+            .OrderBy(c => c.SequenceNumber)
             .Select(m => new ChatCompletionMessage
             (
                 Role: m.MessageRole,

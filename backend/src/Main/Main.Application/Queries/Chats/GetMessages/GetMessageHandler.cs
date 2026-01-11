@@ -30,10 +30,11 @@ internal sealed class GetMessageHandler(IDbConnectionFactory dbConnectionFactory
                                             message_role as MessageRole,
                                             message_content as MessageContent,
                                             token_count as TokenCount,
+                                            sequence_number as SequenceNumber,
                                             created_at as CreatedAt
                                           FROM messages
                                           WHERE chat_id = @ChatId
-                                          ORDER BY id desc 
+                                          ORDER BY sequence_number desc 
                                           LIMIT @Limit
                                           """;
 
@@ -44,10 +45,11 @@ internal sealed class GetMessageHandler(IDbConnectionFactory dbConnectionFactory
                                                       message_role as MessageRole,
                                                       message_content as MessageContent,
                                                       token_count as TokenCount,
+                                                      sequence_number as SequenceNumber,
                                                       created_at as CreatedAt
                                                     FROM messages
                                                     WHERE chat_id = @ChatId AND id < @Cursor
-                                                    ORDER BY id desc 
+                                                    ORDER BY sequence_number desc 
                                                     LIMIT @Limit
                                                     """;
 
@@ -93,7 +95,7 @@ internal sealed class GetMessageHandler(IDbConnectionFactory dbConnectionFactory
         if (hasMore)
             messageList.RemoveAt(messageList.Count - 1);
 
-        int? nextCursor = hasMore ? messageList[0].Id : 0;
+        int? nextCursor = hasMore ? messageList[^1].SequenceNumber : null;
 
         PaginationInfo paginationInfo = new
         (

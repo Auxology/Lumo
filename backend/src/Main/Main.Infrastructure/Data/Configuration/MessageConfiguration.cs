@@ -15,11 +15,15 @@ internal sealed class MessageConfiguration : IEntityTypeConfiguration<Message>
         b.HasKey(m => m.Id);
 
         b.Property(m => m.Id)
-            .IsRequired()
-            .ValueGeneratedOnAdd()
-            .HasColumnType("bigint");
+            .ValueGeneratedNever()
+            .HasConversion
+            (
+                id => id.Value,
+                s => MessageId.UnsafeFrom(s)
+            )
+            .HasColumnType($"varchar({MessageId.Length})");
 
-        b.Property(c => c.ChatId)
+        b.Property(m => m.ChatId)
             .ValueGeneratedNever()
             .HasConversion
             (
@@ -41,12 +45,17 @@ internal sealed class MessageConfiguration : IEntityTypeConfiguration<Message>
             .IsRequired(false)
             .HasColumnType("bigint");
 
+        b.Property(m => m.SequenceNumber)
+            .IsRequired()
+            .HasColumnType("integer");
+
         b.Property(m => m.CreatedAt)
             .IsRequired()
             .HasColumnType("timestamptz");
 
         b.HasIndex(m => m.ChatId);
 
-        b.HasIndex(m => new { m.ChatId, m.Id });
+        b.HasIndex(m => new { m.ChatId, m.SequenceNumber })
+            .IsUnique();
     }
 }

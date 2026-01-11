@@ -1,6 +1,7 @@
 using Contracts.IntegrationEvents.Chat;
 
 using Main.Application.Abstractions.Data;
+using Main.Application.Abstractions.Generators;
 using Main.Application.Abstractions.Stream;
 using Main.Application.Faults;
 using Main.Domain.Aggregates;
@@ -21,6 +22,7 @@ internal sealed class SendMessageHandler(
     IUserContext userContext,
     IRequestContext requestContext,
     IChatLockService chatLockService,
+    IIdGenerator idGenerator,
     IMessageBus messageBus,
     IDateTimeProvider dateTimeProvider) : ICommandHandler<SendMessageCommand, SendMessageResponse>
 {
@@ -57,8 +59,11 @@ internal sealed class SendMessageHandler(
         if (!lockAcquired)
             return ChatOperationFaults.GenerationInProgress;
 
+        MessageId messageId = idGenerator.NewMessageId();
+
         Outcome<Message> messageOutcome = chat.AddUserMessage
         (
+            messageId: messageId,
             messageContent: request.Message,
             utcNow: dateTimeProvider.UtcNow
         );
@@ -86,7 +91,7 @@ internal sealed class SendMessageHandler(
 
         SendMessageResponse response = new
         (
-            MessageId: message.Id,
+            MessageId: message.Id.Value,
             ChatId: chat.Id.Value,
             MessageRole: message.MessageRole.ToString(),
             MessageContent: message.MessageContent,

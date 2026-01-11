@@ -54,6 +54,7 @@ internal sealed class Endpoint : BaseEndpoint<Request, Response>
                         MessageContent: m.MessageContent,
                         MessageRole: m.MessageRole,
                         TokenCount: m.TokenCount,
+                        SequenceNumber: m.SequenceNumber,
                         CreatedAt: m.CreatedAt
                     ))
                     .ToList(),
