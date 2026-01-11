@@ -3,6 +3,7 @@ using Contracts.IntegrationEvents.Chat;
 using Main.Application.Abstractions.AI;
 using Main.Application.Abstractions.Data;
 using Main.Application.Abstractions.Generators;
+using Main.Application.Abstractions.Stream;
 using Main.Application.Faults;
 using Main.Domain.Aggregates;
 using Main.Domain.ReadModels;
@@ -21,6 +22,7 @@ internal sealed class StartChatHandler(
     IUserContext userContext,
     IIdGenerator idGenerator,
     IRequestContext requestContext,
+    IChatLockService chatLockService,
     IChatCompletionService chatCompletionService,
     IMessageBus messageBus,
     IDateTimeProvider dateTimeProvider) : ICommandHandler<StartChatCommand, StartChatResponse>
@@ -51,7 +53,7 @@ internal sealed class StartChatHandler(
             return chatOutcome.Fault;
 
         Chat chat = chatOutcome.Value;
-
+        
         Outcome messageOutcome = chat.AddUserMessage
         (
             messageContent: request.Message,
@@ -60,7 +62,9 @@ internal sealed class StartChatHandler(
 
         if (messageOutcome.IsFailure)
             return messageOutcome.Fault;
-
+        
+        await chatLockService.TryAcquireLockAsync(chat.Id.Value, cancellationToken);
+        
         ChatStarted chatStarted = new()
         {
             EventId = Guid.NewGuid(),

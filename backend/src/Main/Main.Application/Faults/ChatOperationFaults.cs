@@ -9,4 +9,11 @@ internal static class ChatOperationFaults
         title: "Chat.NotFound",
         detail: "The specified chat was not found."
     );
+
+    internal static readonly Fault GenerationInProgress = Fault.Conflict
+    (
+        title: "Chat.GenerationInProgress",
+        detail:
+        "Cannot send a new message while AI is generating a response. Please wait for the current response to complete."
+    );
 }

@@ -179,7 +179,8 @@ public static class DependencyInjection
         });
 
         services.AddSingleton<IStreamPublisher, StreamPublisher>();
-
+        services.AddSingleton<IChatLockService, ChatLockService>();
+        
         services.AddScoped<IChatCompletionService, ChatCompletionService>();
 
         return services;

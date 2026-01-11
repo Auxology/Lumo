@@ -24,6 +24,7 @@ internal sealed class ChatCompletionService(
     ChatClient chatClient,
     IStreamPublisher streamPublisher,
     IMessageBus messageBus,
+    IChatLockService chatLockService,
     IDateTimeProvider dateTimeProvider,
     ILogger<ChatCompletionService> logger) : IChatCompletionService
 {
@@ -164,6 +165,10 @@ internal sealed class ChatCompletionService(
             }
 
             throw;
+        }
+        finally
+        {
+            await chatLockService.ReleaseLockAsync(chatId, cancellationToken);
         }
     }
 }

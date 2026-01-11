@@ -1,6 +1,7 @@
 using Contracts.IntegrationEvents.Chat;
 
 using Main.Application.Abstractions.Data;
+using Main.Application.Abstractions.Stream;
 using Main.Application.Faults;
 using Main.Domain.Aggregates;
 using Main.Domain.Entities;
@@ -19,6 +20,7 @@ internal sealed class SendMessageHandler(
     IMainDbContext dbContext,
     IUserContext userContext,
     IRequestContext requestContext,
+    IChatLockService chatLockService,
     IMessageBus messageBus,
     IDateTimeProvider dateTimeProvider) : ICommandHandler<SendMessageCommand, SendMessageResponse>
 {
@@ -44,6 +46,16 @@ internal sealed class SendMessageHandler(
 
         if (chat is null)
             return ChatOperationFaults.NotFound;
+        
+        bool isGenerating = await chatLockService.IsGeneratingAsync(chat.Id.Value, cancellationToken);
+        
+        if (isGenerating)
+            return ChatOperationFaults.GenerationInProgress;
+
+        bool lockAcquired = await chatLockService.TryAcquireLockAsync(chat.Id.Value, cancellationToken);
+        
+        if (!lockAcquired)
+            return ChatOperationFaults.GenerationInProgress;
 
         Outcome<Message> messageOutcome = chat.AddUserMessage
         (
@@ -52,7 +64,10 @@ internal sealed class SendMessageHandler(
         );
 
         if (messageOutcome.IsFailure)
+        {
+            await chatLockService.ReleaseLockAsync(chat.Id.Value, cancellationToken);
             return messageOutcome.Fault;
+        }
 
         Message message = messageOutcome.Value;
 
