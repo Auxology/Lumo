@@ -36,15 +36,15 @@ public sealed class SessionIdTests
     [Theory]
     [InlineData("invalid_id")]
     [InlineData("sid_short")]
-    [InlineData("sid_01JGX123456789012345678")] // 29 chars - too short
-    [InlineData("sid_01JGX1234567890123456789")] // 31 chars - too long
+    [InlineData("sid_01JGX12345678901234567890")] // 29 chars - too short
+    [InlineData("sid_01JGX1234567890123456789012")] // 31 chars - too long
     [InlineData("xxx_01JGX12345678901234567890")] // wrong prefix
     public void From_WithInvalidFormat_ShouldReturnFailure(string value)
     {
         Outcome<SessionId> outcome = SessionId.From(value);
 
         outcome.IsFailure.Should().BeTrue();
-        outcome.Fault.Title.Should().Be("Session.InvalidFormat");
+        outcome.Fault.Title.Should().Be("SessionId.InvalidFormat");
     }
 
     [Fact]

@@ -1,7 +1,7 @@
 using Auth.Application.Abstractions.Generators;
 using Auth.Domain.ValueObjects;
 
-namespace Main.Infrastructure.Generators;
+namespace Auth.Infrastructure.Generators;
 
 internal sealed class IdGenerator : IIdGenerator
 {

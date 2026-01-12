@@ -56,8 +56,12 @@ internal sealed class GetActiveSessionsHandler(
 
         IEnumerable<ActiveSessionReadModel> sessions = await connection.QueryAsync<ActiveSessionReadModel>
         (
-            Sql,
-            new { UserId = userId.Value, CurrentSessionId = sessionId.Value, UtcNow = dateTimeProvider.UtcNow }
+            new CommandDefinition
+            (
+                Sql,
+                new { UserId = userId.Value, CurrentSessionId = sessionId.Value, UtcNow = dateTimeProvider.UtcNow },
+                cancellationToken: cancellationToken
+            )
         );
 
         return sessions.ToList();

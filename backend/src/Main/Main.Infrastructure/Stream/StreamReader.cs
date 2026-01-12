@@ -36,13 +36,25 @@ internal sealed class StreamReader(IConnectionMultiplexer connectionMultiplexer)
         try
         {
             // PHASE 1: Read any existing messages (late-joiner scenario)
-            await foreach (StreamMessage message in ReadExistingAsync(db, streamKey, lastId)
-                .WithCancellation(cancellationToken))
-            {
-                yield return message;
+            StreamEntry[] existingEntries = await db.StreamReadAsync
+            (
+                key: streamKey,
+                position: lastId,
+                count: ReadSize
+            );
 
-                if (IsTerminalStatus(message))
-                    yield break;
+            foreach (StreamEntry entry in existingEntries)
+            {
+                lastId = entry.Id;
+                StreamMessage? message = ParseEntry(entry);
+
+                if (message is not null)
+                {
+                    yield return message;
+
+                    if (IsTerminalStatus(message))
+                        yield break;
+                }
             }
 
             // PHASE 2: Listen for new messages
@@ -95,27 +107,6 @@ internal sealed class StreamReader(IConnectionMultiplexer connectionMultiplexer)
         }
     }
 
-    private static async IAsyncEnumerable<StreamMessage> ReadExistingAsync(
-        IDatabase db,
-        string streamKey,
-        RedisValue startId)
-    {
-        StreamEntry[] entries = await db.StreamReadAsync
-        (
-            key: streamKey,
-            position: startId,
-            count: ReadSize
-        );
-
-        foreach (StreamEntry entry in entries)
-        {
-            StreamMessage? message = ParseEntry(entry);
-
-            if (message is not null)
-                yield return message;
-        }
-    }
-
     private static StreamMessage? ParseEntry(StreamEntry entry)
     {
         string? type = entry["type"];
@@ -124,8 +115,10 @@ internal sealed class StreamReader(IConnectionMultiplexer connectionMultiplexer)
         if (type is null || timestamp is null)
             return null;
 
-        DateTimeOffset ts = DateTimeOffset.FromUnixTimeMilliseconds(
-            long.Parse(timestamp, CultureInfo.InvariantCulture));
+        if (!long.TryParse(timestamp, CultureInfo.InvariantCulture, out long timestampMs))
+            return null;
+
+        DateTimeOffset ts = DateTimeOffset.FromUnixTimeMilliseconds(timestampMs);
 
         return type switch
         {

@@ -28,7 +28,7 @@ internal sealed class Endpoint : BaseEndpoint<EmptyRequest, Response>
         });
     }
 
-    public override async Task HandleAsync(EmptyRequest endpointRequest, CancellationToken ct)
+    public override async Task HandleAsync(EmptyRequest _, CancellationToken ct)
     {
         GetCurrentUserQuery query = new();
 
@@ -39,7 +39,7 @@ internal sealed class Endpoint : BaseEndpoint<EmptyRequest, Response>
                 Id: user.Id,
                 DisplayName: user.DisplayName,
                 EmailAddress: user.EmailAddress,
-                AvatarUrl: user.AvatarKey,
+                AvatarKey: user.AvatarKey,
                 CreatedAt: user.CreatedAt
             ),
             cancellationToken: ct

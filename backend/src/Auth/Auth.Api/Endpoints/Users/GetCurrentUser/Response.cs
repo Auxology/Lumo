@@ -5,6 +5,6 @@ internal sealed record Response
     Guid Id,
     string DisplayName,
     string EmailAddress,
-    string? AvatarUrl,
+    string? AvatarKey,
     DateTimeOffset CreatedAt
 );

@@ -36,8 +36,8 @@ public sealed class RecoveryKeyChainIdTests
     [Theory]
     [InlineData("invalid_id")]
     [InlineData("rkc_short")]
-    [InlineData("rkc_01JGX123456789012345678")] // 29 chars - too short
-    [InlineData("rkc_01JGX1234567890123456789")] // 31 chars - too long
+    [InlineData("rkc_01JGX12345678901234567890")] // 29 chars - too short
+    [InlineData("rkc_01JGX1234567890123456789012")] // 31 chars - too long
     [InlineData("xxx_01JGX12345678901234567890")] // wrong prefix
     public void From_WithInvalidFormat_ShouldReturnFailure(string value)
     {

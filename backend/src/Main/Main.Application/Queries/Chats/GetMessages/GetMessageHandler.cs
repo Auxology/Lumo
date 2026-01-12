@@ -48,8 +48,8 @@ internal sealed class GetMessageHandler(IDbConnectionFactory dbConnectionFactory
                                                       sequence_number as SequenceNumber,
                                                       created_at as CreatedAt
                                                     FROM messages
-                                                    WHERE chat_id = @ChatId AND id < @Cursor
-                                                    ORDER BY sequence_number desc 
+                                                    WHERE chat_id = @ChatId AND sequence_number < @Cursor
+                                                    ORDER BY sequence_number desc
                                                     LIMIT @Limit
                                                     """;
 

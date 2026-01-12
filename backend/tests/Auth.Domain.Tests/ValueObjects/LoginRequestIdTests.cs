@@ -36,8 +36,8 @@ public sealed class LoginRequestIdTests
     [Theory]
     [InlineData("invalid_id")]
     [InlineData("lrq_short")]
-    [InlineData("lrq_01JGX123456789012345678")] // 29 chars - too short
-    [InlineData("lrq_01JGX1234567890123456789")] // 31 chars - too long
+    [InlineData("lrq_01JGX12345678901234567890")] // 29 chars - too short
+    [InlineData("lrq_01JGX1234567890123456789012")] // 31 chars - too long
     [InlineData("xxx_01JGX12345678901234567890")] // wrong prefix
     public void From_WithInvalidFormat_ShouldReturnFailure(string value)
     {

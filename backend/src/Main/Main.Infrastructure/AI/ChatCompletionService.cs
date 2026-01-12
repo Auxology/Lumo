@@ -169,7 +169,14 @@ internal sealed class ChatCompletionService(
         }
         finally
         {
-            await chatLockService.ReleaseLockAsync(chatId, cancellationToken);
+            try
+            {
+                await chatLockService.ReleaseLockAsync(chatId, CancellationToken.None);
+            }
+            catch (RedisException ex)
+            {
+                logger.LogError(ex, "Failed to release lock for chat {ChatId}", chatId);
+            }
         }
     }
 }

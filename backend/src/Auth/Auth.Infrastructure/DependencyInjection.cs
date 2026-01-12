@@ -11,7 +11,7 @@ using Auth.Infrastructure.Data;
 using Auth.Infrastructure.Options;
 using Auth.Infrastructure.Storage;
 
-using Main.Infrastructure.Generators;
+using Auth.Infrastructure.Generators;
 
 using MassTransit;
 

@@ -49,7 +49,7 @@ internal sealed class ChatLockService(
         catch (RedisException exception)
         {
             logger.LogError(exception, "Error acquiring lock for chatId: {ChatId}", chatId);
-            return true;
+            return false;
         }
     }
 

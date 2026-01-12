@@ -48,7 +48,7 @@ public readonly record struct SessionId
 
         public static readonly Fault InvalidFormat = Fault.Validation
         (
-            title: "Session.InvalidFormat",
+            title: "SessionId.InvalidFormat",
             detail: $"SessionId must start with '{Prefix}' and be {TotalLength} characters."
         );
     }
