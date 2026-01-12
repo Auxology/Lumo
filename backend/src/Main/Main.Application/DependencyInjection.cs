@@ -1,5 +1,7 @@
 using FluentValidation;
 
+using Main.Application.Abstractions.Services;
+
 using Microsoft.Extensions.DependencyInjection;
 
 using SharedKernel.Application.Pipelines;
@@ -10,8 +12,16 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddApplication(this IServiceCollection services) =>
         services
+            .AddServices()
             .AddMessaging()
             .AddFluentValidation();
+
+    private static IServiceCollection AddServices(this IServiceCollection services)
+    {
+        services.AddScoped<IChatAccessValidator, ChatAccessValidator>();
+
+        return services;
+    }
 
     private static IServiceCollection AddMessaging(this IServiceCollection services)
     {
