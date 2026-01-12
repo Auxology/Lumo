@@ -68,6 +68,8 @@ internal sealed class StartChatHandler(
 
         await chatLockService.TryAcquireLockAsync(chat.Id.Value, cancellationToken);
 
+        StreamId streamId = idGenerator.NewStreamId();
+
         ChatStarted chatStarted = new()
         {
             EventId = Guid.NewGuid(),
@@ -75,6 +77,7 @@ internal sealed class StartChatHandler(
             CorrelationId = Guid.Parse(requestContext.CorrelationId),
             ChatId = chat.Id.Value,
             UserId = user.UserId,
+            StreamId = streamId.Value,
             InitialMessage = request.Message
         };
 
@@ -85,6 +88,7 @@ internal sealed class StartChatHandler(
         StartChatResponse response = new
         (
             ChatId: chat.Id.Value,
+            StreamId: streamId.Value,
             ChatTitle: title,
             CreatedAt: chat.CreatedAt
         );

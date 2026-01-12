@@ -6,7 +6,6 @@ using Contracts.IntegrationEvents.Chat;
 using Main.Application.Abstractions.AI;
 using Main.Application.Abstractions.Stream;
 using Main.Domain.Constants;
-using Main.Domain.Entities;
 using Main.Domain.Enums;
 
 using Microsoft.Extensions.Logging;
@@ -74,7 +73,8 @@ internal sealed class ChatCompletionService(
         }
     }
 
-    public async Task StreamCompletionAsync(string chatId, IReadOnlyList<ChatCompletionMessage> messages, CancellationToken cancellationToken)
+    public async Task StreamCompletionAsync(string chatId, string streamId,
+        IReadOnlyList<ChatCompletionMessage> messages, CancellationToken cancellationToken)
     {
         StringBuilder messageContent = new();
 
@@ -82,13 +82,13 @@ internal sealed class ChatCompletionService(
         {
             await streamPublisher.PublishStatusAsync
             (
-                chatId: chatId,
+                streamId: streamId,
                 status: StreamStatus.Pending,
                 cancellationToken: cancellationToken
             );
             await streamPublisher.SetStreamExpirationAsync
             (
-                chatId: chatId,
+                streamId: streamId,
                 expiration: StreamExpiration,
                 cancellationToken: cancellationToken
             );
@@ -105,7 +105,8 @@ internal sealed class ChatCompletionService(
                 })
                 .ToList();
 
-            await foreach (StreamingChatCompletionUpdate update in chatClient.CompleteChatStreamingAsync(chatMessages, cancellationToken: cancellationToken))
+            await foreach (StreamingChatCompletionUpdate update in chatClient.CompleteChatStreamingAsync(chatMessages,
+                               cancellationToken: cancellationToken))
             {
 #pragma warning disable S3267
                 foreach (ChatMessageContentPart? part in update.ContentUpdate)
@@ -119,7 +120,7 @@ internal sealed class ChatCompletionService(
 
                         await streamPublisher.PublishChunkAsync
                         (
-                            chatId: chatId,
+                            streamId: streamId,
                             messageContent: chunk,
                             cancellationToken: cancellationToken
                         );
@@ -129,7 +130,7 @@ internal sealed class ChatCompletionService(
 
             await streamPublisher.PublishStatusAsync
             (
-                chatId: chatId,
+                streamId: streamId,
                 status: StreamStatus.Done,
                 cancellationToken: cancellationToken
             );
@@ -153,7 +154,7 @@ internal sealed class ChatCompletionService(
             {
                 await streamPublisher.PublishStatusAsync
                 (
-                    chatId: chatId,
+                    streamId: streamId,
                     status: StreamStatus.Failed,
                     cancellationToken: cancellationToken,
                     fault: exception.Message

@@ -10,4 +10,7 @@ internal sealed class IdGenerator : IIdGenerator
 
     public MessageId NewMessageId() =>
         MessageId.UnsafeFrom($"{MessageId.PrefixValue}{Ulid.NewUlid()}");
+
+    public StreamId NewStreamId() =>
+        StreamId.UnsafeFrom($"{StreamId.PrefixValue}{Ulid.NewUlid()}");
 }

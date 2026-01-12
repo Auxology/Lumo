@@ -41,6 +41,7 @@ internal sealed class Endpoint : BaseEndpoint<Request, Response>
             mapper: scr => new Response
             (
                 ChatId: scr.ChatId,
+                StreamId: scr.StreamId,
                 ChatTitle: scr.ChatTitle,
                 CreatedAt: scr.CreatedAt
             ),

@@ -30,11 +30,23 @@ internal sealed class MessageSentConsumer(
         {
             logger.LogError(
                 "Invalid ChatId in {EventType}: {EventId}, CorrelationId: {CorrelationId}, ChatId: {ChatId}",
-                nameof(ChatStarted), message.EventId, message.CorrelationId, message.ChatId);
+                nameof(MessageSent), message.EventId, message.CorrelationId, message.ChatId);
             return;
         }
 
         ChatId chatId = chatIdOutcome.Value;
+
+        Outcome<StreamId> streamIdOutcome = StreamId.From(message.StreamId);
+
+        if (streamIdOutcome.IsFailure)
+        {
+            logger.LogError(
+                "Invalid StreamId in {EventType}: {EventId}, CorrelationId: {CorrelationId}, StreamId: {StreamId}",
+                nameof(MessageSent), message.EventId, message.CorrelationId, message.StreamId);
+            return;
+        }
+
+        StreamId streamId = streamIdOutcome.Value;
 
         List<ChatCompletionMessage> messages = await dbContext.Messages
             .Where(c => c.ChatId == chatId)
@@ -51,8 +63,13 @@ internal sealed class MessageSentConsumer(
         await chatCompletionService.StreamCompletionAsync
         (
             chatId: chatId.Value,
+            streamId: streamId.Value,
             messages: messages,
             cancellationToken: cancellationToken
         );
+
+        logger.LogInformation(
+            "Consumed {EventType}: {EventId}, CorrelationId: {CorrelationId}, OccurredAt: {OccurredAt}, ChatId: {ChatId}",
+            nameof(MessageSent), message.EventId, message.CorrelationId, message.OccurredAt, message.ChatId);
     }
 }

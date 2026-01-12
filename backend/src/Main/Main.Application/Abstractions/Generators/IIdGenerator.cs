@@ -7,4 +7,6 @@ public interface IIdGenerator
     ChatId NewChatId();
 
     MessageId NewMessageId();
+
+    StreamId NewStreamId();
 }

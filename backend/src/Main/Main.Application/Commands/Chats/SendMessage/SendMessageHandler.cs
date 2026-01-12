@@ -76,28 +76,40 @@ internal sealed class SendMessageHandler(
 
         Message message = messageOutcome.Value;
 
-        MessageSent messageSent = new()
+        try
         {
-            EventId = Guid.NewGuid(),
-            OccurredAt = dateTimeProvider.UtcNow,
-            CorrelationId = Guid.Parse(requestContext.CorrelationId),
-            ChatId = chat.Id.Value,
-            UserId = user.UserId,
-            Message = request.Message
-        };
+            StreamId streamId = idGenerator.NewStreamId();
 
-        await messageBus.PublishAsync(messageSent, cancellationToken);
-        await dbContext.SaveChangesAsync(cancellationToken);
+            MessageSent messageSent = new()
+            {
+                EventId = Guid.NewGuid(),
+                OccurredAt = dateTimeProvider.UtcNow,
+                CorrelationId = Guid.Parse(requestContext.CorrelationId),
+                ChatId = chat.Id.Value,
+                UserId = user.UserId,
+                StreamId = streamId.Value,
+                Message = request.Message
+            };
 
-        SendMessageResponse response = new
-        (
-            MessageId: message.Id.Value,
-            ChatId: chat.Id.Value,
-            MessageRole: message.MessageRole.ToString(),
-            MessageContent: message.MessageContent,
-            CreatedAt: message.CreatedAt
-        );
+            await messageBus.PublishAsync(messageSent, cancellationToken);
+            await dbContext.SaveChangesAsync(cancellationToken);
 
-        return response;
+            SendMessageResponse response = new
+            (
+                MessageId: message.Id.Value,
+                ChatId: chat.Id.Value,
+                StreamId: streamId.Value,
+                MessageRole: message.MessageRole.ToString(),
+                MessageContent: message.MessageContent,
+                CreatedAt: message.CreatedAt
+            );
+
+            return response;
+        }
+        catch
+        {
+            await chatLockService.ReleaseLockAsync(chat.Id.Value, cancellationToken);
+            throw;
+        }
     }
 }
