@@ -1,4 +1,4 @@
-using Auth.Application.Sessions;
+using Auth.Application.Commands.Sessions.RefreshToken;
 
 using Contracts.Requests;
 using Contracts.Responses;

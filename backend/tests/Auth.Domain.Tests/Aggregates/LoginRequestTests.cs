@@ -16,6 +16,9 @@ public sealed class LoginRequestTests
     private const string ValidTokenKey = "token-key-123";
     private const string ValidOtpTokenHash = "hashed-otp-token";
     private const string ValidMagicLinkTokenHash = "hashed-magic-link-token";
+    private const string ValidLoginRequestIdValue = "lrq_01JGX123456789012345678901";
+
+    private static LoginRequestId CreateValidLoginRequestId() => LoginRequestId.UnsafeFrom(ValidLoginRequestIdValue);
 
     private static Fingerprint CreateValidFingerprint()
     {
@@ -37,6 +40,7 @@ public sealed class LoginRequestTests
 
         Outcome<LoginRequest> outcome = LoginRequest.Create
         (
+            id: CreateValidLoginRequestId(),
             userId: ValidUserId,
             tokenKey: ValidTokenKey,
             otpTokenHash: ValidOtpTokenHash,
@@ -57,10 +61,13 @@ public sealed class LoginRequestTests
     }
 
     [Fact]
-    public void Create_WithValidData_ShouldGenerateNewId()
+    public void Create_WithValidData_ShouldUseProvidedId()
     {
+        LoginRequestId expectedId = CreateValidLoginRequestId();
+
         Outcome<LoginRequest> outcome = LoginRequest.Create
         (
+            id: expectedId,
             userId: ValidUserId,
             tokenKey: ValidTokenKey,
             otpTokenHash: ValidOtpTokenHash,
@@ -70,7 +77,7 @@ public sealed class LoginRequestTests
         );
 
         outcome.IsSuccess.Should().BeTrue();
-        outcome.Value.Id.IsEmpty.Should().BeFalse();
+        outcome.Value.Id.Should().Be(expectedId);
     }
 
     [Fact]
@@ -80,6 +87,7 @@ public sealed class LoginRequestTests
 
         Outcome<LoginRequest> outcome = LoginRequest.Create
         (
+            id: CreateValidLoginRequestId(),
             userId: emptyUserId,
             tokenKey: ValidTokenKey,
             otpTokenHash: ValidOtpTokenHash,
@@ -100,6 +108,7 @@ public sealed class LoginRequestTests
     {
         Outcome<LoginRequest> outcome = LoginRequest.Create
         (
+            id: CreateValidLoginRequestId(),
             userId: ValidUserId,
             tokenKey: tokenKey!,
             otpTokenHash: ValidOtpTokenHash,
@@ -120,6 +129,7 @@ public sealed class LoginRequestTests
     {
         Outcome<LoginRequest> outcome = LoginRequest.Create
         (
+            id: CreateValidLoginRequestId(),
             userId: ValidUserId,
             tokenKey: ValidTokenKey,
             otpTokenHash: otpTokenHash!,
@@ -140,6 +150,7 @@ public sealed class LoginRequestTests
     {
         Outcome<LoginRequest> outcome = LoginRequest.Create
         (
+            id: CreateValidLoginRequestId(),
             userId: ValidUserId,
             tokenKey: ValidTokenKey,
             otpTokenHash: ValidOtpTokenHash,
@@ -157,6 +168,7 @@ public sealed class LoginRequestTests
     {
         LoginRequest loginRequest = LoginRequest.Create
         (
+            id: CreateValidLoginRequestId(),
             userId: ValidUserId,
             tokenKey: ValidTokenKey,
             otpTokenHash: ValidOtpTokenHash,
@@ -178,6 +190,7 @@ public sealed class LoginRequestTests
     {
         LoginRequest loginRequest = LoginRequest.Create
         (
+            id: CreateValidLoginRequestId(),
             userId: ValidUserId,
             tokenKey: ValidTokenKey,
             otpTokenHash: ValidOtpTokenHash,
@@ -199,6 +212,7 @@ public sealed class LoginRequestTests
     {
         LoginRequest loginRequest = LoginRequest.Create
         (
+            id: CreateValidLoginRequestId(),
             userId: ValidUserId,
             tokenKey: ValidTokenKey,
             otpTokenHash: ValidOtpTokenHash,
@@ -220,6 +234,7 @@ public sealed class LoginRequestTests
     {
         LoginRequest loginRequest = LoginRequest.Create
         (
+            id: CreateValidLoginRequestId(),
             userId: ValidUserId,
             tokenKey: ValidTokenKey,
             otpTokenHash: ValidOtpTokenHash,
@@ -241,6 +256,7 @@ public sealed class LoginRequestTests
     {
         LoginRequest loginRequest = LoginRequest.Create
         (
+            id: CreateValidLoginRequestId(),
             userId: ValidUserId,
             tokenKey: ValidTokenKey,
             otpTokenHash: ValidOtpTokenHash,

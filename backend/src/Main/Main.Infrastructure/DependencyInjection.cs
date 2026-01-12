@@ -21,11 +21,14 @@ using Microsoft.Extensions.Hosting;
 
 using OpenAI;
 
+using SharedKernel.Application.Data;
 using SharedKernel.Application.Messaging;
 using SharedKernel.Infrastructure;
 using SharedKernel.Infrastructure.Data;
 using SharedKernel.Infrastructure.Messaging;
 using SharedKernel.Infrastructure.Options;
+
+using StreamReader = Main.Infrastructure.Stream.StreamReader;
 
 namespace Main.Infrastructure;
 
@@ -178,8 +181,11 @@ public static class DependencyInjection
         });
 
         services.AddSingleton<IStreamPublisher, StreamPublisher>();
+        services.AddSingleton<IChatLockService, ChatLockService>();
 
         services.AddScoped<IChatCompletionService, ChatCompletionService>();
+
+        services.AddSingleton<IStreamReader, StreamReader>();
 
         return services;
     }

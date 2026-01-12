@@ -1,0 +1,381 @@
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+
+#nullable disable
+
+namespace Auth.Infrastructure.Migrations
+{
+    /// <inheritdoc />
+    public partial class InitialCreate : Migration
+    {
+        /// <inheritdoc />
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.CreateTable(
+                name: "inbox_state",
+                columns: table => new
+                {
+                    id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    message_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    consumer_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    lock_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    row_version = table.Column<byte[]>(type: "bytea", rowVersion: true, nullable: true),
+                    received = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    receive_count = table.Column<int>(type: "integer", nullable: false),
+                    expiration_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    consumed = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    delivered = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    last_sequence_number = table.Column<long>(type: "bigint", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_inbox_state", x => x.id);
+                    table.UniqueConstraint("ak_inbox_state_message_id_consumer_id", x => new { x.message_id, x.consumer_id });
+                });
+
+            migrationBuilder.CreateTable(
+                name: "login_requests",
+                columns: table => new
+                {
+                    id = table.Column<string>(type: "varchar(30)", nullable: false),
+                    user_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    token_key = table.Column<string>(type: "varchar", maxLength: 512, nullable: false),
+                    otp_token_hash = table.Column<string>(type: "varchar", maxLength: 512, nullable: false),
+                    magic_link_token_hash = table.Column<string>(type: "varchar", maxLength: 512, nullable: false),
+                    created_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: false),
+                    expires_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: false),
+                    consumed_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: true),
+                    fingerprint_computed_hash = table.Column<string>(type: "varchar", maxLength: 512, nullable: false),
+                    fingerprint_ip_address = table.Column<string>(type: "varchar", maxLength: 45, nullable: false),
+                    fingerprint_language = table.Column<string>(type: "varchar", maxLength: 16, nullable: false),
+                    fingerprint_normalized_browser = table.Column<string>(type: "varchar", maxLength: 128, nullable: false),
+                    fingerprint_normalized_os = table.Column<string>(type: "varchar", maxLength: 128, nullable: false),
+                    fingerprint_timezone = table.Column<string>(type: "varchar", maxLength: 64, nullable: false),
+                    fingerprint_user_agent = table.Column<string>(type: "varchar", maxLength: 512, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_login_requests", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "outbox_state",
+                columns: table => new
+                {
+                    outbox_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    lock_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    row_version = table.Column<byte[]>(type: "bytea", rowVersion: true, nullable: true),
+                    created = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    delivered = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    last_sequence_number = table.Column<long>(type: "bigint", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_outbox_state", x => x.outbox_id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "recovery_key_chains",
+                columns: table => new
+                {
+                    id = table.Column<string>(type: "varchar(30)", nullable: false),
+                    user_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    created_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: false),
+                    last_rotated_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: true),
+                    version = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_recovery_key_chains", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "sessions",
+                columns: table => new
+                {
+                    id = table.Column<string>(type: "varchar(30)", nullable: false),
+                    user_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    refresh_token_key = table.Column<string>(type: "varchar", maxLength: 512, nullable: false),
+                    refresh_token_hash = table.Column<string>(type: "varchar", maxLength: 512, nullable: false),
+                    created_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: false),
+                    expires_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: false),
+                    last_refreshed_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: true),
+                    revoke_reason = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: true),
+                    revoked_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: true),
+                    version = table.Column<int>(type: "integer", nullable: false),
+                    fingerprint_computed_hash = table.Column<string>(type: "varchar", maxLength: 512, nullable: false),
+                    fingerprint_ip_address = table.Column<string>(type: "varchar", maxLength: 45, nullable: false),
+                    fingerprint_language = table.Column<string>(type: "varchar", maxLength: 16, nullable: false),
+                    fingerprint_normalized_browser = table.Column<string>(type: "varchar", maxLength: 128, nullable: false),
+                    fingerprint_normalized_os = table.Column<string>(type: "varchar", maxLength: 128, nullable: false),
+                    fingerprint_timezone = table.Column<string>(type: "varchar", maxLength: 64, nullable: false),
+                    fingerprint_user_agent = table.Column<string>(type: "varchar", maxLength: 512, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_sessions", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "users",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    display_name = table.Column<string>(type: "varchar", maxLength: 256, nullable: false),
+                    email_address = table.Column<string>(type: "varchar", maxLength: 254, nullable: false),
+                    avatar_key = table.Column<string>(type: "varchar", nullable: true),
+                    is_verified = table.Column<bool>(type: "boolean", nullable: false),
+                    created_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: false),
+                    updated_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: true),
+                    verified_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_users", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "outbox_message",
+                columns: table => new
+                {
+                    sequence_number = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    enqueue_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    sent_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    headers = table.Column<string>(type: "text", nullable: true),
+                    properties = table.Column<string>(type: "text", nullable: true),
+                    inbox_message_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    inbox_consumer_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    outbox_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    message_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    content_type = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    message_type = table.Column<string>(type: "text", nullable: false),
+                    body = table.Column<string>(type: "text", nullable: false),
+                    conversation_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    correlation_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    initiator_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    request_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    source_address = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    destination_address = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    response_address = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    fault_address = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    expiration_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_outbox_message", x => x.sequence_number);
+                    table.ForeignKey(
+                        name: "fk_outbox_message_inbox_state_inbox_message_id_inbox_consumer_",
+                        columns: x => new { x.inbox_message_id, x.inbox_consumer_id },
+                        principalTable: "inbox_state",
+                        principalColumns: new[] { "message_id", "consumer_id" });
+                    table.ForeignKey(
+                        name: "fk_outbox_message_outbox_state_outbox_id",
+                        column: x => x.outbox_id,
+                        principalTable: "outbox_state",
+                        principalColumn: "outbox_id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "recovery_keys",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    recovery_key_chain_id = table.Column<string>(type: "varchar(30)", nullable: false),
+                    identifier = table.Column<string>(type: "varchar", maxLength: 512, nullable: false),
+                    verifier_hash = table.Column<string>(type: "varchar", maxLength: 512, nullable: false),
+                    is_used = table.Column<bool>(type: "boolean", nullable: false),
+                    used_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: true),
+                    fingerprint_computed_hash = table.Column<string>(type: "varchar", maxLength: 512, nullable: true),
+                    fingerprint_ip_address = table.Column<string>(type: "varchar", maxLength: 45, nullable: true),
+                    fingerprint_language = table.Column<string>(type: "varchar", maxLength: 16, nullable: true),
+                    fingerprint_normalized_browser = table.Column<string>(type: "varchar", maxLength: 128, nullable: true),
+                    fingerprint_normalized_os = table.Column<string>(type: "varchar", maxLength: 128, nullable: true),
+                    fingerprint_timezone = table.Column<string>(type: "varchar", maxLength: 64, nullable: true),
+                    fingerprint_user_agent = table.Column<string>(type: "varchar", maxLength: 512, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_recovery_keys", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_recovery_keys_recovery_key_chains_recovery_key_chain_id",
+                        column: x => x.recovery_key_chain_id,
+                        principalTable: "recovery_key_chains",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "ix_inbox_state_delivered",
+                table: "inbox_state",
+                column: "delivered");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_login_requests_consumed_at",
+                table: "login_requests",
+                column: "consumed_at");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_login_requests_expires_at",
+                table: "login_requests",
+                column: "expires_at");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_login_requests_token_key",
+                table: "login_requests",
+                column: "token_key",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "ix_login_requests_token_key_consumed_at_expires_at",
+                table: "login_requests",
+                columns: new[] { "token_key", "consumed_at", "expires_at" });
+
+            migrationBuilder.CreateIndex(
+                name: "ix_login_requests_user_id",
+                table: "login_requests",
+                column: "user_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_outbox_message_enqueue_time",
+                table: "outbox_message",
+                column: "enqueue_time");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_outbox_message_expiration_time",
+                table: "outbox_message",
+                column: "expiration_time");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_outbox_message_inbox_message_id_inbox_consumer_id_sequence_",
+                table: "outbox_message",
+                columns: new[] { "inbox_message_id", "inbox_consumer_id", "sequence_number" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "ix_outbox_message_outbox_id_sequence_number",
+                table: "outbox_message",
+                columns: new[] { "outbox_id", "sequence_number" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "ix_outbox_state_created",
+                table: "outbox_state",
+                column: "created");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_recovery_key_chains_created_at",
+                table: "recovery_key_chains",
+                column: "created_at");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_recovery_key_chains_user_id",
+                table: "recovery_key_chains",
+                column: "user_id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "ix_recovery_keys_identifier",
+                table: "recovery_keys",
+                column: "identifier");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_recovery_keys_identifier_is_used",
+                table: "recovery_keys",
+                columns: new[] { "identifier", "is_used" });
+
+            migrationBuilder.CreateIndex(
+                name: "ix_recovery_keys_is_used",
+                table: "recovery_keys",
+                column: "is_used");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_recovery_keys_recovery_key_chain_id",
+                table: "recovery_keys",
+                column: "recovery_key_chain_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_recovery_keys_recovery_key_chain_id_is_used",
+                table: "recovery_keys",
+                columns: new[] { "recovery_key_chain_id", "is_used" });
+
+            migrationBuilder.CreateIndex(
+                name: "ix_sessions_expires_at",
+                table: "sessions",
+                column: "expires_at");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_sessions_expires_at_revoked_at",
+                table: "sessions",
+                columns: new[] { "expires_at", "revoked_at" });
+
+            migrationBuilder.CreateIndex(
+                name: "ix_sessions_refresh_token_key",
+                table: "sessions",
+                column: "refresh_token_key",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "ix_sessions_revoked_at",
+                table: "sessions",
+                column: "revoked_at");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_sessions_user_id",
+                table: "sessions",
+                column: "user_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_sessions_user_id_revoked_at",
+                table: "sessions",
+                columns: new[] { "user_id", "revoked_at" });
+
+            migrationBuilder.CreateIndex(
+                name: "ix_users_created_at",
+                table: "users",
+                column: "created_at");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_users_email_address",
+                table: "users",
+                column: "email_address",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "ix_users_is_verified",
+                table: "users",
+                column: "is_verified");
+        }
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropTable(
+                name: "login_requests");
+
+            migrationBuilder.DropTable(
+                name: "outbox_message");
+
+            migrationBuilder.DropTable(
+                name: "recovery_keys");
+
+            migrationBuilder.DropTable(
+                name: "sessions");
+
+            migrationBuilder.DropTable(
+                name: "users");
+
+            migrationBuilder.DropTable(
+                name: "inbox_state");
+
+            migrationBuilder.DropTable(
+                name: "outbox_state");
+
+            migrationBuilder.DropTable(
+                name: "recovery_key_chains");
+        }
+    }
+}

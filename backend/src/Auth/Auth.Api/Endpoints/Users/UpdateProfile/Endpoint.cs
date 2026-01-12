@@ -1,4 +1,4 @@
-using Auth.Application.Users.UpdateProfile;
+using Auth.Application.Commands.Users.UpdateProfile;
 
 using FastEndpoints;
 

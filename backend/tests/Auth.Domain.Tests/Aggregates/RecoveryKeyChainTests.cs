@@ -13,6 +13,9 @@ public sealed class RecoveryKeyChainTests
 {
     private static readonly DateTimeOffset UtcNow = DateTimeOffset.UtcNow;
     private static readonly UserId ValidUserId = UserId.New();
+    private const string ValidRecoveryKeyChainIdValue = "rkc_01JGX123456789012345678901";
+
+    private static RecoveryKeyChainId CreateValidRecoveryKeyChainId() => RecoveryKeyChainId.UnsafeFrom(ValidRecoveryKeyChainIdValue);
 
     private static List<RecoverKeyInput> CreateValidRecoveryKeyInputs()
     {
@@ -35,6 +38,7 @@ public sealed class RecoveryKeyChainTests
 
         Outcome<RecoveryKeyChain> outcome = RecoveryKeyChain.Create
         (
+            id: CreateValidRecoveryKeyChainId(),
             userId: ValidUserId,
             recoverKeyInputs: inputs,
             utcNow: UtcNow
@@ -49,19 +53,21 @@ public sealed class RecoveryKeyChainTests
     }
 
     [Fact]
-    public void Create_WithValidData_ShouldGenerateNewId()
+    public void Create_WithValidData_ShouldUseProvidedId()
     {
         List<RecoverKeyInput> inputs = CreateValidRecoveryKeyInputs();
+        RecoveryKeyChainId expectedId = CreateValidRecoveryKeyChainId();
 
         Outcome<RecoveryKeyChain> outcome = RecoveryKeyChain.Create
         (
+            id: expectedId,
             userId: ValidUserId,
             recoverKeyInputs: inputs,
             utcNow: UtcNow
         );
 
         outcome.IsSuccess.Should().BeTrue();
-        outcome.Value.Id.IsEmpty.Should().BeFalse();
+        outcome.Value.Id.Should().Be(expectedId);
     }
 
     [Fact]
@@ -72,6 +78,7 @@ public sealed class RecoveryKeyChainTests
 
         Outcome<RecoveryKeyChain> outcome = RecoveryKeyChain.Create
         (
+            id: CreateValidRecoveryKeyChainId(),
             userId: emptyUserId,
             recoverKeyInputs: inputs,
             utcNow: UtcNow
@@ -90,6 +97,7 @@ public sealed class RecoveryKeyChainTests
 
         Outcome<RecoveryKeyChain> outcome = RecoveryKeyChain.Create
         (
+            id: CreateValidRecoveryKeyChainId(),
             userId: ValidUserId,
             recoverKeyInputs: inputs,
             utcNow: UtcNow
@@ -108,6 +116,7 @@ public sealed class RecoveryKeyChainTests
 
         Outcome<RecoveryKeyChain> outcome = RecoveryKeyChain.Create
         (
+            id: CreateValidRecoveryKeyChainId(),
             userId: ValidUserId,
             recoverKeyInputs: inputs,
             utcNow: UtcNow
@@ -124,6 +133,7 @@ public sealed class RecoveryKeyChainTests
 
         Outcome<RecoveryKeyChain> outcome = RecoveryKeyChain.Create
         (
+            id: CreateValidRecoveryKeyChainId(),
             userId: ValidUserId,
             recoverKeyInputs: inputs,
             utcNow: UtcNow
@@ -138,6 +148,7 @@ public sealed class RecoveryKeyChainTests
     {
         RecoveryKeyChain chain = RecoveryKeyChain.Create
         (
+            id: CreateValidRecoveryKeyChainId(),
             userId: ValidUserId,
             recoverKeyInputs: CreateValidRecoveryKeyInputs(),
             utcNow: UtcNow
@@ -159,6 +170,7 @@ public sealed class RecoveryKeyChainTests
     {
         RecoveryKeyChain chain = RecoveryKeyChain.Create
         (
+            id: CreateValidRecoveryKeyChainId(),
             userId: ValidUserId,
             recoverKeyInputs: CreateValidRecoveryKeyInputs(),
             utcNow: UtcNow
@@ -176,6 +188,7 @@ public sealed class RecoveryKeyChainTests
     {
         RecoveryKeyChain chain = RecoveryKeyChain.Create
         (
+            id: CreateValidRecoveryKeyChainId(),
             userId: ValidUserId,
             recoverKeyInputs: CreateValidRecoveryKeyInputs(),
             utcNow: UtcNow
@@ -196,6 +209,7 @@ public sealed class RecoveryKeyChainTests
     {
         RecoveryKeyChain chain = RecoveryKeyChain.Create
         (
+            id: CreateValidRecoveryKeyChainId(),
             userId: ValidUserId,
             recoverKeyInputs: CreateValidRecoveryKeyInputs(),
             utcNow: UtcNow
@@ -216,6 +230,7 @@ public sealed class RecoveryKeyChainTests
     {
         RecoveryKeyChain chain = RecoveryKeyChain.Create
         (
+            id: CreateValidRecoveryKeyChainId(),
             userId: ValidUserId,
             recoverKeyInputs: CreateValidRecoveryKeyInputs(),
             utcNow: UtcNow
@@ -234,6 +249,7 @@ public sealed class RecoveryKeyChainTests
     {
         RecoveryKeyChain chain = RecoveryKeyChain.Create
         (
+            id: CreateValidRecoveryKeyChainId(),
             userId: ValidUserId,
             recoverKeyInputs: CreateValidRecoveryKeyInputs(),
             utcNow: UtcNow

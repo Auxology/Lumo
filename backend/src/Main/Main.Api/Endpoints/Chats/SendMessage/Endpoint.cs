@@ -1,6 +1,6 @@
 using FastEndpoints;
 
-using Main.Application.Chats.SendMessage;
+using Main.Application.Commands.Chats.SendMessage;
 
 using Mediator;
 
@@ -48,6 +48,7 @@ internal sealed class Endpoint : BaseEndpoint<Request, Response>
             (
                 MessageId: response.MessageId,
                 ChatId: response.ChatId,
+                StreamId: response.StreamId,
                 MessageRole: response.MessageRole,
                 MessageContent: response.MessageContent,
                 CreatedAt: response.CreatedAt

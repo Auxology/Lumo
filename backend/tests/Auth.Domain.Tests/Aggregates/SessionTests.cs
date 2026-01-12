@@ -16,6 +16,9 @@ public sealed class SessionTests
     private static readonly UserId ValidUserId = UserId.New();
     private const string ValidRefreshTokenKey = "refresh-key-123";
     private const string ValidRefreshTokenHash = "hashed-refresh-token";
+    private const string ValidSessionIdValue = "sid_01JGX123456789012345678901";
+
+    private static SessionId CreateValidSessionId() => SessionId.UnsafeFrom(ValidSessionIdValue);
 
     private static Fingerprint CreateValidFingerprint()
     {
@@ -37,6 +40,7 @@ public sealed class SessionTests
 
         Outcome<Session> outcome = Session.Create
         (
+            id: CreateValidSessionId(),
             userId: ValidUserId,
             refreshTokenKey: ValidRefreshTokenKey,
             refreshTokenHash: ValidRefreshTokenHash,
@@ -58,10 +62,13 @@ public sealed class SessionTests
     }
 
     [Fact]
-    public void Create_WithValidData_ShouldGenerateNewId()
+    public void Create_WithValidData_ShouldUseProvidedId()
     {
+        SessionId expectedId = CreateValidSessionId();
+
         Outcome<Session> outcome = Session.Create
         (
+            id: expectedId,
             userId: ValidUserId,
             refreshTokenKey: ValidRefreshTokenKey,
             refreshTokenHash: ValidRefreshTokenHash,
@@ -70,7 +77,7 @@ public sealed class SessionTests
         );
 
         outcome.IsSuccess.Should().BeTrue();
-        outcome.Value.Id.IsEmpty.Should().BeFalse();
+        outcome.Value.Id.Should().Be(expectedId);
     }
 
     [Fact]
@@ -80,6 +87,7 @@ public sealed class SessionTests
 
         Outcome<Session> outcome = Session.Create
         (
+            id: CreateValidSessionId(),
             userId: emptyUserId,
             refreshTokenKey: ValidRefreshTokenKey,
             refreshTokenHash: ValidRefreshTokenHash,
@@ -99,6 +107,7 @@ public sealed class SessionTests
     {
         Outcome<Session> outcome = Session.Create
         (
+            id: CreateValidSessionId(),
             userId: ValidUserId,
             refreshTokenKey: refreshTokenKey!,
             refreshTokenHash: ValidRefreshTokenHash,
@@ -118,6 +127,7 @@ public sealed class SessionTests
     {
         Outcome<Session> outcome = Session.Create
         (
+            id: CreateValidSessionId(),
             userId: ValidUserId,
             refreshTokenKey: ValidRefreshTokenKey,
             refreshTokenHash: refreshTokenHash!,
@@ -135,6 +145,7 @@ public sealed class SessionTests
         Fingerprint originalFingerprint = CreateValidFingerprint();
         Session session = Session.Create
         (
+            id: CreateValidSessionId(),
             userId: ValidUserId,
             refreshTokenKey: ValidRefreshTokenKey,
             refreshTokenHash: ValidRefreshTokenHash,
@@ -166,6 +177,7 @@ public sealed class SessionTests
     {
         Session session = Session.Create
         (
+            id: CreateValidSessionId(),
             userId: ValidUserId,
             refreshTokenKey: ValidRefreshTokenKey,
             refreshTokenHash: ValidRefreshTokenHash,
@@ -187,6 +199,7 @@ public sealed class SessionTests
     {
         Session session = Session.Create
         (
+            id: CreateValidSessionId(),
             userId: ValidUserId,
             refreshTokenKey: ValidRefreshTokenKey,
             refreshTokenHash: ValidRefreshTokenHash,
@@ -205,6 +218,7 @@ public sealed class SessionTests
     {
         Session session = Session.Create
         (
+            id: CreateValidSessionId(),
             userId: ValidUserId,
             refreshTokenKey: ValidRefreshTokenKey,
             refreshTokenHash: ValidRefreshTokenHash,
@@ -225,6 +239,7 @@ public sealed class SessionTests
     {
         Session session = Session.Create
         (
+            id: CreateValidSessionId(),
             userId: ValidUserId,
             refreshTokenKey: ValidRefreshTokenKey,
             refreshTokenHash: ValidRefreshTokenHash,
@@ -245,6 +260,7 @@ public sealed class SessionTests
     {
         Session session = Session.Create
         (
+            id: CreateValidSessionId(),
             userId: ValidUserId,
             refreshTokenKey: ValidRefreshTokenKey,
             refreshTokenHash: ValidRefreshTokenHash,
@@ -266,6 +282,7 @@ public sealed class SessionTests
     {
         Session session = Session.Create
         (
+            id: CreateValidSessionId(),
             userId: ValidUserId,
             refreshTokenKey: ValidRefreshTokenKey,
             refreshTokenHash: ValidRefreshTokenHash,
@@ -286,6 +303,7 @@ public sealed class SessionTests
     {
         Session session = Session.Create
         (
+            id: CreateValidSessionId(),
             userId: ValidUserId,
             refreshTokenKey: ValidRefreshTokenKey,
             refreshTokenHash: ValidRefreshTokenHash,
@@ -306,6 +324,7 @@ public sealed class SessionTests
     {
         Session session = Session.Create
         (
+            id: CreateValidSessionId(),
             userId: ValidUserId,
             refreshTokenKey: ValidRefreshTokenKey,
             refreshTokenHash: ValidRefreshTokenHash,
@@ -327,6 +346,7 @@ public sealed class SessionTests
     {
         Session session = Session.Create
         (
+            id: CreateValidSessionId(),
             userId: ValidUserId,
             refreshTokenKey: ValidRefreshTokenKey,
             refreshTokenHash: ValidRefreshTokenHash,
@@ -347,6 +367,7 @@ public sealed class SessionTests
     {
         Session session = Session.Create
         (
+            id: CreateValidSessionId(),
             userId: ValidUserId,
             refreshTokenKey: ValidRefreshTokenKey,
             refreshTokenHash: ValidRefreshTokenHash,

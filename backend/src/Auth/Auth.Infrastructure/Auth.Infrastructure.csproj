@@ -25,6 +25,7 @@
         <PackageReference Include="MassTransit" />
         <PackageReference Include="MassTransit.RabbitMQ" />
         <PackageReference Include="MassTransit.EntityFrameworkCore" />
+        <PackageReference Include="Ulid" />
     </ItemGroup>
 
 </Project>

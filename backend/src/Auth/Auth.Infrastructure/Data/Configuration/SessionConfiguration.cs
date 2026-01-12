@@ -15,12 +15,13 @@ internal sealed class SessionConfiguration : IEntityTypeConfiguration<Session>
         b.HasKey(s => s.Id);
 
         b.Property(s => s.Id)
+            .ValueGeneratedNever()
             .HasConversion
             (
                 id => id.Value,
-                guid => SessionId.UnsafeFromGuid(guid)
+                s => SessionId.UnsafeFrom(s)
             )
-            .HasColumnType("uuid");
+            .HasColumnType($"varchar({SessionId.Length})");
 
         b.Property(s => s.UserId)
             .IsRequired()

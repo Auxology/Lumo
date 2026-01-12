@@ -4,11 +4,14 @@ using Amazon.S3;
 
 using Auth.Application.Abstractions.Authentication;
 using Auth.Application.Abstractions.Data;
+using Auth.Application.Abstractions.Generators;
 using Auth.Application.Abstractions.Storage;
 using Auth.Infrastructure.Authentication;
 using Auth.Infrastructure.Data;
 using Auth.Infrastructure.Options;
 using Auth.Infrastructure.Storage;
+
+using Auth.Infrastructure.Generators;
 
 using MassTransit;
 
@@ -18,6 +21,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.JsonWebTokens;
 
+using SharedKernel.Application.Data;
 using SharedKernel.Application.Messaging;
 using SharedKernel.Infrastructure;
 using SharedKernel.Infrastructure.Data;
@@ -32,11 +36,19 @@ public static class DependencyInjection
         AddInfrastructure(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment) =>
         services
             .AddSharedKernelInfrastructure(configuration)
+            .AddServices()
             .AddDatabase(configuration, environment)
             .AddAuthenticationInternal()
             .AddAuthorization()
             .AddStorage(configuration)
             .AddMessaging(configuration);
+
+    private static IServiceCollection AddServices(this IServiceCollection services)
+    {
+        services.AddSingleton<IIdGenerator, IdGenerator>();
+
+        return services;
+    }
 
     private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
     {

@@ -36,11 +36,23 @@ internal sealed class ChatStartedConsumer(
 
         ChatId chatId = chatIdOutcome.Value;
 
+        Outcome<StreamId> streamIdOutcome = StreamId.From(message.StreamId);
+
+        if (streamIdOutcome.IsFailure)
+        {
+            logger.LogError(
+                "Invalid StreamId in {EventType}: {EventId}, CorrelationId: {CorrelationId}, StreamId: {StreamId}",
+                nameof(ChatStarted), message.EventId, message.CorrelationId, message.StreamId);
+            return;
+        }
+
+        StreamId streamId = streamIdOutcome.Value;
+
         List<ChatCompletionMessage> messages = await dbContext.Messages
             .Where(c => c.ChatId == chatId)
-            .OrderByDescending(c => c.CreatedAt)
+            .OrderByDescending(c => c.SequenceNumber)
             .Take(ChatConstants.MaxContextMessages)
-            .OrderBy(c => c.CreatedAt)
+            .OrderBy(c => c.SequenceNumber)
             .Select(m => new ChatCompletionMessage
             (
                 Role: m.MessageRole,
@@ -51,6 +63,7 @@ internal sealed class ChatStartedConsumer(
         await chatCompletionService.StreamCompletionAsync
         (
             chatId: chatId.Value,
+            streamId: streamId.Value,
             messages: messages,
             cancellationToken: cancellationToken
         );

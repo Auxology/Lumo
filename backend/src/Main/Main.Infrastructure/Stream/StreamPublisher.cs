@@ -15,13 +15,10 @@ internal sealed class StreamPublisher(
     ILogger<StreamPublisher> logger,
     IDateTimeProvider dateTimeProvider) : IStreamPublisher
 {
-    private const string StreamKeyPrefix = "chat:stream:";
-    private const string NotifyChannelPrefix = "chat:notify:";
-
-    public async Task PublishStatusAsync(string chatId, StreamStatus status, CancellationToken cancellationToken, string? fault = null)
+    public async Task PublishStatusAsync(string streamId, StreamStatus status, CancellationToken cancellationToken, string? fault = null)
     {
-        string streamKey = $"{StreamKeyPrefix}{chatId}";
-        string notifyChannel = $"{NotifyChannelPrefix}{chatId}";
+        string streamKey = $"{StreamConstants.StreamKeyPrefix}{streamId}";
+        string notifyChannel = $"{StreamConstants.NotifyChannelPrefix}{streamId}";
 
         IDatabase db = connectionMultiplexer.GetDatabase();
         ISubscriber pub = connectionMultiplexer.GetSubscriber();
@@ -47,24 +44,24 @@ internal sealed class StreamPublisher(
         }
         catch (Exception exception)
         {
-            logger.LogError(exception, "Failed to publish chunk for chat {ChatId}", chatId);
+            logger.LogError(exception, "Failed to publish status for stream {StreamId}", streamId);
             throw;
         }
     }
 
-    public async Task SetStreamExpirationAsync(string chatId, TimeSpan expiration, CancellationToken cancellationToken)
+    public async Task SetStreamExpirationAsync(string streamId, TimeSpan expiration, CancellationToken cancellationToken)
     {
-        string streamKey = $"{StreamKeyPrefix}{chatId}";
+        string streamKey = $"{StreamConstants.StreamKeyPrefix}{streamId}";
 
         IDatabase db = connectionMultiplexer.GetDatabase();
 
         await db.KeyExpireAsync(streamKey, expiration);
     }
 
-    public async Task PublishChunkAsync(string chatId, string messageContent, CancellationToken cancellationToken)
+    public async Task PublishChunkAsync(string streamId, string messageContent, CancellationToken cancellationToken)
     {
-        string streamKey = $"{StreamKeyPrefix}{chatId}";
-        string notifyChannel = $"{NotifyChannelPrefix}{chatId}";
+        string streamKey = $"{StreamConstants.StreamKeyPrefix}{streamId}";
+        string notifyChannel = $"{StreamConstants.NotifyChannelPrefix}{streamId}";
 
         IDatabase db = connectionMultiplexer.GetDatabase();
         ISubscriber pub = connectionMultiplexer.GetSubscriber();
@@ -84,7 +81,7 @@ internal sealed class StreamPublisher(
         }
         catch (Exception exception)
         {
-            logger.LogError(exception, "Failed to publish chunk for chat {ChatId}", chatId);
+            logger.LogError(exception, "Failed to publish chunk for stream {StreamId}", streamId);
             throw;
         }
     }

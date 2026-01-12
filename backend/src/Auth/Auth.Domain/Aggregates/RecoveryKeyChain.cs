@@ -44,6 +44,7 @@ public sealed class RecoveryKeyChain : AggregateRoot<RecoveryKeyChainId>
 
     public static Outcome<RecoveryKeyChain> Create
     (
+        RecoveryKeyChainId id,
         UserId userId,
         IReadOnlyCollection<RecoverKeyInput> recoverKeyInputs,
         DateTimeOffset utcNow
@@ -57,15 +58,13 @@ public sealed class RecoveryKeyChain : AggregateRoot<RecoveryKeyChainId>
         if (recoverKeyInputs.Count != RecoveryKeyConstants.MaxKeysPerChain)
             return RecoveryKeyChainFaults.InvalidRecoveryKeyCount;
 
-        RecoveryKeyChainId recoveryKeyChainId = RecoveryKeyChainId.New();
-
         List<RecoveryKey> recoveryKeys = new(capacity: RecoveryKeyConstants.MaxKeysPerChain);
 
         foreach (RecoverKeyInput recoverKeyInput in recoverKeyInputs)
         {
             Outcome<RecoveryKey> recoveryKeyOutcome = RecoveryKey.Create
             (
-                recoveryKeyChainId: recoveryKeyChainId,
+                recoveryKeyChainId: id,
                 identifier: recoverKeyInput.Identifier,
                 verifierHash: recoverKeyInput.VerifierHash
             );
@@ -78,7 +77,7 @@ public sealed class RecoveryKeyChain : AggregateRoot<RecoveryKeyChainId>
 
         RecoveryKeyChain recoveryKeyChain = new
         (
-            id: recoveryKeyChainId,
+            id: id,
             userId: userId,
             utcNow: utcNow,
             recoveryKeys: recoveryKeys

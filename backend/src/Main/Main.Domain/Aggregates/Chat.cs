@@ -22,6 +22,8 @@ public sealed class Chat : AggregateRoot<ChatId>
 
     public bool IsArchived { get; private set; }
 
+    public int NextSequenceNumber { get; private set; }
+
     public DateTimeOffset CreatedAt { get; private set; }
 
     public DateTimeOffset? UpdatedAt { get; private set; }
@@ -44,6 +46,7 @@ public sealed class Chat : AggregateRoot<ChatId>
         Title = title;
         ModelName = null;
         IsArchived = false;
+        NextSequenceNumber = 0;
         CreatedAt = utcNow;
         UpdatedAt = null;
     }
@@ -115,16 +118,27 @@ public sealed class Chat : AggregateRoot<ChatId>
         return Outcome.Success();
     }
 
-    private Outcome<Message> AddMessage(string messageContent, MessageRole role, DateTimeOffset utcNow)
+    private Outcome<Message> AddMessage
+    (
+        MessageId messageId,
+        string messageContent,
+        MessageRole role,
+        DateTimeOffset utcNow
+    )
     {
         if (IsArchived)
             return ChatFaults.CannotModifyArchivedChat;
 
+        int sequenceNumber = NextSequenceNumber;
+        NextSequenceNumber++;
+
         Outcome<Message> messageOutcome = Message.Create
         (
+            id: messageId,
             chatId: Id,
             messageRole: role,
             messageContent: messageContent,
+            sequenceNumber: sequenceNumber,
             utcNow: utcNow
         );
 
@@ -139,9 +153,9 @@ public sealed class Chat : AggregateRoot<ChatId>
         return message;
     }
 
-    public Outcome<Message> AddUserMessage(string messageContent, DateTimeOffset utcNow)
-        => AddMessage(messageContent, MessageRole.User, utcNow);
+    public Outcome<Message> AddUserMessage(MessageId messageId, string messageContent, DateTimeOffset utcNow)
+        => AddMessage(messageId, messageContent, MessageRole.User, utcNow);
 
-    public Outcome<Message> AddAssistantMessage(string messageContent, DateTimeOffset utcNow) =>
-        AddMessage(messageContent, MessageRole.Assistant, utcNow);
+    public Outcome<Message> AddAssistantMessage(MessageId messageId, string messageContent, DateTimeOffset utcNow) =>
+        AddMessage(messageId, messageContent, MessageRole.Assistant, utcNow);
 }

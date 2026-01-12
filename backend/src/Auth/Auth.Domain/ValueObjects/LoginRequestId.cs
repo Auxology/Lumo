@@ -4,62 +4,52 @@ namespace Auth.Domain.ValueObjects;
 
 public readonly record struct LoginRequestId
 {
-    public Guid Value { get; }
+    private const string Prefix = "lrq_";
+    private const int TotalLength = 30;
 
-    private LoginRequestId(Guid value)
+    public string Value { get; }
+
+    private LoginRequestId(string value)
     {
         Value = value;
     }
 
-    public static LoginRequestId New() => new(Guid.NewGuid());
-
-    public static Outcome<LoginRequestId> FromGuid(Guid value)
+    public static Outcome<LoginRequestId> From(string? value)
     {
-        if (value == Guid.Empty)
-            return Faults.Invalid;
+        if (string.IsNullOrWhiteSpace(value))
+            return Faults.Required;
+
+        if (!IsValid(value!))
+            return Faults.InvalidFormat;
 
         return new LoginRequestId(value);
     }
 
-    public static LoginRequestId UnsafeFromGuid(Guid value) => new(value);
+    public static LoginRequestId UnsafeFrom(string value) => new(value);
 
-    public static Outcome<LoginRequestId> FromString(string value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-            return Faults.StringRequired;
+    public static string PrefixValue => Prefix;
 
-        if (!Guid.TryParse(value, out var guid))
-            return Faults.InvalidFormat;
+    public static int Length => TotalLength;
 
-        return FromGuid(guid);
-    }
+    private static bool IsValid(string value) =>
+        value.Length == TotalLength && value.StartsWith(Prefix, StringComparison.Ordinal);
 
-    public override string ToString() => Value.ToString();
+    public override string ToString() => Value;
 
-    public bool IsEmpty => Value == Guid.Empty;
-
-    public static implicit operator Guid(LoginRequestId loginRequestId) => loginRequestId.Value;
-
-    public static explicit operator LoginRequestId(Guid value) => UnsafeFromGuid(value);
+    public bool IsEmpty => string.IsNullOrEmpty(Value);
 
     private static class Faults
     {
-        public static readonly Fault Invalid = Fault.Validation
+        public static readonly Fault Required = Fault.Validation
         (
-            title: "LoginRequestId.Invalid",
-            detail: "LoginRequestId cannot be an empty GUID."
+            title: "LoginRequestId.Required",
+            detail: "LoginRequestId is required."
         );
 
         public static readonly Fault InvalidFormat = Fault.Validation
         (
             title: "LoginRequestId.InvalidFormat",
-            detail: "The provided string is not a valid GUID format."
-        );
-
-        public static readonly Fault StringRequired = Fault.Validation
-        (
-            title: "LoginRequestId.StringRequired",
-            detail: "LoginRequestId requires a non-empty string."
+            detail: $"LoginRequestId must start with '{Prefix}' and be {TotalLength} characters."
         );
     }
 }

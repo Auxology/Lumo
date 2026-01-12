@@ -31,6 +31,7 @@ public sealed class LoginRequest : AggregateRoot<LoginRequestId>
     [SetsRequiredMembers]
     private LoginRequest
     (
+        LoginRequestId id,
         UserId userId,
         string tokenKey,
         string otpTokenHash,
@@ -39,7 +40,7 @@ public sealed class LoginRequest : AggregateRoot<LoginRequestId>
         DateTimeOffset utcNow
     )
     {
-        Id = LoginRequestId.New();
+        Id = id;
         UserId = userId;
         TokenKey = tokenKey;
         OtpTokenHash = otpTokenHash;
@@ -52,6 +53,7 @@ public sealed class LoginRequest : AggregateRoot<LoginRequestId>
 
     public static Outcome<LoginRequest> Create
     (
+        LoginRequestId id,
         UserId userId,
         string tokenKey,
         string otpTokenHash,
@@ -74,12 +76,13 @@ public sealed class LoginRequest : AggregateRoot<LoginRequestId>
 
         LoginRequest loginRequest = new
         (
-            userId,
-            tokenKey,
-            otpTokenHash,
-            magicLinkTokenHash,
-            fingerprint,
-            utcNow
+            id: id,
+            userId: userId,
+            tokenKey: tokenKey,
+            otpTokenHash: otpTokenHash,
+            magicLinkTokenHash: magicLinkTokenHash,
+            fingerprint: fingerprint,
+            utcNow: utcNow
         );
 
         return loginRequest;

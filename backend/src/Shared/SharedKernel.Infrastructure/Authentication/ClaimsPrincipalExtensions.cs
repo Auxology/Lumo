@@ -15,12 +15,13 @@ public static class ClaimsPrincipalExtensions
             : throw new InvalidOperationException("User id is unavailable");
     }
 
-    public static Guid GetSessionId(this ClaimsPrincipal claimsPrincipal)
+    public static string GetSessionId(this ClaimsPrincipal claimsPrincipal)
     {
         string? sessionId = claimsPrincipal.FindFirstValue(JwtRegisteredClaimNames.Sid);
 
-        return Guid.TryParse(sessionId, out Guid parsedSessionId)
-            ? parsedSessionId
-            : throw new InvalidOperationException("Session id is unavailable");
+        if (string.IsNullOrWhiteSpace(sessionId))
+            throw new InvalidOperationException("Session id is unavailable");
+
+        return sessionId;
     }
 }
