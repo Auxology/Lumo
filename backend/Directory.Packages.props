@@ -79,6 +79,7 @@
         <PackageVersion Include="FastEndpoints.Swagger" Version="7.1.1" />
         <PackageVersion Include="FastEndpoints.Generator" Version="7.1.1" />
         <PackageVersion Include="Scalar.AspNetCore" Version="2.12.5" />
+        <PackageVersion Include="RedisRateLimiting.AspNetCore" Version="1.2.1" />
         <!-- Tests -->
         <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
         <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />

@@ -5,6 +5,7 @@ using Gateway.Api.Authentication;
 using Gateway.Api.Caching;
 using Gateway.Api.HttpClients;
 using Gateway.Api.Options;
+using Gateway.Api.RateLimiting;
 using Gateway.Api.Transforms;
 
 using SharedKernel.Api;
@@ -19,7 +20,8 @@ internal static class DependencyInjection
         services
             .AddSharedKernelApi()
             .AddSharedKernelInfrastructure(configuration)
-            .AddSharedHealthChecks(configuration);
+            .AddSharedHealthChecks(configuration)
+            .AddRateLimitingSetup(configuration);
 
         services.AddCors(options =>
         {
