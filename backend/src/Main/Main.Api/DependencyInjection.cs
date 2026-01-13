@@ -2,6 +2,7 @@ using FastEndpoints;
 using FastEndpoints.Swagger;
 
 using Main.Api.Options;
+using Main.Api.RateLimiting;
 
 using SharedKernel.Api;
 
@@ -11,7 +12,9 @@ internal static class DependencyInjection
 {
     public static IServiceCollection AddMainApi(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddSharedKernelApi();
+        services
+            .AddSharedKernelApi()
+            .AddRateLimitingSetup(configuration);
 
         services.AddOptions<MainApiOptions>()
             .Bind(configuration.GetSection(MainApiOptions.SectionName))

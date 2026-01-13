@@ -56,6 +56,7 @@ HealthCheckOptions healthCheckOptions = new()
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseRateLimiter();
 
 app.UseFastEndpoints(c =>
 {

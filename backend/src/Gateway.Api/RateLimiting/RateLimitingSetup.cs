@@ -52,7 +52,7 @@ internal static class RateLimitingSetup
                         out TimeSpan retryAfter))
                     context.HttpContext.Response.Headers.RetryAfter =
                         ((int)retryAfter.TotalSeconds).ToString(CultureInfo.InvariantCulture);
-                
+
                 Outcome outcome = Outcome.Failure(RateLimitingFaults.RateLimited);
                 await CustomResults.Problem(outcome, context.HttpContext)
                     .ExecuteAsync(context.HttpContext);
@@ -108,7 +108,7 @@ internal static class RateLimitingSetup
                         out TimeSpan retryAfter))
                     context.HttpContext.Response.Headers.RetryAfter =
                         ((int)retryAfter.TotalSeconds).ToString(CultureInfo.InvariantCulture);
-                
+
                 Outcome outcome = Outcome.Failure(RateLimitingFaults.RateLimited);
                 await CustomResults.Problem(outcome, context.HttpContext)
                     .ExecuteAsync(context.HttpContext);
