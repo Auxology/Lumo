@@ -23,6 +23,8 @@ internal static class DependencyInjection
             .AddSharedHealthChecks(configuration)
             .AddRateLimitingSetup(configuration);
 
+        services.AddHttpContextAccessor();
+
         services.AddCors(options =>
         {
             options.AddDefaultPolicy(policy =>

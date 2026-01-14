@@ -7,4 +7,6 @@ public interface ISecureTokenGenerator
     string HashToken(string token);
 
     bool VerifyToken(string token, string hashedToken);
+
+    bool TryParseCompoundToken(string compoundToken, out string key, out string token);
 }

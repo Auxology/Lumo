@@ -60,4 +60,18 @@ internal sealed class SessionTokenOrchestrator(
 
         return new TokenPair(response.AccessToken, response.RefreshToken);
     }
+
+    public async Task<Outcome> LogoutAsync(string refreshToken, CancellationToken cancellationToken = default)
+    {
+        LogoutApiRequest request = new(refreshToken);
+
+        Outcome outcome = await authServiceClient.LogoutAsync(request, cancellationToken);
+
+        if (outcome.IsFailure)
+            return outcome.Fault;
+
+        await tokenCacheService.RemoveAccessTokenAsync(refreshToken, cancellationToken);
+
+        return Outcome.Success();
+    }
 }
