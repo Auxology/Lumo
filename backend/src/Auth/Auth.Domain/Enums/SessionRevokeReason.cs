@@ -4,5 +4,6 @@ public enum SessionRevokeReason
 {
     None = 0,
     UserLogout = 1,
-    EmailChange = 2
+    EmailChange = 2,
+    AccountRecovery = 3,
 }

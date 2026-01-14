@@ -13,4 +13,7 @@ internal sealed class IdGenerator : IIdGenerator
 
     public RecoveryKeyChainId NewRecoveryKeyChainId() =>
         RecoveryKeyChainId.UnsafeFrom($"{RecoveryKeyChainId.PrefixValue}{Ulid.NewUlid()}");
+
+    public RecoveryRequestId NewRecoveryRequestId() =>
+        RecoveryRequestId.UnsafeFrom($"{RecoveryRequestId.PrefixValue}{Ulid.NewUlid()}");
 }

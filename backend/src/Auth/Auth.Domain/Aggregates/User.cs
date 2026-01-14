@@ -93,6 +93,22 @@ public sealed class User : AggregateRoot<UserId>
 
         return Outcome.Success();
     }
+    
+    public Outcome ChangeEmailAddress(EmailAddress newEmailAddress, DateTimeOffset utcNow)
+    {
+        if (newEmailAddress.IsEmpty())
+            return UserFaults.EmailAddressRequiredForUpdate;
+        
+        if (newEmailAddress == EmailAddress)
+            return UserFaults.EmailAddressSameAsCurrent;
+
+        EmailAddress = newEmailAddress;
+        IsVerified = false;
+        VerifiedAt = null;
+        UpdatedAt = utcNow;
+
+        return Outcome.Success();
+    }
 
     public Outcome SetAvatarKey(string avatarKey, DateTimeOffset utcNow)
     {

@@ -21,4 +21,10 @@ public static class RecoveryKeyFaults
         title: "RecoveryKey.VerifierHashRequiredForCreation",
         detail: "A verifier hash is required to create a recovery key."
     );
+
+    public static readonly Fault AlreadyUsed = Fault.Conflict
+    (
+        title: "RecoveryKey.AlreadyUsed",
+        detail: "The recovery key has already been used."
+    );
 }
