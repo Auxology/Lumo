@@ -1,4 +1,4 @@
-using Auth.Application.LoginRequests.Verify;
+using Auth.Application.Commands.LoginRequests.Verify;
 
 using Contracts.Requests;
 using Contracts.Responses;

@@ -93,12 +93,12 @@ public sealed class User : AggregateRoot<UserId>
 
         return Outcome.Success();
     }
-    
+
     public Outcome ChangeEmailAddress(EmailAddress newEmailAddress, DateTimeOffset utcNow)
     {
         if (newEmailAddress.IsEmpty())
             return UserFaults.EmailAddressRequiredForUpdate;
-        
+
         if (newEmailAddress == EmailAddress)
             return UserFaults.EmailAddressSameAsCurrent;
 

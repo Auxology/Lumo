@@ -33,7 +33,7 @@ public static class RecoveryRequestFaults
         title: "RecoveryRequest.MagicLinkTokenHashRequiredForCreation",
         detail: "A magic link token hash is required to create a recovery request."
     );
-    
+
     public static readonly Fault Expired = Fault.Validation
     (
         title: "RecoveryRequest.Expired",
@@ -57,5 +57,5 @@ public static class RecoveryRequestFaults
         title: "RecoveryRequest.NewEmailAlreadyVerified",
         detail: "The new email has already been verified for this recovery request."
     );
-    
+
 }

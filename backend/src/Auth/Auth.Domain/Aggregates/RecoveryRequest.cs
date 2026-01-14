@@ -11,26 +11,26 @@ namespace Auth.Domain.Aggregates;
 public sealed class RecoveryRequest : AggregateRoot<RecoveryRequestId>
 {
     public UserId UserId { get; private set; }
-    
+
     public string TokenKey { get; private set; } = string.Empty;
-    
+
     public EmailAddress NewEmailAddress { get; private set; }
-    
+
     public string OtpTokenHash { get; private set; } = string.Empty;
-    
+
     public string MagicLinkTokenHash { get; private set; } = string.Empty;
-    
-    public Fingerprint Fingerprint { get; private set; } 
-    
+
+    public Fingerprint Fingerprint { get; private set; }
+
     public DateTimeOffset CreatedAt { get; private set; }
-    
+
     public DateTimeOffset ExpiresAt { get; private set; }
-    
+
     public DateTimeOffset? NewEmailVerifiedAt { get; private set; }
-    
+
     public DateTimeOffset? CompletedAt { get; private set; }
-    
-    private RecoveryRequest() {} // For EF Core
+
+    private RecoveryRequest() { } // For EF Core
 
     [SetsRequiredMembers]
     private RecoveryRequest
@@ -72,16 +72,16 @@ public sealed class RecoveryRequest : AggregateRoot<RecoveryRequestId>
     {
         if (userId.IsEmpty)
             return RecoveryRequestFaults.UserIdRequiredForCreation;
-        
+
         if (string.IsNullOrWhiteSpace(tokenKey))
             return RecoveryRequestFaults.TokenKeyRequiredForCreation;
-        
+
         if (newEmailAddress.IsEmpty())
             return RecoveryRequestFaults.NewEmailRequiredForCreation;
-        
+
         if (string.IsNullOrWhiteSpace(otpTokenHash))
             return RecoveryRequestFaults.OtpTokenHashRequiredForCreation;
-        
+
         if (string.IsNullOrWhiteSpace(magicLinkTokenHash))
             return RecoveryRequestFaults.MagicLinkTokenHashRequiredForCreation;
 
@@ -96,7 +96,7 @@ public sealed class RecoveryRequest : AggregateRoot<RecoveryRequestId>
             fingerprint: fingerprint,
             utcNow: utcNow
         );
-        
+
         return recoveryRequest;
     }
 
@@ -104,15 +104,15 @@ public sealed class RecoveryRequest : AggregateRoot<RecoveryRequestId>
     {
         if (CompletedAt is not null)
             return RecoveryRequestFaults.AlreadyCompleted;
-        
+
         if (ExpiresAt < utcNow)
             return RecoveryRequestFaults.Expired;
-        
+
         if (NewEmailVerifiedAt is not null)
             return RecoveryRequestFaults.NewEmailAlreadyVerified;
-        
+
         NewEmailVerifiedAt = utcNow;
-        
+
         return Outcome.Success();
     }
 
@@ -120,18 +120,18 @@ public sealed class RecoveryRequest : AggregateRoot<RecoveryRequestId>
     {
         if (CompletedAt is not null)
             return RecoveryRequestFaults.AlreadyCompleted;
-        
+
         if (ExpiresAt < utcNow)
             return RecoveryRequestFaults.Expired;
-        
+
         if (NewEmailVerifiedAt is null)
             return RecoveryRequestFaults.NewEmailNotVerified;
-        
+
         CompletedAt = utcNow;
-        
+
         return Outcome.Success();
     }
-    
+
     public bool IsNewEmailVerified => NewEmailVerifiedAt is not null;
 
     public bool IsCompleted => CompletedAt is not null;

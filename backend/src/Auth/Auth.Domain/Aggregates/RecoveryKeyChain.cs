@@ -121,4 +121,24 @@ public sealed class RecoveryKeyChain : AggregateRoot<RecoveryKeyChainId>
 
         return Outcome.Success();
     }
+
+    public Outcome MarkKeyAsUsed(string identifier, Fingerprint fingerprint, DateTimeOffset utcNow)
+    {
+        RecoveryKey? recoveryKey = FindUnusedKeyByIdentifier(identifier);
+
+        return recoveryKey is null
+            ? RecoveryKeyChainFaults.KeyNotFoundOrUsed
+            : recoveryKey.MarkAsUsed(fingerprint, utcNow);
+    }
+
+    private RecoveryKey? FindUnusedKeyByIdentifier(string identifier)
+        => _recoveryKeys.FirstOrDefault(rk => rk.Identifier == identifier && !rk.IsUsed);
+
+    public string? GetVerifierHashForKey(string identifier) =>
+        _recoveryKeys
+            .FirstOrDefault(rk => rk.Identifier == identifier && !rk.IsUsed)
+            ?.VerifierHash;
+
+    public int GetRemainingKeyCount() =>
+        _recoveryKeys.Count(rk => !rk.IsUsed);
 }

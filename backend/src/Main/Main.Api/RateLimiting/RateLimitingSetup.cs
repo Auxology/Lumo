@@ -24,7 +24,7 @@ internal static class RateLimitingSetup
 
         RateLimitingOptions rateLimitingOptions = new();
         configuration.GetSection(RateLimitingOptions.SectionName).Bind(rateLimitingOptions);
-        
+
         ValkeyOptions valkeyOptions = new();
         configuration.GetSection(ValkeyOptions.SectionName).Bind(valkeyOptions);
 
@@ -33,7 +33,7 @@ internal static class RateLimitingSetup
 
         return services.AddInMemoryRateLimiting(rateLimitingOptions);
     }
-    
+
     private static IServiceCollection AddInMemoryRateLimiting(this IServiceCollection services,
         RateLimitingOptions options)
     {

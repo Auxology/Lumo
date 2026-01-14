@@ -15,7 +15,7 @@ public interface IAuthDbContext
     DbSet<RecoveryKey> RecoveryKeys { get; }
 
     DbSet<LoginRequest> LoginRequests { get; }
-    
+
     DbSet<RecoveryRequest> RecoveryRequests { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

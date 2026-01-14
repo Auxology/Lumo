@@ -1,4 +1,4 @@
-namespace Auth.Application.LoginRequests.Verify;
+namespace Auth.Application.Commands.LoginRequests.Verify;
 
 public sealed record VerifyLoginResponse
 (

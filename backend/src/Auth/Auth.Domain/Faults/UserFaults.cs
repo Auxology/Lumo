@@ -41,7 +41,7 @@ public static class UserFaults
         title: "User.AvatarKeyRequiredForUpdate",
         detail: "Please provide a valid avatar to update your profile picture."
     );
-    
+
     public static readonly Fault EmailAddressRequiredForUpdate = Fault.Validation
     (
         title: "User.EmailAddressRequiredForUpdate",

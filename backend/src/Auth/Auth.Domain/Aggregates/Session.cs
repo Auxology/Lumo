@@ -143,7 +143,7 @@ public sealed class Session : AggregateRoot<SessionId>
 
         return Outcome.Success();
     }
-    
+
     public Outcome RevokeDueToAccountRecovery(DateTimeOffset utcNow)
     {
         Outcome ensureActiveOutcome = EnsureActive(utcNow);
@@ -156,7 +156,7 @@ public sealed class Session : AggregateRoot<SessionId>
 
         return Outcome.Success();
     }
-    
+
     private Outcome EnsureActive(DateTimeOffset utcNow)
     {
         if (ExpiresAt <= utcNow)

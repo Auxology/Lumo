@@ -64,7 +64,7 @@ public sealed class RecoveryKey : Entity<int>
 
         return recoveryKey;
     }
-    
+
     internal Outcome MarkAsUsed(Fingerprint fingerprint, DateTimeOffset utcNow)
     {
         if (IsUsed)
