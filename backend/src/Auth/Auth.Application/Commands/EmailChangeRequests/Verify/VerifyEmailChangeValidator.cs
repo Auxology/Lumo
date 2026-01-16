@@ -10,8 +10,8 @@ internal sealed class VerifyEmailChangeValidator : AbstractValidator<VerifyEmail
             .NotEmpty()
             .WithMessage("Token key is required.");
 
-        RuleFor(vecc => vecc)
-            .Must(vecc => !string.IsNullOrWhiteSpace(vecc.OtpToken) || !string.IsNullOrWhiteSpace(vecc.MagicLinkToken))
-            .WithMessage("Either OTP token or magic link token must be provided.");
+        RuleFor(vecc => vecc.OtpToken)
+            .NotEmpty()
+            .WithMessage("OTP token is required.");
     }
 }

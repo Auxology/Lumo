@@ -4,7 +4,7 @@ using FastEndpoints;
 
 using Mediator;
 
-namespace Auth.Api.Endpoints.RecoveryRequests;
+namespace Auth.Api.Endpoints.RecoveryRequests.Create;
 
 internal sealed class Endpoint : BaseEndpoint<Request, Response>
 {

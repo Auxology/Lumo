@@ -11,28 +11,26 @@ namespace Auth.Domain.Aggregates;
 public sealed class EmailChangeRequest : AggregateRoot<EmailChangeRequestId>
 {
     public UserId UserId { get; private set; }
-    
+
     public string TokenKey { get; private set; } = string.Empty;
-    
+
     public EmailAddress CurrentEmailAddress { get; private set; }
-    
+
     public EmailAddress NewEmailAddress { get; private set; }
-    
+
     public string OtpTokenHash { get; private set; } = string.Empty;
-    
-    public string MagicLinkTokenHash { get; private set; } = string.Empty;
 
     public Fingerprint Fingerprint { get; private set; }
-    
+
     public DateTimeOffset CreatedAt { get; private set; }
-    
+
     public DateTimeOffset ExpiresAt { get; private set; }
-    
+
     public DateTimeOffset? CompletedAt { get; private set; }
-    
+
     public DateTimeOffset? CancelledAt { get; private set; }
-    
-    private EmailChangeRequest() {} // For EF Core
+
+    private EmailChangeRequest() { } // For EF Core
 
     [SetsRequiredMembers]
     private EmailChangeRequest
@@ -43,7 +41,6 @@ public sealed class EmailChangeRequest : AggregateRoot<EmailChangeRequestId>
         EmailAddress currentEmailAddress,
         EmailAddress newEmailAddress,
         string otpTokenHash,
-        string magicLinkTokenHash,
         Fingerprint fingerprint,
         DateTimeOffset utcNow
     )
@@ -54,10 +51,9 @@ public sealed class EmailChangeRequest : AggregateRoot<EmailChangeRequestId>
         CurrentEmailAddress = currentEmailAddress;
         NewEmailAddress = newEmailAddress;
         OtpTokenHash = otpTokenHash;
-        MagicLinkTokenHash = magicLinkTokenHash;
         Fingerprint = fingerprint;
         CreatedAt = utcNow;
-        ExpiresAt = utcNow.AddHours(EmailChangeRequestConstants.ExpirationMinutes);
+        ExpiresAt = utcNow.AddMinutes(EmailChangeRequestConstants.ExpirationMinutes);
         CompletedAt = null;
         CancelledAt = null;
     }
@@ -70,14 +66,13 @@ public sealed class EmailChangeRequest : AggregateRoot<EmailChangeRequestId>
         EmailAddress currentEmailAddress,
         EmailAddress newEmailAddress,
         string otpTokenHash,
-        string magicLinkTokenHash,
         Fingerprint fingerprint,
         DateTimeOffset utcNow
     )
     {
         if (userId.IsEmpty)
             return EmailChangeRequestFaults.UserIdRequiredForCreation;
-        
+
         if (string.IsNullOrWhiteSpace(tokenKey))
             return EmailChangeRequestFaults.TokenKeyRequiredForCreation;
 
@@ -93,9 +88,6 @@ public sealed class EmailChangeRequest : AggregateRoot<EmailChangeRequestId>
         if (string.IsNullOrWhiteSpace(otpTokenHash))
             return EmailChangeRequestFaults.OtpTokenHashRequiredForCreation;
 
-        if (string.IsNullOrWhiteSpace(magicLinkTokenHash))
-            return EmailChangeRequestFaults.MagicLinkTokenHashRequiredForCreation;
-
         EmailChangeRequest emailChangeRequest = new
         (
             id: id,
@@ -104,11 +96,10 @@ public sealed class EmailChangeRequest : AggregateRoot<EmailChangeRequestId>
             currentEmailAddress: currentEmailAddress,
             newEmailAddress: newEmailAddress,
             otpTokenHash: otpTokenHash,
-            magicLinkTokenHash: magicLinkTokenHash,
             fingerprint: fingerprint,
             utcNow: utcNow
         );
-        
+
         return emailChangeRequest;
     }
 
@@ -116,18 +107,18 @@ public sealed class EmailChangeRequest : AggregateRoot<EmailChangeRequestId>
     {
         if (IsCompleted)
             return EmailChangeRequestFaults.AlreadyCompleted;
-        
+
         if (IsCancelled)
             return EmailChangeRequestFaults.AlreadyCancelled;
-        
+
         if (IsExpired(utcNow))
             return EmailChangeRequestFaults.Expired;
-        
+
         CompletedAt = utcNow;
-        
+
         return Outcome.Success();
     }
-    
+
     public Outcome Cancel(DateTimeOffset utcNow)
     {
         if (IsCompleted)
@@ -140,7 +131,7 @@ public sealed class EmailChangeRequest : AggregateRoot<EmailChangeRequestId>
 
         return Outcome.Success();
     }
-    
+
     private bool IsCompleted => CompletedAt is not null;
 
     private bool IsCancelled => CancelledAt is not null;

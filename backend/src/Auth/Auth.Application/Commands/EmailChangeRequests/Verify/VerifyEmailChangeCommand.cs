@@ -5,6 +5,5 @@ namespace Auth.Application.Commands.EmailChangeRequests.Verify;
 public sealed record VerifyEmailChangeCommand
 (
     string TokenKey,
-    string? OtpToken,
-    string? MagicLinkToken
+    string OtpToken
 ) : ICommand<VerifyEmailChangeResponse>;

@@ -22,7 +22,7 @@ internal sealed class CancelEmailChangeHandler(
         CancellationToken cancellationToken)
     {
         Outcome<UserId> userIdOutcome = UserId.FromGuid(userContext.UserId);
-        
+
         if (userIdOutcome.IsFailure)
             return userIdOutcome.Fault;
 
@@ -37,7 +37,7 @@ internal sealed class CancelEmailChangeHandler(
             return EmailChangeRequestOperationFaults.NotFoundOrNotOwned;
 
         Outcome cancelOutcome = emailChangeRequest.Cancel(dateTimeProvider.UtcNow);
-        
+
         if (cancelOutcome.IsFailure)
             return cancelOutcome.Fault;
 

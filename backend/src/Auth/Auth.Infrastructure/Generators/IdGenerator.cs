@@ -16,7 +16,7 @@ internal sealed class IdGenerator : IIdGenerator
 
     public RecoveryRequestId NewRecoveryRequestId() =>
         RecoveryRequestId.UnsafeFrom($"{RecoveryRequestId.PrefixValue}{Ulid.NewUlid()}");
-    
+
     public EmailChangeRequestId NewEmailChangeRequestId() =>
         EmailChangeRequestId.UnsafeFrom($"{EmailChangeRequestId.PrefixValue}{Ulid.NewUlid()}");
 }

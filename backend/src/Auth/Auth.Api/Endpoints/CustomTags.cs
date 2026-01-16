@@ -9,4 +9,6 @@ internal static class CustomTags
     public const string Sessions = "Sessions";
 
     public const string Recovery = "Recovery";
+
+    public const string EmailChangeRequests = "EmailChangeRequests";
 }

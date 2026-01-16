@@ -1,4 +1,4 @@
-namespace Auth.Api.Endpoints.RecoveryRequests;
+namespace Auth.Api.Endpoints.RecoveryRequests.Create;
 
 internal sealed record Request
 (

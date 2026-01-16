@@ -42,34 +42,22 @@ internal sealed class VerifyEmailChangeHandler(
 
         if (data is null)
             return EmailChangeRequestOperationFaults.InvalidOrExpired;
-        
+
         EmailChangeRequest emailChangeRequest = data.EmailChangeRequest;
         User user = data.User;
-        
+
         if (!emailChangeRequest.IsActive(dateTimeProvider.UtcNow))
             return EmailChangeRequestOperationFaults.InvalidOrExpired;
 
-        bool tokenValid = false;
-        
-        if (request.OtpToken is not null)
-        {
-            tokenValid = secureTokenGenerator.VerifyToken
-            (
-                token: request.OtpToken,
-                hashedToken: emailChangeRequest.OtpTokenHash
-            );
-        }
-        else if (request.MagicLinkToken is not null)
-        {
-            tokenValid = secureTokenGenerator.VerifyToken
-            (
-                token: request.MagicLinkToken,
-                hashedToken: emailChangeRequest.MagicLinkTokenHash
-            );
-        }
+        bool tokenValid = secureTokenGenerator.VerifyToken
+        (
+            token: request.OtpToken,
+            hashedToken: emailChangeRequest.OtpTokenHash
+        );
+
         if (!tokenValid)
-            return EmailChangeRequestOperationFaults.InvalidOrExpired;
-        
+            return EmailChangeRequestOperationFaults.InvalidToken;
+
         bool emailExists = await dbContext.Users
             .AnyAsync(u => u.EmailAddress == emailChangeRequest.NewEmailAddress, cancellationToken);
 
@@ -77,13 +65,13 @@ internal sealed class VerifyEmailChangeHandler(
             return UserOperationFaults.EmailAlreadyInUse;
 
         Outcome completeOutcome = emailChangeRequest.Complete(dateTimeProvider.UtcNow);
-        
+
         if (completeOutcome.IsFailure)
             return completeOutcome.Fault;
-        
+
         string oldEmailAddress = user.EmailAddress.Value;
         string newEmailAddress = emailChangeRequest.NewEmailAddress.Value;
-        
+
         Outcome emailChangeOutcome = user.ChangeEmailAddress
         (
             newEmailAddress: emailChangeRequest.NewEmailAddress,
@@ -92,7 +80,7 @@ internal sealed class VerifyEmailChangeHandler(
 
         if (emailChangeOutcome.IsFailure)
             return emailChangeOutcome.Fault;
-        
+
         List<Session> activeSessions = await dbContext.Sessions
             .Where(s => s.UserId == user.Id && s.RevokedAt == null)
             .ToListAsync(cancellationToken);
@@ -109,12 +97,12 @@ internal sealed class VerifyEmailChangeHandler(
             OldEmailAddress = oldEmailAddress,
             NewEmailAddress = newEmailAddress
         };
-        
+
         await messageBus.PublishAsync(emailAddressChanged, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
-        
+
         VerifyEmailChangeResponse response = new(newEmailAddress);
-        
+
         return response;
     }
 }

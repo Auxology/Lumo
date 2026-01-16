@@ -31,38 +31,38 @@ internal sealed class RequestEmailChangeHandler(
 
     {
         Outcome<UserId> userIdOutcome = UserId.FromGuid(userContext.UserId);
-        
+
         if (userIdOutcome.IsFailure)
             return userIdOutcome.Fault;
-        
+
         UserId userId = userIdOutcome.Value;
-        
+
         Outcome<EmailAddress> newEmailAddressOutcome = EmailAddress.Create(request.NewEmailAddress);
-        
+
         if (newEmailAddressOutcome.IsFailure)
             return newEmailAddressOutcome.Fault;
-        
+
         EmailAddress newEmailAddress = newEmailAddressOutcome.Value;
-        
+
         User? user = await dbContext.Users
             .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
 
         if (user is null)
             return UserOperationFaults.NotFound;
-        
+
         bool emailInUse = await dbContext.Users
             .AnyAsync(u => u.EmailAddress == newEmailAddress, cancellationToken);
-        
+
         if (emailInUse)
             return UserOperationFaults.EmailAlreadyInUse;
 
         List<EmailChangeRequest> pendingRequests = await dbContext.EmailChangeRequests
             .Where(ecr => ecr.UserId == userId && ecr.IsActive(dateTimeProvider.UtcNow))
             .ToListAsync(cancellationToken);
-        
+
         foreach (EmailChangeRequest pendingRequest in pendingRequests)
             pendingRequest.Cancel(dateTimeProvider.UtcNow);
-        
+
         Outcome<Fingerprint> fingerprintOutcome = Fingerprint.Create
         (
             ipAddress: requestContext.IpAddress,
@@ -78,13 +78,10 @@ internal sealed class RequestEmailChangeHandler(
 
         string tokenKey = secureTokenGenerator.GenerateToken(EmailChangeRequestConstants.TokenKeyLength);
         string otpToken = secureTokenGenerator.GenerateToken(EmailChangeRequestConstants.OtpTokenLength);
-        string magicLinkToken = secureTokenGenerator.GenerateToken(EmailChangeRequestConstants.MagicLinkTokenLength);
-        
         string otpTokenHash = secureTokenGenerator.HashToken(otpToken);
-        string magicLinkTokenHash = secureTokenGenerator.HashToken(magicLinkToken);
 
         EmailChangeRequestId emailChangeRequestId = idGenerator.NewEmailChangeRequestId();
-        
+
         Outcome<EmailChangeRequest> emailChangeRequestOutcome = EmailChangeRequest.Create
         (
             id: emailChangeRequestId,
@@ -93,14 +90,13 @@ internal sealed class RequestEmailChangeHandler(
             currentEmailAddress: user.EmailAddress,
             newEmailAddress: newEmailAddress,
             otpTokenHash: otpTokenHash,
-            magicLinkTokenHash: magicLinkTokenHash,
             fingerprint: fingerprintOutcome.Value,
             utcNow: dateTimeProvider.UtcNow
         );
-        
+
         if (emailChangeRequestOutcome.IsFailure)
             return emailChangeRequestOutcome.Fault;
-        
+
         EmailChangeRequest emailChangeRequest = emailChangeRequestOutcome.Value;
 
         EmailChangeRequested emailChangeRequested = new()
@@ -112,18 +108,17 @@ internal sealed class RequestEmailChangeHandler(
             CurrentEmailAddress = user.EmailAddress.Value,
             NewEmailAddress = newEmailAddress.Value,
             OtpToken = otpToken,
-            MagicLinkToken = magicLinkToken,
             ExpiresAt = emailChangeRequest.ExpiresAt,
             IpAddress = requestContext.IpAddress,
             UserAgent = requestContext.UserAgent
         };
-        
+
         await dbContext.EmailChangeRequests.AddAsync(emailChangeRequest, cancellationToken);
         await messageBus.PublishAsync(emailChangeRequested, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
 
         RequestEmailChangeResponse response = new(tokenKey);
-        
+
         return response;
     }
 }

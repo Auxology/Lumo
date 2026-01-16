@@ -40,12 +40,6 @@ public static class EmailChangeRequestFaults
         detail: "OTP token hash is required."
     );
 
-    public static readonly Fault MagicLinkTokenHashRequiredForCreation = Fault.Validation
-    (
-        title: "EmailChangeRequest.MagicLinkTokenHashRequiredForCreation",
-        detail: "Magic link token hash is required."
-    );
-
     public static readonly Fault AlreadyCompleted = Fault.Conflict
     (
         title: "EmailChangeRequest.AlreadyCompleted",
