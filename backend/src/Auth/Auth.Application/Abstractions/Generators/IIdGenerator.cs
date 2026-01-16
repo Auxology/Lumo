@@ -11,4 +11,6 @@ public interface IIdGenerator
     RecoveryKeyChainId NewRecoveryKeyChainId();
 
     RecoveryRequestId NewRecoveryRequestId();
+    
+    EmailChangeRequestId NewEmailChangeRequestId();
 }
