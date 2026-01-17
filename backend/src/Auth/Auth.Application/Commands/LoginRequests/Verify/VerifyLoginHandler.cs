@@ -14,7 +14,7 @@ using SharedKernel;
 using SharedKernel.Application.Authentication;
 using SharedKernel.Application.Messaging;
 
-namespace Auth.Application.LoginRequests.Verify;
+namespace Auth.Application.Commands.LoginRequests.Verify;
 
 internal sealed class VerifyLoginHandler(
     IAuthDbContext dbContext,

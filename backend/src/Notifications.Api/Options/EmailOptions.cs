@@ -23,4 +23,13 @@ internal sealed class EmailOptions
 
     [Required, MinLength(1)]
     public string LoginVerifiedTemplateName { get; init; } = string.Empty;
+
+    [Required, MinLength(1)]
+    public string EmailAddressChangedTemplateName { get; init; } = string.Empty;
+
+    [Required, MinLength(1)]
+    public string RecoveryInitiatedTemplateName { get; init; } = string.Empty;
+
+    [Required, MinLength(1)]
+    public string EmailChangeRequestedTemplateName { get; init; } = string.Empty;
 }

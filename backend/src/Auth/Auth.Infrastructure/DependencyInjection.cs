@@ -8,10 +8,9 @@ using Auth.Application.Abstractions.Generators;
 using Auth.Application.Abstractions.Storage;
 using Auth.Infrastructure.Authentication;
 using Auth.Infrastructure.Data;
+using Auth.Infrastructure.Generators;
 using Auth.Infrastructure.Options;
 using Auth.Infrastructure.Storage;
-
-using Auth.Infrastructure.Generators;
 
 using MassTransit;
 

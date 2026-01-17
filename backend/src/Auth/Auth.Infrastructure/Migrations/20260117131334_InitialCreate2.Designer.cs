@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Auth.Infrastructure.Migrations
 {
     [DbContext(typeof(AuthDbContext))]
-    [Migration("20260108174912_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260117131334_InitialCreate2")]
+    partial class InitialCreate2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,6 +25,126 @@ namespace Auth.Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("Auth.Domain.Aggregates.EmailChangeRequest", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(30)")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset?>("CancelledAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("cancelled_at");
+
+                    b.Property<DateTimeOffset?>("CompletedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("completed_at");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTimeOffset>("ExpiresAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("expires_at");
+
+                    b.Property<string>("OtpTokenHash")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("varchar")
+                        .HasColumnName("otp_token_hash");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "CurrentEmailAddress", "Auth.Domain.Aggregates.EmailChangeRequest.CurrentEmailAddress#EmailAddress", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasMaxLength(254)
+                                .HasColumnType("varchar")
+                                .HasColumnName("current_email_address");
+                        });
+
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "Fingerprint", "Auth.Domain.Aggregates.EmailChangeRequest.Fingerprint#Fingerprint", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<string>("ComputedHash")
+                                .IsRequired()
+                                .HasMaxLength(512)
+                                .HasColumnType("varchar")
+                                .HasColumnName("fingerprint_computed_hash");
+
+                            b1.Property<string>("IpAddress")
+                                .IsRequired()
+                                .HasMaxLength(45)
+                                .HasColumnType("varchar")
+                                .HasColumnName("fingerprint_ip_address");
+
+                            b1.Property<string>("Language")
+                                .IsRequired()
+                                .HasMaxLength(16)
+                                .HasColumnType("varchar")
+                                .HasColumnName("fingerprint_language");
+
+                            b1.Property<string>("NormalizedBrowser")
+                                .IsRequired()
+                                .HasMaxLength(128)
+                                .HasColumnType("varchar")
+                                .HasColumnName("fingerprint_normalized_browser");
+
+                            b1.Property<string>("NormalizedOs")
+                                .IsRequired()
+                                .HasMaxLength(128)
+                                .HasColumnType("varchar")
+                                .HasColumnName("fingerprint_normalized_os");
+
+                            b1.Property<string>("Timezone")
+                                .IsRequired()
+                                .HasMaxLength(64)
+                                .HasColumnType("varchar")
+                                .HasColumnName("fingerprint_timezone");
+
+                            b1.Property<string>("UserAgent")
+                                .IsRequired()
+                                .HasMaxLength(512)
+                                .HasColumnType("varchar")
+                                .HasColumnName("fingerprint_user_agent");
+                        });
+
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "NewEmailAddress", "Auth.Domain.Aggregates.EmailChangeRequest.NewEmailAddress#EmailAddress", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasMaxLength(254)
+                                .HasColumnType("varchar")
+                                .HasColumnName("new_email_address");
+                        });
+
+                    b.HasKey("Id")
+                        .HasName("pk_email_change_requests");
+
+                    b.HasIndex("CreatedAt")
+                        .HasDatabaseName("ix_email_change_requests_created_at");
+
+                    b.HasIndex("ExpiresAt")
+                        .HasDatabaseName("ix_email_change_requests_expires_at");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_email_change_requests_user_id");
+
+                    b.HasIndex("UserId", "ExpiresAt")
+                        .HasDatabaseName("ix_email_change_requests_user_id_expires_at")
+                        .HasFilter("completed_at IS NULL AND cancelled_at IS NULL");
+
+                    b.ToTable("email_change_requests", (string)null);
+                });
 
             modelBuilder.Entity("Auth.Domain.Aggregates.LoginRequest", b =>
                 {
@@ -169,6 +289,127 @@ namespace Auth.Infrastructure.Migrations
                         .HasDatabaseName("ix_recovery_key_chains_user_id");
 
                     b.ToTable("recovery_key_chains", (string)null);
+                });
+
+            modelBuilder.Entity("Auth.Domain.Aggregates.RecoveryRequest", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(29)")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset?>("CompletedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("completed_at");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTimeOffset>("ExpiresAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("expires_at");
+
+                    b.Property<string>("MagicLinkTokenHash")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("varchar")
+                        .HasColumnName("magic_link_token_hash");
+
+                    b.Property<DateTimeOffset?>("NewEmailVerifiedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("new_email_verified_at");
+
+                    b.Property<string>("OtpTokenHash")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("varchar")
+                        .HasColumnName("otp_token_hash");
+
+                    b.Property<string>("TokenKey")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("varchar")
+                        .HasColumnName("token_key");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "Fingerprint", "Auth.Domain.Aggregates.RecoveryRequest.Fingerprint#Fingerprint", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<string>("ComputedHash")
+                                .IsRequired()
+                                .HasMaxLength(512)
+                                .HasColumnType("varchar")
+                                .HasColumnName("fingerprint_computed_hash");
+
+                            b1.Property<string>("IpAddress")
+                                .IsRequired()
+                                .HasMaxLength(45)
+                                .HasColumnType("varchar")
+                                .HasColumnName("fingerprint_ip_address");
+
+                            b1.Property<string>("Language")
+                                .IsRequired()
+                                .HasMaxLength(16)
+                                .HasColumnType("varchar")
+                                .HasColumnName("fingerprint_language");
+
+                            b1.Property<string>("NormalizedBrowser")
+                                .IsRequired()
+                                .HasMaxLength(128)
+                                .HasColumnType("varchar")
+                                .HasColumnName("fingerprint_normalized_browser");
+
+                            b1.Property<string>("NormalizedOs")
+                                .IsRequired()
+                                .HasMaxLength(128)
+                                .HasColumnType("varchar")
+                                .HasColumnName("fingerprint_normalized_os");
+
+                            b1.Property<string>("Timezone")
+                                .IsRequired()
+                                .HasMaxLength(64)
+                                .HasColumnType("varchar")
+                                .HasColumnName("fingerprint_timezone");
+
+                            b1.Property<string>("UserAgent")
+                                .IsRequired()
+                                .HasMaxLength(512)
+                                .HasColumnType("varchar")
+                                .HasColumnName("fingerprint_user_agent");
+                        });
+
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "NewEmailAddress", "Auth.Domain.Aggregates.RecoveryRequest.NewEmailAddress#EmailAddress", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasMaxLength(254)
+                                .HasColumnType("varchar")
+                                .HasColumnName("new_email_address");
+                        });
+
+                    b.HasKey("Id")
+                        .HasName("pk_recovery_requests");
+
+                    b.HasIndex("CreatedAt")
+                        .HasDatabaseName("ix_recovery_requests_created_at");
+
+                    b.HasIndex("ExpiresAt")
+                        .HasDatabaseName("ix_recovery_requests_expires_at");
+
+                    b.HasIndex("TokenKey")
+                        .IsUnique()
+                        .HasDatabaseName("ix_recovery_requests_token_key");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_recovery_requests_user_id");
+
+                    b.ToTable("recovery_requests", (string)null);
                 });
 
             modelBuilder.Entity("Auth.Domain.Aggregates.Session", b =>

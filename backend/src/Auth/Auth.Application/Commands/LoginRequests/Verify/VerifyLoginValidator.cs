@@ -2,7 +2,7 @@ using Auth.Domain.Constants;
 
 using FluentValidation;
 
-namespace Auth.Application.LoginRequests.Verify;
+namespace Auth.Application.Commands.LoginRequests.Verify;
 
 internal sealed class VerifyLoginValidator : AbstractValidator<VerifyLoginCommand>
 {

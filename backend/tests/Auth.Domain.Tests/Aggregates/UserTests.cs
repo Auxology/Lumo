@@ -180,4 +180,55 @@ public sealed class UserTests
         user.AvatarKey.Should().BeNull();
         user.UpdatedAt.Should().Be(updateTime);
     }
+
+    [Fact]
+    public void ChangeEmailAddress_WithValidEmail_ShouldUpdateEmailAddress()
+    {
+        User user = User.Create("John Doe", ValidEmail, UtcNow).Value;
+        EmailAddress newEmail = EmailAddress.UnsafeFromString("new@example.com");
+        DateTimeOffset updateTime = UtcNow.AddHours(1);
+
+        Outcome outcome = user.ChangeEmailAddress(newEmail, updateTime);
+
+        outcome.IsSuccess.Should().BeTrue();
+        user.EmailAddress.Should().Be(newEmail);
+        user.UpdatedAt.Should().Be(updateTime);
+    }
+
+    [Fact]
+    public void ChangeEmailAddress_WithValidEmail_ShouldResetVerificationStatus()
+    {
+        User user = User.Create("John Doe", ValidEmail, UtcNow).Value;
+        EmailAddress newEmail = EmailAddress.UnsafeFromString("new@example.com");
+        DateTimeOffset updateTime = UtcNow.AddHours(1);
+
+        Outcome outcome = user.ChangeEmailAddress(newEmail, updateTime);
+
+        outcome.IsSuccess.Should().BeTrue();
+        user.IsVerified.Should().BeFalse();
+        user.VerifiedAt.Should().BeNull();
+    }
+
+    [Fact]
+    public void ChangeEmailAddress_WithEmptyEmail_ShouldReturnFailure()
+    {
+        User user = User.Create("John Doe", ValidEmail, UtcNow).Value;
+        EmailAddress emptyEmail = EmailAddress.UnsafeFromString(string.Empty);
+
+        Outcome outcome = user.ChangeEmailAddress(emptyEmail, UtcNow);
+
+        outcome.IsFailure.Should().BeTrue();
+        outcome.Fault.Should().Be(UserFaults.EmailAddressRequiredForUpdate);
+    }
+
+    [Fact]
+    public void ChangeEmailAddress_WithSameEmail_ShouldReturnFailure()
+    {
+        User user = User.Create("John Doe", ValidEmail, UtcNow).Value;
+
+        Outcome outcome = user.ChangeEmailAddress(ValidEmail, UtcNow);
+
+        outcome.IsFailure.Should().BeTrue();
+        outcome.Fault.Should().Be(UserFaults.EmailAddressSameAsCurrent);
+    }
 }

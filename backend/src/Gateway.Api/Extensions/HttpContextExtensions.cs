@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
 
 using SharedKernel.Infrastructure.Options;
@@ -11,25 +12,33 @@ internal static class HttpContextExtensions
     public static void SetRefreshTokenCookie(this HttpContext httpContext, string refreshToken)
     {
         JwtOptions jwtOptions = httpContext.RequestServices.GetRequiredService<IOptions<JwtOptions>>().Value;
+        IWebHostEnvironment environment = httpContext.RequestServices.GetRequiredService<IWebHostEnvironment>();
+
+        bool isDevelopment = environment.IsDevelopment();
 
         httpContext.Response.Cookies.Append(CookieName, refreshToken, new CookieOptions
         {
             HttpOnly = true,
-            Secure = true,
-            SameSite = SameSiteMode.Strict,
+            Secure = !isDevelopment,
+            SameSite = isDevelopment ? SameSiteMode.Lax : SameSiteMode.None,
             Path = "/",
             MaxAge = jwtOptions.RefreshTokenExpiration
         });
     }
 
-    public static void RemoveRefreshTokenCookie(this HttpContext httpContext) =>
+    public static void RemoveRefreshTokenCookie(this HttpContext httpContext)
+    {
+        IWebHostEnvironment environment = httpContext.RequestServices.GetRequiredService<IWebHostEnvironment>();
+        bool isDevelopment = environment.IsDevelopment();
+
         httpContext.Response.Cookies.Delete(CookieName, new CookieOptions
         {
             HttpOnly = true,
-            Secure = true,
-            SameSite = SameSiteMode.Strict,
+            Secure = !isDevelopment,
+            SameSite = isDevelopment ? SameSiteMode.Lax : SameSiteMode.None,
             Path = "/"
         });
+    }
 
     public static string? GetRefreshTokenCookie(this HttpContext httpContext) =>
         httpContext.Request.Cookies[CookieName];

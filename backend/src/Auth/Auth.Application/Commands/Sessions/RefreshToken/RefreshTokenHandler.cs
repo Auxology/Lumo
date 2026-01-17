@@ -37,15 +37,7 @@ internal sealed class RefreshTokenHandler(
 
         Fingerprint fingerprint = fingerprintOutcome.Value;
 
-        string[] parts = request.RefreshToken.Split('.');
-
-        if (parts.Length != 2)
-            return SessionFaults.RefreshTokenInvalidOrExpired;
-
-        string refreshTokenKey = parts[0];
-        string refreshToken = parts[1];
-
-        if (string.IsNullOrWhiteSpace(refreshTokenKey) || string.IsNullOrWhiteSpace(refreshToken))
+        if (!secureTokenGenerator.TryParseCompoundToken(request.RefreshToken, out string refreshTokenKey, out string refreshToken))
             return SessionFaults.RefreshTokenInvalidOrExpired;
 
         Session? session = await dbContext.Sessions

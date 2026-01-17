@@ -39,7 +39,7 @@ public sealed class RecoveryKey : Entity<int>
         Fingerprint = null;
     }
 
-    public static Outcome<RecoveryKey> Create
+    internal static Outcome<RecoveryKey> Create
     (
         RecoveryKeyChainId recoveryKeyChainId,
         string identifier,
@@ -63,5 +63,17 @@ public sealed class RecoveryKey : Entity<int>
         );
 
         return recoveryKey;
+    }
+
+    internal Outcome MarkAsUsed(Fingerprint fingerprint, DateTimeOffset utcNow)
+    {
+        if (IsUsed)
+            return RecoveryKeyFaults.AlreadyUsed;
+
+        Fingerprint = fingerprint;
+        UsedAt = utcNow;
+        IsUsed = true;
+
+        return Outcome.Success();
     }
 }

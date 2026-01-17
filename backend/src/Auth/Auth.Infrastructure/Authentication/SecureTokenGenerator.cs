@@ -48,4 +48,23 @@ internal sealed class SecureTokenGenerator : ISecureTokenGenerator
             return false;
         }
     }
+
+    public bool TryParseCompoundToken(string compoundToken, out string key, out string token)
+    {
+        key = string.Empty;
+        token = string.Empty;
+
+        if (string.IsNullOrWhiteSpace(compoundToken))
+            return false;
+
+        int separatorIndex = compoundToken.IndexOf('.', StringComparison.Ordinal);
+
+        if (separatorIndex <= 0 || separatorIndex >= compoundToken.Length - 1)
+            return false;
+
+        key = compoundToken[..separatorIndex];
+        token = compoundToken[(separatorIndex + 1)..];
+
+        return !string.IsNullOrWhiteSpace(key) && !string.IsNullOrWhiteSpace(token);
+    }
 }

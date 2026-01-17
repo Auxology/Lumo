@@ -12,4 +12,6 @@ internal interface IAuthServiceClient
 
     Task<Outcome<RefreshSessionApiResponse>> RefreshSessionAsync(RefreshSessionApiRequest request,
         CancellationToken cancellationToken = default);
+
+    Task<Outcome> LogoutAsync(LogoutApiRequest request, CancellationToken cancellationToken = default);
 }

@@ -21,6 +21,7 @@ builder.Host.ConfigureSerilog();
 var app = builder.Build();
 
 app.UseCors();
+app.UseRateLimiter();
 
 bool isDevelopment = app.Environment.IsDevelopment();
 

@@ -20,6 +20,8 @@ internal sealed class Endpoint : BaseEndpoint<Request, Response>
         Post("/api/chats/{chatId}/messages");
         Version(1);
 
+        Options(o => o.RequireRateLimiting("ai-generation"));
+
         Description(d =>
         {
             d.WithSummary("Send Message")

@@ -7,11 +7,37 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Auth.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialCreate2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "email_change_requests",
+                columns: table => new
+                {
+                    id = table.Column<string>(type: "varchar(30)", nullable: false),
+                    user_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    otp_token_hash = table.Column<string>(type: "varchar", maxLength: 512, nullable: false),
+                    created_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: false),
+                    expires_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: false),
+                    completed_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: true),
+                    cancelled_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: true),
+                    current_email_address = table.Column<string>(type: "varchar", maxLength: 254, nullable: false),
+                    fingerprint_computed_hash = table.Column<string>(type: "varchar", maxLength: 512, nullable: false),
+                    fingerprint_ip_address = table.Column<string>(type: "varchar", maxLength: 45, nullable: false),
+                    fingerprint_language = table.Column<string>(type: "varchar", maxLength: 16, nullable: false),
+                    fingerprint_normalized_browser = table.Column<string>(type: "varchar", maxLength: 128, nullable: false),
+                    fingerprint_normalized_os = table.Column<string>(type: "varchar", maxLength: 128, nullable: false),
+                    fingerprint_timezone = table.Column<string>(type: "varchar", maxLength: 64, nullable: false),
+                    fingerprint_user_agent = table.Column<string>(type: "varchar", maxLength: 512, nullable: false),
+                    new_email_address = table.Column<string>(type: "varchar", maxLength: 254, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_email_change_requests", x => x.id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "inbox_state",
                 columns: table => new
@@ -89,6 +115,33 @@ namespace Auth.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("pk_recovery_key_chains", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "recovery_requests",
+                columns: table => new
+                {
+                    id = table.Column<string>(type: "varchar(29)", nullable: false),
+                    user_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    token_key = table.Column<string>(type: "varchar", maxLength: 512, nullable: false),
+                    otp_token_hash = table.Column<string>(type: "varchar", maxLength: 512, nullable: false),
+                    magic_link_token_hash = table.Column<string>(type: "varchar", maxLength: 512, nullable: false),
+                    created_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: false),
+                    expires_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: false),
+                    new_email_verified_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: true),
+                    completed_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: true),
+                    fingerprint_computed_hash = table.Column<string>(type: "varchar", maxLength: 512, nullable: false),
+                    fingerprint_ip_address = table.Column<string>(type: "varchar", maxLength: 45, nullable: false),
+                    fingerprint_language = table.Column<string>(type: "varchar", maxLength: 16, nullable: false),
+                    fingerprint_normalized_browser = table.Column<string>(type: "varchar", maxLength: 128, nullable: false),
+                    fingerprint_normalized_os = table.Column<string>(type: "varchar", maxLength: 128, nullable: false),
+                    fingerprint_timezone = table.Column<string>(type: "varchar", maxLength: 64, nullable: false),
+                    fingerprint_user_agent = table.Column<string>(type: "varchar", maxLength: 512, nullable: false),
+                    new_email_address = table.Column<string>(type: "varchar", maxLength: 254, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_recovery_requests", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -209,6 +262,27 @@ namespace Auth.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "ix_email_change_requests_created_at",
+                table: "email_change_requests",
+                column: "created_at");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_email_change_requests_expires_at",
+                table: "email_change_requests",
+                column: "expires_at");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_email_change_requests_user_id",
+                table: "email_change_requests",
+                column: "user_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_email_change_requests_user_id_expires_at",
+                table: "email_change_requests",
+                columns: new[] { "user_id", "expires_at" },
+                filter: "completed_at IS NULL AND cancelled_at IS NULL");
+
+            migrationBuilder.CreateIndex(
                 name: "ix_inbox_state_delivered",
                 table: "inbox_state",
                 column: "delivered");
@@ -303,6 +377,27 @@ namespace Auth.Infrastructure.Migrations
                 columns: new[] { "recovery_key_chain_id", "is_used" });
 
             migrationBuilder.CreateIndex(
+                name: "ix_recovery_requests_created_at",
+                table: "recovery_requests",
+                column: "created_at");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_recovery_requests_expires_at",
+                table: "recovery_requests",
+                column: "expires_at");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_recovery_requests_token_key",
+                table: "recovery_requests",
+                column: "token_key",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "ix_recovery_requests_user_id",
+                table: "recovery_requests",
+                column: "user_id");
+
+            migrationBuilder.CreateIndex(
                 name: "ix_sessions_expires_at",
                 table: "sessions",
                 column: "expires_at");
@@ -354,6 +449,9 @@ namespace Auth.Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "email_change_requests");
+
+            migrationBuilder.DropTable(
                 name: "login_requests");
 
             migrationBuilder.DropTable(
@@ -361,6 +459,9 @@ namespace Auth.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "recovery_keys");
+
+            migrationBuilder.DropTable(
+                name: "recovery_requests");
 
             migrationBuilder.DropTable(
                 name: "sessions");

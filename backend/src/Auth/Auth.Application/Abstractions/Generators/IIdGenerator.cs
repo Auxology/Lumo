@@ -9,4 +9,8 @@ public interface IIdGenerator
     LoginRequestId NewLoginRequestId();
 
     RecoveryKeyChainId NewRecoveryKeyChainId();
+
+    RecoveryRequestId NewRecoveryRequestId();
+
+    EmailChangeRequestId NewEmailChangeRequestId();
 }

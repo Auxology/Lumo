@@ -382,4 +382,68 @@ public sealed class SessionTests
         outcome.IsFailure.Should().BeTrue();
         outcome.Fault.Should().Be(SessionFaults.SessionRevoked);
     }
+
+    [Fact]
+    public void RevokeDueToAccountRecovery_WhenActive_ShouldRevokeSession()
+    {
+        Session session = Session.Create
+        (
+            id: CreateValidSessionId(),
+            userId: ValidUserId,
+            refreshTokenKey: ValidRefreshTokenKey,
+            refreshTokenHash: ValidRefreshTokenHash,
+            fingerprint: CreateValidFingerprint(),
+            utcNow: UtcNow
+        ).Value;
+
+        DateTimeOffset revokeTime = UtcNow.AddHours(1);
+
+        Outcome outcome = session.RevokeDueToAccountRecovery(revokeTime);
+
+        outcome.IsSuccess.Should().BeTrue();
+        session.RevokeReason.Should().Be(SessionRevokeReason.AccountRecovery);
+        session.RevokedAt.Should().Be(revokeTime);
+    }
+
+    [Fact]
+    public void RevokeDueToAccountRecovery_WhenExpired_ShouldReturnFailure()
+    {
+        Session session = Session.Create
+        (
+            id: CreateValidSessionId(),
+            userId: ValidUserId,
+            refreshTokenKey: ValidRefreshTokenKey,
+            refreshTokenHash: ValidRefreshTokenHash,
+            fingerprint: CreateValidFingerprint(),
+            utcNow: UtcNow
+        ).Value;
+
+        DateTimeOffset expiredTime = UtcNow.AddDays(SessionConstants.SessionExpirationDays + 1);
+
+        Outcome outcome = session.RevokeDueToAccountRecovery(expiredTime);
+
+        outcome.IsFailure.Should().BeTrue();
+        outcome.Fault.Should().Be(SessionFaults.SessionExpired);
+    }
+
+    [Fact]
+    public void RevokeDueToAccountRecovery_WhenAlreadyRevoked_ShouldReturnFailure()
+    {
+        Session session = Session.Create
+        (
+            id: CreateValidSessionId(),
+            userId: ValidUserId,
+            refreshTokenKey: ValidRefreshTokenKey,
+            refreshTokenHash: ValidRefreshTokenHash,
+            fingerprint: CreateValidFingerprint(),
+            utcNow: UtcNow
+        ).Value;
+
+        session.RevokeDueToLogout(UtcNow);
+
+        Outcome outcome = session.RevokeDueToAccountRecovery(UtcNow);
+
+        outcome.IsFailure.Should().BeTrue();
+        outcome.Fault.Should().Be(SessionFaults.SessionRevoked);
+    }
 }

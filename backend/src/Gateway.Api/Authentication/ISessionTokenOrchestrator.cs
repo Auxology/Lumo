@@ -11,4 +11,6 @@ internal interface ISessionTokenOrchestrator
 
     Task<Outcome<TokenPair>>
         ResolveAccessTokenAsync(string refreshToken, CancellationToken cancellationToken = default);
+
+    Task<Outcome> LogoutAsync(string refreshToken, CancellationToken cancellationToken = default);
 }

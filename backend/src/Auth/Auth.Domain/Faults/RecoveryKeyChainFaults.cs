@@ -17,4 +17,10 @@ public static class RecoveryKeyChainFaults
         title: "RecoveryKeyChain.InvalidRecoveryKeyCount",
         detail: $"Exactly {RecoveryKeyConstants.MaxKeysPerChain} recovery keys must be provided."
     );
+
+    public static readonly Fault KeyNotFoundOrUsed = Fault.Validation
+    (
+        title: "RecoveryKeyChain.KeyNotFoundOrUsed",
+        detail: "The specified recovery key was not found or has already been used."
+    );
 }
