@@ -136,5 +136,5 @@ public sealed class RecoveryRequest : AggregateRoot<RecoveryRequestId>
 
     public bool IsCompleted => CompletedAt is not null;
 
-    public bool IsExpired(DateTimeOffset utcNow) => ExpiresAt <= utcNow;
+    public bool IsExpired(DateTimeOffset utcNow) => ExpiresAt < utcNow;
 }

@@ -66,7 +66,7 @@ internal sealed class RequestEmailChangeHandler(
             .ToListAsync(cancellationToken);
 
         foreach (EmailChangeRequest pendingRequest in pendingRequests)
-            pendingRequest.Cancel(dateTimeProvider.UtcNow);
+            pendingRequest.Cancel(utcNow);
 
         Outcome<Fingerprint> fingerprintOutcome = Fingerprint.Create
         (
@@ -94,7 +94,7 @@ internal sealed class RequestEmailChangeHandler(
             newEmailAddress: newEmailAddress,
             otpTokenHash: otpTokenHash,
             fingerprint: fingerprintOutcome.Value,
-            utcNow: dateTimeProvider.UtcNow
+            utcNow: utcNow
         );
 
         if (emailChangeRequestOutcome.IsFailure)
@@ -105,7 +105,7 @@ internal sealed class RequestEmailChangeHandler(
         EmailChangeRequested emailChangeRequested = new()
         {
             EventId = Guid.NewGuid(),
-            OccurredAt = dateTimeProvider.UtcNow,
+            OccurredAt = utcNow,
             CorrelationId = Guid.Parse(requestContext.CorrelationId),
             UserId = user.Id.Value,
             CurrentEmailAddress = user.EmailAddress.Value,
