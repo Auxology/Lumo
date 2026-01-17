@@ -6,9 +6,9 @@ internal sealed class VerifyEmailChangeValidator : AbstractValidator<VerifyEmail
 {
     public VerifyEmailChangeValidator()
     {
-        RuleFor(vecc => vecc.TokenKey)
+        RuleFor(vecc => vecc.RequestId)
             .NotEmpty()
-            .WithMessage("Token key is required.");
+            .WithMessage("Request ID is required.");
 
         RuleFor(vecc => vecc.OtpToken)
             .NotEmpty()

@@ -4,7 +4,5 @@ public static class EmailChangeRequestConstants
 {
     public const int ExpirationMinutes = 15;
 
-    public const int TokenKeyLength = 32;
-
     public const int OtpTokenLength = 8;
 }

@@ -1,6 +1,6 @@
 namespace Auth.Application.Commands.RecoveryRequests.Complete;
 
-internal sealed record CompleteRecoveryResponse
+public sealed record CompleteRecoveryResponse
 (
     string NewEmailAddress
 );

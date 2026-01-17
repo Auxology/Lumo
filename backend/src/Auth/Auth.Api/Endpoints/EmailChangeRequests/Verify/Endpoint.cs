@@ -17,7 +17,7 @@ internal sealed class Endpoint : BaseEndpoint<Request, Response>
 
     public override void Configure()
     {
-        Patch("/api/email-change-requests/{TokenKey}");
+        Patch("/api/email-change-requests/{RequestId}");
         Version(1);
 
         Description(d =>
@@ -37,7 +37,7 @@ internal sealed class Endpoint : BaseEndpoint<Request, Response>
     {
         VerifyEmailChangeCommand command = new
         (
-            TokenKey: endpointRequest.TokenKey,
+            RequestId: endpointRequest.RequestId,
             OtpToken: endpointRequest.OtpToken
         );
 

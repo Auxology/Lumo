@@ -32,11 +32,20 @@ internal sealed class VerifyEmailChangeHandler(
         if (userIdOutcome.IsFailure)
             return userIdOutcome.Fault;
 
+        UserId userId = userIdOutcome.Value;
+
+        Outcome<EmailChangeRequestId> requestIdOutcome = EmailChangeRequestId.From(request.RequestId);
+
+        if (requestIdOutcome.IsFailure)
+            return requestIdOutcome.Fault;
+
+        EmailChangeRequestId requestId = requestIdOutcome.Value;
+
         var data = await
         (
             from ecr in dbContext.EmailChangeRequests
             join u in dbContext.Users on ecr.UserId equals u.Id
-            where ecr.TokenKey == request.TokenKey
+            where ecr.Id == requestId && ecr.UserId == userId
             select new { EmailChangeRequest = ecr, User = u }
         ).FirstOrDefaultAsync(cancellationToken);
 

@@ -28,9 +28,15 @@ internal sealed class CancelEmailChangeHandler(
 
         UserId userId = userIdOutcome.Value;
 
+        Outcome<EmailChangeRequestId> requestIdOutcome = EmailChangeRequestId.From(request.RequestId);
+
+        if (requestIdOutcome.IsFailure)
+            return requestIdOutcome.Fault;
+
+        EmailChangeRequestId requestId = requestIdOutcome.Value;
+
         EmailChangeRequest? emailChangeRequest = await dbContext.EmailChangeRequests
-            .FirstOrDefaultAsync(ecr => ecr.TokenKey == request.TokenKey &&
-                                        ecr.UserId == userId,
+            .FirstOrDefaultAsync(ecr => ecr.Id == requestId && ecr.UserId == userId,
                 cancellationToken);
 
         if (emailChangeRequest is null)

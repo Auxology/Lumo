@@ -56,8 +56,13 @@ internal sealed class RequestEmailChangeHandler(
         if (emailInUse)
             return UserOperationFaults.EmailAlreadyInUse;
 
+        DateTimeOffset utcNow = dateTimeProvider.UtcNow;
+
         List<EmailChangeRequest> pendingRequests = await dbContext.EmailChangeRequests
-            .Where(ecr => ecr.UserId == userId && ecr.IsActive(dateTimeProvider.UtcNow))
+            .Where(ecr => ecr.UserId == userId
+                          && ecr.CompletedAt == null
+                          && ecr.CancelledAt == null
+                          && ecr.ExpiresAt > utcNow)
             .ToListAsync(cancellationToken);
 
         foreach (EmailChangeRequest pendingRequest in pendingRequests)
@@ -76,7 +81,6 @@ internal sealed class RequestEmailChangeHandler(
         if (fingerprintOutcome.IsFailure)
             return fingerprintOutcome.Fault;
 
-        string tokenKey = secureTokenGenerator.GenerateToken(EmailChangeRequestConstants.TokenKeyLength);
         string otpToken = secureTokenGenerator.GenerateToken(EmailChangeRequestConstants.OtpTokenLength);
         string otpTokenHash = secureTokenGenerator.HashToken(otpToken);
 
@@ -86,7 +90,6 @@ internal sealed class RequestEmailChangeHandler(
         (
             id: emailChangeRequestId,
             userId: userId,
-            tokenKey: tokenKey,
             currentEmailAddress: user.EmailAddress,
             newEmailAddress: newEmailAddress,
             otpTokenHash: otpTokenHash,
@@ -117,7 +120,7 @@ internal sealed class RequestEmailChangeHandler(
         await messageBus.PublishAsync(emailChangeRequested, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        RequestEmailChangeResponse response = new(tokenKey);
+        RequestEmailChangeResponse response = new(emailChangeRequestId.Value);
 
         return response;
     }

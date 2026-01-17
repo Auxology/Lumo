@@ -10,12 +10,6 @@ public static class EmailChangeRequestFaults
         detail: "A user ID is required to create an email change request."
     );
 
-    public static readonly Fault TokenKeyRequiredForCreation = Fault.Validation
-    (
-        title: "EmailChangeRequest.TokenKeyRequiredForCreation",
-        detail: "A token key is required to create an email change request."
-    );
-
     public static readonly Fault CurrentEmailRequiredForCreation = Fault.Validation
     (
         title: "EmailChangeRequest.CurrentEmailRequiredForCreation",

@@ -79,6 +79,9 @@ internal static class DependencyInjection
             bus.AddConsumer<UserSignedUpConsumer>()
                 .Endpoint(e => e.Name = "notifications-user-signed-up");
             bus.AddConsumer<LoginRequestedConsumer>();
+            bus.AddConsumer<UserEmailAddressChangedConsumer>();
+            bus.AddConsumer<RecoveryInitiatedConsumer>();
+            bus.AddConsumer<EmailChangeRequestedConsumer>();
 
             bus.AddEntityFrameworkOutbox<NotificationDbContext>(outbox =>
             {

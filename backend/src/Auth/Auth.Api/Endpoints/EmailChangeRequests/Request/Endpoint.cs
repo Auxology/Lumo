@@ -42,7 +42,7 @@ internal sealed class Endpoint : BaseEndpoint<Request, Response>
         await SendOutcomeAsync
         (
             outcome: await _sender.Send(command, ct),
-            mapper: recr => new Response(TokenKey: recr.TokenKey),
+            mapper: recr => new Response(RequestId: recr.RequestId),
             successStatusCode: 201,
             ct
         );

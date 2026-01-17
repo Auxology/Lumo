@@ -1,3 +1,3 @@
 namespace Auth.Application.Commands.EmailChangeRequests.Request;
 
-public sealed record RequestEmailChangeResponse(string TokenKey);
+public sealed record RequestEmailChangeResponse(string RequestId);

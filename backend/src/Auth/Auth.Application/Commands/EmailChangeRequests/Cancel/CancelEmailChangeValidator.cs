@@ -1,5 +1,3 @@
-using Auth.Application.Commands.EmailChangeRequests.Verify;
-
 using FluentValidation;
 
 namespace Auth.Application.Commands.EmailChangeRequests.Cancel;
@@ -8,8 +6,8 @@ internal sealed class CancelEmailChangeValidator : AbstractValidator<CancelEmail
 {
     public CancelEmailChangeValidator()
     {
-        RuleFor(cecc => cecc.TokenKey)
+        RuleFor(cecc => cecc.RequestId)
             .NotEmpty()
-            .WithMessage("Token key is required.");
+            .WithMessage("Request ID is required.");
     }
 }

@@ -32,11 +32,6 @@ internal sealed class EmailChangeRequestConfiguration : IEntityTypeConfiguration
             )
             .HasColumnType("uuid");
 
-        b.Property(ecr => ecr.TokenKey)
-            .IsRequired()
-            .HasMaxLength(DataConfigurationConstants.DefaultStringMaxLength)
-            .HasColumnType("varchar");
-
         b.ComplexProperty(ecr => ecr.CurrentEmailAddress, ea =>
         {
             ea.Property(e => e.Value)
@@ -78,7 +73,6 @@ internal sealed class EmailChangeRequestConfiguration : IEntityTypeConfiguration
             .IsRequired(false)
             .HasColumnType("timestamptz");
 
-        b.HasIndex(ecr => ecr.TokenKey).IsUnique();
         b.HasIndex(ecr => ecr.UserId);
         b.HasIndex(ecr => ecr.CreatedAt);
         b.HasIndex(ecr => ecr.ExpiresAt);

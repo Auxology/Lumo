@@ -12,8 +12,6 @@ public sealed class EmailChangeRequest : AggregateRoot<EmailChangeRequestId>
 {
     public UserId UserId { get; private set; }
 
-    public string TokenKey { get; private set; } = string.Empty;
-
     public EmailAddress CurrentEmailAddress { get; private set; }
 
     public EmailAddress NewEmailAddress { get; private set; }
@@ -37,7 +35,6 @@ public sealed class EmailChangeRequest : AggregateRoot<EmailChangeRequestId>
     (
         EmailChangeRequestId id,
         UserId userId,
-        string tokenKey,
         EmailAddress currentEmailAddress,
         EmailAddress newEmailAddress,
         string otpTokenHash,
@@ -47,7 +44,6 @@ public sealed class EmailChangeRequest : AggregateRoot<EmailChangeRequestId>
     {
         Id = id;
         UserId = userId;
-        TokenKey = tokenKey;
         CurrentEmailAddress = currentEmailAddress;
         NewEmailAddress = newEmailAddress;
         OtpTokenHash = otpTokenHash;
@@ -62,7 +58,6 @@ public sealed class EmailChangeRequest : AggregateRoot<EmailChangeRequestId>
     (
         EmailChangeRequestId id,
         UserId userId,
-        string tokenKey,
         EmailAddress currentEmailAddress,
         EmailAddress newEmailAddress,
         string otpTokenHash,
@@ -72,9 +67,6 @@ public sealed class EmailChangeRequest : AggregateRoot<EmailChangeRequestId>
     {
         if (userId.IsEmpty)
             return EmailChangeRequestFaults.UserIdRequiredForCreation;
-
-        if (string.IsNullOrWhiteSpace(tokenKey))
-            return EmailChangeRequestFaults.TokenKeyRequiredForCreation;
 
         if (currentEmailAddress.IsEmpty())
             return EmailChangeRequestFaults.CurrentEmailRequiredForCreation;
@@ -92,7 +84,6 @@ public sealed class EmailChangeRequest : AggregateRoot<EmailChangeRequestId>
         (
             id: id,
             userId: userId,
-            tokenKey: tokenKey,
             currentEmailAddress: currentEmailAddress,
             newEmailAddress: newEmailAddress,
             otpTokenHash: otpTokenHash,
