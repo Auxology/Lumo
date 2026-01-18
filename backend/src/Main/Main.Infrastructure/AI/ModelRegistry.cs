@@ -21,8 +21,14 @@ internal sealed class ModelRegistry : IModelRegistry
                 Id: m.Id,
                 DisplayName: m.DisplayName,
                 Provider: m.Provider,
-                IsDefault: m.IsDefault
-            )).ToList();
+                IsDefault: m.IsDefault,
+                ModelCapabilities: new ModelCapabilities
+                (
+                    MaxContextTokens: m.MaxContextTokens,
+                    SupportsVision: m.SupportsVision,
+                    SupportsStreaming: m.SupportsStreaming
+                )            
+                )).ToList();
 
         _modelMap = options.AllowedModels
             .ToDictionary(m => m.Id, m => m);

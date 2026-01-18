@@ -18,7 +18,8 @@ public sealed record ModelInfo
     string Id,
     string DisplayName,
     string Provider,
-    bool IsDefault
+    bool IsDefault,
+    ModelCapabilities ModelCapabilities
 );
 
 public sealed record ModelCapabilities
