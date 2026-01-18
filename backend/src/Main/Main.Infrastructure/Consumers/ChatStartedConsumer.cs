@@ -65,6 +65,7 @@ internal sealed class ChatStartedConsumer(
             chatId: chatId.Value,
             streamId: streamId.Value,
             messages: messages,
+            modelId: message.ModelId,
             cancellationToken: cancellationToken
         );
 

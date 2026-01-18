@@ -20,8 +20,28 @@ internal sealed class OpenRouterOptions
     [Url]
     public string? SiteUrl { get; init; }
 
-    public Dictionary<string, string> ModelMappings { get; init; } = new()
-    {
-        ["allenai/olmo-3.1"] = "allenai/olmo-3.1-32b-think:free"
-    };
+    public List<ModelConfiguration> AllowedModels { get; init; } = [];
+}
+
+public sealed class ModelConfiguration
+{
+    [Required]
+    public string Id { get; init; } = string.Empty;
+
+    [Required]
+    public string OpenRouterId { get; init; } = string.Empty;
+
+    [Required]
+    public string DisplayName { get; init; } = string.Empty;
+
+    [Required]
+    public string Provider { get; init; } = string.Empty;
+
+    public bool IsDefault { get; init; }
+
+    public int MaxContextTokens { get; init; } = 4096;
+
+    public bool SupportsVision { get; init; }
+
+    public bool SupportsStreaming { get; init; } = true;
 }

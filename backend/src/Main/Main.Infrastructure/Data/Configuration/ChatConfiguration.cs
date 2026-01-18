@@ -31,10 +31,10 @@ internal sealed class ChatConfiguration : IEntityTypeConfiguration<Chat>
             .HasMaxLength(ChatConstants.MaxTitleLength)
             .HasColumnType($"varchar({ChatConstants.MaxTitleLength})");
 
-        b.Property(c => c.ModelName)
+        b.Property(c => c.ModelId)
             .IsRequired(false)
-            .HasMaxLength(ChatConstants.MaxModelNameLength)
-            .HasColumnType($"varchar({ChatConstants.MaxModelNameLength})");
+            .HasMaxLength(ChatConstants.MaxModelIdLength)
+            .HasColumnType($"varchar({ChatConstants.MaxModelIdLength})");
 
         b.Property(c => c.IsArchived)
             .IsRequired()

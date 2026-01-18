@@ -33,7 +33,11 @@ internal sealed class Endpoint : BaseEndpoint<Request, Response>
 
     public override async Task HandleAsync(Request endpointRequest, CancellationToken ct)
     {
-        StartChatCommand command = new(endpointRequest.Message);
+        StartChatCommand command = new
+        (
+            Message: endpointRequest.Message,
+            ModelId: endpointRequest.ModelId
+        );
 
         await SendOutcomeAsync
         (
@@ -43,6 +47,7 @@ internal sealed class Endpoint : BaseEndpoint<Request, Response>
                 ChatId: scr.ChatId,
                 StreamId: scr.StreamId,
                 ChatTitle: scr.ChatTitle,
+                ModelId: scr.ModelId,
                 CreatedAt: scr.CreatedAt
             ),
             successStatusCode: 202,

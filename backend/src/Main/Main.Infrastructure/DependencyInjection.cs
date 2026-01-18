@@ -173,20 +173,16 @@ public static class DependencyInjection
                 options: options
             );
         });
-
-        services.AddSingleton(sp =>
-        {
-            OpenAIClient client = sp.GetRequiredService<OpenAIClient>();
-            return client.GetChatClient(openRouterOptions.DefaultModel);
-        });
-
+        
         services.AddSingleton<IStreamPublisher, StreamPublisher>();
         services.AddSingleton<IChatLockService, ChatLockService>();
 
         services.AddScoped<IChatCompletionService, ChatCompletionService>();
 
         services.AddSingleton<IStreamReader, StreamReader>();
-
+        
+        services.AddSingleton<IModelRegistry, ModelRegistry>();
+        
         return services;
     }
 }

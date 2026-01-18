@@ -5,5 +5,6 @@ internal sealed record Response
     string ChatId,
     string ChatTitle,
     string StreamId,
+    string? ModelId,
     DateTimeOffset CreatedAt
 );

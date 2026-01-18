@@ -2,4 +2,8 @@ using SharedKernel.Application.Messaging;
 
 namespace Main.Application.Commands.Chats.Start;
 
-public sealed record StartChatCommand(string Message) : ICommand<StartChatResponse>;
+public sealed record StartChatCommand
+(
+    string Message,
+    string? ModelId
+) : ICommand<StartChatResponse>;

@@ -4,6 +4,7 @@ public interface IChatCompletionService
 {
     Task<string> GetTitleAsync(string message, CancellationToken cancellationToken);
 
-    Task StreamCompletionAsync(string chatId, string streamId, IReadOnlyList<ChatCompletionMessage> messages,
+    Task StreamCompletionAsync(string chatId, string streamId, string modelId,
+        IReadOnlyList<ChatCompletionMessage> messages,
         CancellationToken cancellationToken);
 }

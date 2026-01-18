@@ -10,6 +10,7 @@ using Main.Domain.Enums;
 
 using Microsoft.Extensions.Logging;
 
+using OpenAI;
 using OpenAI.Chat;
 
 using SharedKernel;
@@ -20,7 +21,8 @@ using StackExchange.Redis;
 namespace Main.Infrastructure.AI;
 
 internal sealed class ChatCompletionService(
-    ChatClient chatClient,
+    OpenAIClient openAiClient,
+    IModelRegistry modelRegistry,
     IStreamPublisher streamPublisher,
     IMessageBus messageBus,
     IChatLockService chatLockService,
@@ -35,6 +37,9 @@ internal sealed class ChatCompletionService(
 
     public async Task<string> GetTitleAsync(string message, CancellationToken cancellationToken)
     {
+        string defaultModelId = modelRegistry.GetDefaultModelId();
+        ChatClient chatClient = openAiClient.GetChatClient(defaultModelId);
+        
         try
         {
             List<ChatMessage> messages =
@@ -73,11 +78,14 @@ internal sealed class ChatCompletionService(
         }
     }
 
-    public async Task StreamCompletionAsync(string chatId, string streamId,
+    public async Task StreamCompletionAsync(string chatId, string streamId, string modelId,
         IReadOnlyList<ChatCompletionMessage> messages, CancellationToken cancellationToken)
     {
         StringBuilder messageContent = new();
 
+        string openRouterId = modelRegistry.GetOpenRouterModelId(modelId);
+        ChatClient chatClient = openAiClient.GetChatClient(openRouterId);
+        
         try
         {
             await streamPublisher.PublishStatusAsync
