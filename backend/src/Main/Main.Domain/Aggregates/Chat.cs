@@ -48,7 +48,7 @@ public sealed class Chat : AggregateRoot<ChatId>
         IsArchived = false;
         NextSequenceNumber = 0;
         CreatedAt = utcNow;
-        UpdatedAt = null;
+        UpdatedAt = utcNow;
     }
 
     public static Outcome<Chat> Create
