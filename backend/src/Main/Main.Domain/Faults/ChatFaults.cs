@@ -39,13 +39,13 @@ public static class ChatFaults
         title: "Chat.NotArchived",
         detail: "The chat is not archived."
     );
-    
+
     public static readonly Fault ModelIdRequired = Fault.Validation
     (
         title: "Chat.ModelIdRequired",
         detail: "A model ID is required to create a chat."
     );
-    
+
     public static readonly Fault ModelNotAllowed = Fault.Validation
     (
         title: "Chat.ModelNotAllowed",

@@ -37,13 +37,13 @@ internal sealed class StartChatHandler(
 
         if (user is null)
             return UserOperationFaults.NotFound;
-        
+
         string modelId = request.ModelId ?? modelRegistry.GetDefaultModelId();
 
         string title = await chatCompletionService.GetTitleAsync(request.Message, cancellationToken);
 
         ChatId chatId = idGenerator.NewChatId();
-        
+
         Outcome<Chat> chatOutcome = Chat.Create
         (
             id: chatId,

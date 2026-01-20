@@ -20,7 +20,7 @@ internal sealed class GetAvailableModelsHandler(IModelRegistry modelRegistry) : 
             MaxContextTokens: m.ModelCapabilities.MaxContextTokens,
             SupportsVision: m.ModelCapabilities.SupportsVision
         )).ToList();
-        
+
         GetAvailableModelsResponse response = new(dtos);
 
         return ValueTask.FromResult(Outcome.Success(response));

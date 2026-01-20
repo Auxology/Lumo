@@ -69,7 +69,7 @@ public sealed class Chat : AggregateRoot<ChatId>
 
         if (title.Length > ChatConstants.MaxTitleLength)
             return ChatFaults.TitleTooLong;
-        
+
         if (string.IsNullOrWhiteSpace(modelId))
             return ChatFaults.ModelIdRequired;
 

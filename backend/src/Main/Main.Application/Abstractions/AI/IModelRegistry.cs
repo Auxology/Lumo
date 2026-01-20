@@ -3,13 +3,13 @@ namespace Main.Application.Abstractions.AI;
 public interface IModelRegistry
 {
     IReadOnlyList<ModelInfo> GetAvailableModels();
-    
+
     bool IsModelAllowed(string modelId);
-    
+
     string GetOpenRouterModelId(string modelId);
-    
+
     string GetDefaultModelId();
-    
+
     ModelInfo? GetModelInfo(string modelId);
 }
 

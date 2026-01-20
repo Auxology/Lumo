@@ -27,7 +27,7 @@ internal sealed class ModelRegistry : IModelRegistry
                     MaxContextTokens: m.MaxContextTokens,
                     SupportsVision: m.SupportsVision,
                     SupportsStreaming: m.SupportsStreaming
-                )            
+                )
                 )).ToList();
 
         _modelMap = options.AllowedModels
@@ -43,9 +43,9 @@ internal sealed class ModelRegistry : IModelRegistry
     public bool IsModelAllowed(string modelId) =>
         _modelMap.ContainsKey(modelId);
 
-    public string GetOpenRouterModelId(string modelId) => 
+    public string GetOpenRouterModelId(string modelId) =>
         _modelMap[modelId].OpenRouterId;
-    
+
     public string GetDefaultModelId() =>
         _defaultModelId;
 

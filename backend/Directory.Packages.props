@@ -52,6 +52,8 @@
         <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.1" />
         <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.1" />
         <PackageVersion Include="EFCore.NamingConventions" Version="10.0.0" />
+        <PackageVersion Include="Pgvector" Version="0.3.2" />
+        <PackageVersion Include="Pgvector.EntityFrameworkCore" Version="0.3.0" />
       
         <!-- Dapper -->
         <PackageVersion Include="Dapper" Version="2.1.66" />

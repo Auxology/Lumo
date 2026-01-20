@@ -39,7 +39,7 @@ internal sealed class ChatCompletionService(
     {
         string defaultModelId = modelRegistry.GetDefaultModelId();
         ChatClient chatClient = openAiClient.GetChatClient(defaultModelId);
-        
+
         try
         {
             List<ChatMessage> messages =
@@ -85,7 +85,7 @@ internal sealed class ChatCompletionService(
 
         string openRouterId = modelRegistry.GetOpenRouterModelId(modelId);
         ChatClient chatClient = openAiClient.GetChatClient(openRouterId);
-        
+
         try
         {
             await streamPublisher.PublishStatusAsync
