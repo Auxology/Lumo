@@ -73,6 +73,8 @@ services:
             - RabbitMq__VirtualHost=${RABBITMQ_VIRTUAL_HOST:?RABBITMQ_VIRTUAL_HOST is required}
             - RabbitMq__Username=${RABBITMQ_USERNAME:?RABBITMQ_USERNAME is required}
             - RabbitMq__Password=${RABBITMQ_PASSWORD:?RABBITMQ_PASSWORD is required}
+            - OpenAI__ApiKey=${OPENAI_API_KEY:?OPENAI_API_KEY is required}                                                                                                                         
+            - OpenAI__EmbeddingModel=${OPENAI_EMBEDDING_MODEL:-text-embedding-3-small}       
         networks:
             - lumo-network
         depends_on:

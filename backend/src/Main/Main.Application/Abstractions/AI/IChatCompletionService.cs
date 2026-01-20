@@ -10,7 +10,16 @@ public interface IChatCompletionService
         string streamId,
         string modelId,
         IReadOnlyList<ChatCompletionMessage> messages,
+        CancellationToken cancellationToken
+    );
+
+    Task StreamCompletionAdvancedAsync
+    (
         Guid userId,
+        string chatId,
+        string streamId,
+        string modelId,
+        IReadOnlyList<ChatCompletionMessage> messages,
         CancellationToken cancellationToken
     );
 }

@@ -4,11 +4,13 @@ using System.ComponentModel.DataAnnotations;
 using Main.Application.Abstractions.AI;
 using Main.Application.Abstractions.Data;
 using Main.Application.Abstractions.Generators;
+using Main.Application.Abstractions.Memory;
 using Main.Application.Abstractions.Stream;
 using Main.Infrastructure.AI;
 using Main.Infrastructure.Consumers;
 using Main.Infrastructure.Data;
 using Main.Infrastructure.Generators;
+using Main.Infrastructure.Memory;
 using Main.Infrastructure.Options;
 using Main.Infrastructure.Stream;
 
@@ -20,6 +22,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 using OpenAI;
+using OpenAI.Embeddings;
 
 using SharedKernel.Application.Data;
 using SharedKernel.Application.Messaging;
@@ -69,7 +72,10 @@ public static class DependencyInjection
         services.AddDbContext<MainDbContext>(options =>
         {
             options
-                .UseNpgsql(databaseOptions.ConnectionString)
+                .UseNpgsql(databaseOptions.ConnectionString, npgSqlOptions =>
+                {
+                    npgSqlOptions.UseVector();
+                })
                 .UseSnakeCaseNamingConvention()
                 .EnableSensitiveDataLogging(enableSensitiveLogging);
         });
@@ -160,6 +166,14 @@ public static class DependencyInjection
         OpenRouterOptions openRouterOptions = new();
         configuration.GetSection(OpenRouterOptions.SectionName).Bind(openRouterOptions);
 
+        services.AddOptions<OpenAIOptions>()
+            .Bind(configuration.GetSection(OpenAIOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        OpenAIOptions openAIOptions = new();
+        configuration.GetSection(OpenAIOptions.SectionName).Bind(openAIOptions);
+
         services.AddSingleton<OpenAIClient>(_ =>
         {
             OpenAIClientOptions options = new()
@@ -174,8 +188,16 @@ public static class DependencyInjection
             );
         });
 
+        services.AddSingleton<EmbeddingClient>(_ =>
+        {
+            OpenAIClient client = new(openAIOptions.ApiKey);
+            return client.GetEmbeddingClient(openAIOptions.EmbeddingModel);
+        });
+
         services.AddSingleton<IStreamPublisher, StreamPublisher>();
         services.AddSingleton<IChatLockService, ChatLockService>();
+
+        services.AddScoped<IMemoryStore, MemoryStore>();
 
         services.AddScoped<IChatCompletionService, ChatCompletionService>();
 

@@ -187,4 +187,10 @@ internal sealed class ChatCompletionService(
             }
         }
     }
+
+    public Task StreamCompletionAdvancedAsync(Guid userId, string chatId, string streamId, string modelId, IReadOnlyList<ChatCompletionMessage> messages,
+        CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
 }
