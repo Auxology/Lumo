@@ -6,14 +6,14 @@
         <!-- Static code analysis -->
         <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.18.0.131500" />
         <!-- Application -->
-        <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.1" />
+        <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.2" />
         <PackageVersion Include="Mediator.SourceGenerator" Version="3.1.0-preview.14" />
         <PackageVersion Include="Mediator.Abstractions" Version="3.1.0-preview.14" />
         <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
         <!-- Infrastructure -->
-        <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.1" />
-        <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="10.0.1" />
-        <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.1" />
+        <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.2" />
+        <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="10.0.2" />
+        <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.2" />
 
         <!-- Serilog -->
         <PackageVersion Include="Serilog.AspNetCore" Version="10.0.0" />
@@ -29,15 +29,15 @@
         <PackageVersion Include="Serilog.Exceptions.EntityFrameworkCore" Version="8.4.0" />
 
         <!-- Otel Core -->
-        <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.14.0" />
-        <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.14.0" />
+        <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.15.0" />
+        <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.15.0" />
 
         <!-- Otel Instrumentations -->
-        <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.14.0" />
-        <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.14.0" />
+        <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.15.0" />
+        <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.15.0" />
         <PackageVersion Include="OpenTelemetry.Instrumentation.SqlClient" Version="1.14.0-beta.1" />
         <PackageVersion Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="1.14.0-beta.2" />
-        <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.14.0" />
+        <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.15.0" />
         <PackageVersion Include="OpenTelemetry.Instrumentation.Process" Version="1.14.0-beta.2" />
 
         <!-- Health Checks -->
@@ -45,13 +45,13 @@
         <PackageVersion Include="AspnetCore.HealthChecks.Redis" Version="9.0.0" />
         <PackageVersion Include="AspnetCore.HealthChecks.NpgSql" Version="9.0.0" />
 
-        <PackageVersion Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="10.0.1" />
+        <PackageVersion Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="10.0.2" />
 
         <!-- Entity Framework -->
         <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
-        <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.1" />
-        <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.1" />
-        <PackageVersion Include="EFCore.NamingConventions" Version="10.0.0" />
+        <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.2" />
+        <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.2" />
+        <PackageVersion Include="EFCore.NamingConventions" Version="10.0.1" />
         <PackageVersion Include="Pgvector" Version="0.3.2" />
         <PackageVersion Include="Pgvector.EntityFrameworkCore" Version="0.3.0" />
       
@@ -61,9 +61,9 @@
         <PackageVersion Include="UAParser" Version="3.1.47" />
 
         <!-- AWS SDK -->
-        <PackageVersion Include="AWSSDK.S3" Version="4.0.17" />
-        <PackageVersion Include="AWSSDK.Extensions.NETCore.Setup" Version="4.0.3.19" />
-        <PackageVersion Include="AWSSDK.SimpleEmailV2" Version="4.0.11.2" />
+        <PackageVersion Include="AWSSDK.S3" Version="4.0.17.3" />
+        <PackageVersion Include="AWSSDK.Extensions.NETCore.Setup" Version="4.0.3.21" />
+        <PackageVersion Include="AWSSDK.SimpleEmailV2" Version="4.0.11.4" />
 
         <!-- MassTransit -->
         <!-- Avoid updating MassTransit versions beyond 8.5.x, as newer version required license -->
@@ -77,10 +77,10 @@
         <PackageVersion Include="Ulid" Version="1.4.1" />
         <!-- Web.Api -->
         <PackageVersion Include="Yarp.ReverseProxy" Version="2.3.0" />
-        <PackageVersion Include="FastEndpoints" Version="7.1.1" />
-        <PackageVersion Include="FastEndpoints.Swagger" Version="7.1.1" />
-        <PackageVersion Include="FastEndpoints.Generator" Version="7.1.1" />
-        <PackageVersion Include="Scalar.AspNetCore" Version="2.12.5" />
+        <PackageVersion Include="FastEndpoints" Version="7.2.0" />
+        <PackageVersion Include="FastEndpoints.Swagger" Version="7.2.0" />
+        <PackageVersion Include="FastEndpoints.Generator" Version="7.2.0" />
+        <PackageVersion Include="Scalar.AspNetCore" Version="2.12.14" />
         <PackageVersion Include="RedisRateLimiting.AspNetCore" Version="1.2.1" />
         <!-- Tests -->
         <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
