@@ -1,6 +1,5 @@
 using System.ClientModel;
 
-using Main.Application.Abstractions.Data;
 using Main.Application.Abstractions.Memory;
 using Main.Infrastructure.Data;
 using Main.Infrastructure.Data.Entities;
@@ -127,6 +126,15 @@ internal sealed class MemoryStore(
 
             logger.LogInformation("Deleted memory {MemoryId} for user {UserId}", memoryRecord.Id, userId);
         }
+    }
+
+    public async Task DeleteAllAsync(Guid userId, CancellationToken cancellationToken)
+    {
+        await dbContext.Memories
+            .Where(m => m.UserId == userId)
+            .ExecuteDeleteAsync(cancellationToken);
+
+        logger.LogInformation("Deleted all memories for user {UserId}", userId);
     }
 
     private async Task<float[]> GenerateEmbeddingAsync(string content, CancellationToken cancellationToken)

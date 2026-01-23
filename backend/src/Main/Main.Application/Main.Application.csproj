@@ -18,9 +18,5 @@
         <PackageReference Include="Mediator.SourceGenerator" PrivateAssets="all" />
         <PackageReference Include="Mediator.Abstractions" />
     </ItemGroup>
-    
-    <ItemGroup>
-      <Folder Include="Commands\" />
-    </ItemGroup>
 
 </Project>

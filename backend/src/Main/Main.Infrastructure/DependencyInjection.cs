@@ -7,6 +7,7 @@ using Main.Application.Abstractions.Generators;
 using Main.Application.Abstractions.Memory;
 using Main.Application.Abstractions.Stream;
 using Main.Infrastructure.AI;
+using Main.Infrastructure.AI.Tools;
 using Main.Infrastructure.Consumers;
 using Main.Infrastructure.Data;
 using Main.Infrastructure.Generators;
@@ -198,6 +199,7 @@ public static class DependencyInjection
         services.AddSingleton<IChatLockService, ChatLockService>();
 
         services.AddScoped<IMemoryStore, MemoryStore>();
+        services.AddScoped<ToolExecutor>();
 
         services.AddScoped<IChatCompletionService, ChatCompletionService>();
 

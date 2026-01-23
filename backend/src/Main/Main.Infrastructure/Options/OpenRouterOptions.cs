@@ -13,7 +13,7 @@ internal sealed class OpenRouterOptions
     public string BaseUrl { get; init; } = "https://openrouter.ai/api/v1";
 
     [Required, MinLength(1)]
-    public string DefaultModel { get; init; } = "allenai/olmo-3.1-32b-think:free";
+    public string DefaultModel { get; init; } = string.Empty;
 
     public string? AppName { get; init; }
 
