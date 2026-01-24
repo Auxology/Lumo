@@ -167,14 +167,6 @@ public static class DependencyInjection
         OpenRouterOptions openRouterOptions = new();
         configuration.GetSection(OpenRouterOptions.SectionName).Bind(openRouterOptions);
 
-        services.AddOptions<OpenAIOptions>()
-            .Bind(configuration.GetSection(OpenAIOptions.SectionName))
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
-
-        OpenAIOptions openAIOptions = new();
-        configuration.GetSection(OpenAIOptions.SectionName).Bind(openAIOptions);
-
         services.AddSingleton<OpenAIClient>(_ =>
         {
             OpenAIClientOptions options = new()
@@ -191,8 +183,17 @@ public static class DependencyInjection
 
         services.AddSingleton<EmbeddingClient>(_ =>
         {
-            OpenAIClient client = new(openAIOptions.ApiKey);
-            return client.GetEmbeddingClient(openAIOptions.EmbeddingModel);
+            OpenAIClientOptions options = new()
+            {
+                Endpoint = new Uri(openRouterOptions.BaseUrl)
+            };
+
+            OpenAIClient client = new(
+                credential: new ApiKeyCredential(openRouterOptions.ApiKey),
+                options: options
+            );
+
+            return client.GetEmbeddingClient(openRouterOptions.EmbeddingModel);
         });
 
         services.AddSingleton<IStreamPublisher, StreamPublisher>();

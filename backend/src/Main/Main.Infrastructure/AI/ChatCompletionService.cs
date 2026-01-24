@@ -43,9 +43,7 @@ internal sealed class ChatCompletionService(
 
     public async Task<string> GetTitleAsync(string message, CancellationToken cancellationToken)
     {
-        string defaultModelId = modelRegistry.GetDefaultModelId();
-        string defaultOpenRouterId = modelRegistry.GetOpenRouterModelId(defaultModelId);
-        ChatClient chatClient = openAiClient.GetChatClient(defaultOpenRouterId);
+        ChatClient chatClient = GetChatClient(modelRegistry.GetDefaultModelId());
 
         try
         {
@@ -55,370 +53,452 @@ internal sealed class ChatCompletionService(
                 new UserChatMessage(message)
             ];
 
-            ChatCompletion response = await chatClient.CompleteChatAsync
-            (
-                messages,
-                cancellationToken: cancellationToken
-            );
-
+            ChatCompletion response = await chatClient.CompleteChatAsync(messages, cancellationToken: cancellationToken);
             string? text = response.Content.FirstOrDefault()?.Text;
 
             if (string.IsNullOrWhiteSpace(text))
                 return "New Chat";
 
             string title = text.Trim();
-
-            if (title.Length > ChatConstants.MaxTitleLength)
-                title = title[..(ChatConstants.MaxTitleLength - 3)] + "...";
-
-            return title;
+            return title.Length > ChatConstants.MaxTitleLength
+                ? title[..(ChatConstants.MaxTitleLength - 3)] + "..."
+                : title;
         }
-        catch (HttpRequestException exception)
+        catch (Exception ex) when (ex is HttpRequestException or ClientResultException)
         {
-            logger.LogWarning(exception, "Failed to generate chat title due to network error, using fallback");
-            return "New Chat";
-        }
-        catch (ClientResultException exception)
-        {
-            logger.LogWarning(exception, "Failed to generate chat title due to API error, using fallback");
+            logger.LogWarning(ex, "Failed to generate chat title, using fallback");
             return "New Chat";
         }
     }
 
-    public async Task StreamCompletionAsync(string chatId, string streamId, string modelId,
-        IReadOnlyList<ChatCompletionMessage> messages, CancellationToken cancellationToken)
+    public Task StreamCompletionAsync
+    (
+        string chatId,
+        string streamId,
+        string modelId,
+        IReadOnlyList<ChatCompletionMessage> messages,
+        CancellationToken cancellationToken
+        )
+    {
+        return ExecuteStreamingAsync
+        (
+            chatId: chatId,
+            streamId: streamId,
+            modelId: modelId,
+            messages: messages,
+            toolContext: null,
+            cancellationToken: cancellationToken
+        );
+    }
+
+    public Task StreamCompletionAdvancedAsync
+    (
+        Guid userId,
+        string chatId,
+        string streamId,
+        string modelId,
+        IReadOnlyList<ChatCompletionMessage> messages,
+        CancellationToken cancellationToken)
+    {
+        return ExecuteStreamingAsync
+        (
+            chatId: chatId,
+            streamId: streamId,
+            modelId: modelId,
+            messages: messages,
+            toolContext: new ToolContext(userId),
+            cancellationToken: cancellationToken
+        );
+    }
+
+    private async Task ExecuteStreamingAsync
+    (
+        string chatId,
+        string streamId,
+        string modelId,
+        IReadOnlyList<ChatCompletionMessage> messages,
+        ToolContext? toolContext,
+        CancellationToken cancellationToken
+    )
     {
         StringBuilder messageContent = new();
 
         try
         {
-            string openRouterId = modelRegistry.GetOpenRouterModelId(modelId);
-            ChatClient chatClient = openAiClient.GetChatClient(openRouterId);
+            await InitializeStreamAsync(streamId, cancellationToken);
 
-            await streamPublisher.PublishStatusAsync
+            ChatClient chatClient = GetChatClient(modelId);
+            
+            List<ChatMessage> chatMessages = await BuildChatMessagesAsync(messages, toolContext, cancellationToken);
+            
+            ChatCompletionOptions? options = toolContext is not null
+                ? new ChatCompletionOptions { Tools = { ToolDefinitions.SaveMemory } }
+                : null;
+
+            await ProcessStreamingResponseAsync
             (
+                chatClient: chatClient,
+                chatMessages: chatMessages,
+                options: options,
                 streamId: streamId,
-                status: StreamStatus.Pending,
-                cancellationToken: cancellationToken
-            );
-            await streamPublisher.SetStreamExpirationAsync
-            (
-                streamId: streamId,
-                expiration: StreamExpiration,
-                cancellationToken: cancellationToken
-            );
-
-            List<ChatMessage> chatMessages = messages.Select<ChatCompletionMessage, ChatMessage>(m =>
-                {
-                    return m.Role switch
-                    {
-                        MessageRole.User => new UserChatMessage(m.Content),
-                        MessageRole.Assistant => new AssistantChatMessage(m.Content),
-                        MessageRole.System => new SystemChatMessage(m.Content),
-                        _ => new UserChatMessage(m.Content)
-                    };
-                })
-                .ToList();
-
-            await foreach (StreamingChatCompletionUpdate update in chatClient.CompleteChatStreamingAsync(chatMessages,
-                               cancellationToken: cancellationToken))
-            {
-#pragma warning disable S3267
-                foreach (ChatMessageContentPart? part in update.ContentUpdate)
-#pragma warning restore S3267
-                {
-                    string? chunk = part.Text;
-
-                    if (!string.IsNullOrWhiteSpace(chunk))
-                    {
-                        messageContent.Append(chunk);
-
-                        await streamPublisher.PublishChunkAsync
-                        (
-                            streamId: streamId,
-                            messageContent: chunk,
-                            cancellationToken: cancellationToken
-                        );
-                    }
-                }
-            }
-
-            await streamPublisher.PublishStatusAsync
-            (
-                streamId: streamId,
-                status: StreamStatus.Done,
+                chatId: chatId,
+                messageContent: messageContent,
+                toolContext: toolContext,
                 cancellationToken: cancellationToken
             );
 
-            AssistantMessageGenerated assistantMessageGenerated = new()
-            {
-                EventId = Guid.NewGuid(),
-                OccurredAt = dateTimeProvider.UtcNow,
-                CorrelationId = Guid.NewGuid(),
-                ChatId = chatId,
-                MessageContent = messageContent.ToString(),
-            };
-
-            await messageBus.PublishAsync(assistantMessageGenerated, cancellationToken);
+            await FinalizeStreamAsync(streamId, chatId, messageContent, cancellationToken);
         }
         catch (Exception exception)
         {
-            logger.LogError(exception, "Streaming failed for chat {ChatId}", chatId);
-
-            try
-            {
-                await streamPublisher.PublishStatusAsync
-                (
-                    streamId: streamId,
-                    status: StreamStatus.Failed,
-                    cancellationToken: cancellationToken,
-                    fault: exception.Message
-                );
-            }
-            catch (RedisException redisException)
-            {
-                logger.LogError(redisException, "Failed to publish faulted status for chat {ChatId}", chatId);
-            }
-
+            await HandleStreamingErrorAsync(chatId, streamId, exception, cancellationToken);
             throw;
         }
         finally
         {
-            try
+            await ReleaseChatLockAsync(chatId);
+        }
+    }
+
+    private async Task ProcessStreamingResponseAsync
+    (
+        ChatClient chatClient,
+        List<ChatMessage> chatMessages,
+        ChatCompletionOptions? options,
+        string streamId,
+        string chatId,
+        StringBuilder messageContent,
+        ToolContext? toolContext,
+        CancellationToken cancellationToken
+    )
+    {
+        int iterations = 0;
+
+        while (iterations < MaxToolCallIterations)
+        {
+            iterations++;
+
+            StreamIterationResult result = await ProcessSingleIterationAsync
+            (
+                chatClient: chatClient,
+                chatMessages: chatMessages,
+                options: options,
+                streamId: streamId,
+                chatId: chatId,
+                messageContent: messageContent,
+                cancellationToken: cancellationToken
+            );
+
+            if (result.HasProviderError)
+                throw new InvalidOperationException("The AI provider returned an error. Please try again or select a different model.");
+
+            if (result.ToolCalls.Count == 0)
+                break;
+
+            if (toolContext is null)
+                break;
+
+            await ProcessToolCallsAsync(chatMessages, result, toolContext.UserId, cancellationToken);
+        }
+
+        if (messageContent.Length == 0 && iterations > 0 && toolContext is not null)
+            await StreamFinalResponseAsync(chatClient, chatMessages, streamId, messageContent, cancellationToken);
+    }
+
+    private async Task<StreamIterationResult> ProcessSingleIterationAsync
+    (
+        ChatClient chatClient,
+        List<ChatMessage> chatMessages,
+        ChatCompletionOptions? options,
+        string streamId,
+        string chatId,
+        StringBuilder messageContent,
+        CancellationToken cancellationToken
+    )
+    {
+        ToolCallAccumulator toolAccumulator = new();
+        StringBuilder contentBuilder = new();
+        bool providerError = false;
+
+        try
+        {
+            IAsyncEnumerable<StreamingChatCompletionUpdate> stream = options is not null
+                ? chatClient.CompleteChatStreamingAsync(chatMessages, options, cancellationToken)
+                : chatClient.CompleteChatStreamingAsync(chatMessages, cancellationToken: cancellationToken);
+
+            await foreach (StreamingChatCompletionUpdate update in stream)
             {
-                await chatLockService.ReleaseLockAsync(chatId, CancellationToken.None);
+                toolAccumulator.ProcessUpdate(update);
+                await ProcessContentUpdateAsync(update, streamId, messageContent, contentBuilder, cancellationToken);
             }
-            catch (RedisException ex)
+        }
+        catch (ArgumentOutOfRangeException exception) when (exception.Message.Contains("ChatFinishReason", StringComparison.Ordinal))
+        {
+            logger.LogWarning(exception, "Provider returned unknown finish reason for chat {ChatId}", chatId);
+            providerError = true;
+        }
+
+        return new StreamIterationResult
+        (
+            ToolCalls: toolAccumulator.Build(),
+            Content: contentBuilder.ToString(),
+            HasProviderError: providerError
+        );
+    }
+
+    private async Task ProcessContentUpdateAsync
+    (
+        StreamingChatCompletionUpdate update,
+        string streamId,
+        StringBuilder messageContent,
+        StringBuilder contentBuilder,
+        CancellationToken cancellationToken
+    )
+    {
+#pragma warning disable S3267
+        foreach (ChatMessageContentPart? part in update.ContentUpdate)
+#pragma warning restore S3267
+        {
+            string? chunk = part.Text;
+
+            if (string.IsNullOrWhiteSpace(chunk))
+                continue;
+
+            contentBuilder.Append(chunk);
+            messageContent.Append(chunk);
+
+            await streamPublisher.PublishChunkAsync(streamId, chunk, cancellationToken);
+        }
+    }
+
+    private async Task ProcessToolCallsAsync
+    (
+        List<ChatMessage> chatMessages,
+        StreamIterationResult result,
+        Guid userId,
+        CancellationToken cancellationToken
+    )
+    {
+        AssistantChatMessage assistantMessage = new(result.ToolCalls);
+
+        if (result.Content.Length > 0)
+            assistantMessage.Content.Add(ChatMessageContentPart.CreateTextPart(result.Content));
+
+        chatMessages.Add(assistantMessage);
+
+        foreach (ChatToolCall toolCall in result.ToolCalls)
+        {
+            string toolResult = await toolExecutor.ExecuteAsync(toolCall, userId, cancellationToken);
+            chatMessages.Add(new ToolChatMessage(toolCall.Id, toolResult));
+        }
+    }
+
+    private async Task StreamFinalResponseAsync
+    (
+        ChatClient chatClient,
+        List<ChatMessage> chatMessages,
+        string streamId,
+        StringBuilder messageContent,
+        CancellationToken cancellationToken
+    )
+    {
+        await foreach (StreamingChatCompletionUpdate update in chatClient.CompleteChatStreamingAsync(
+                           chatMessages, cancellationToken: cancellationToken))
+        {
+#pragma warning disable S3267
+            foreach (ChatMessageContentPart? part in update.ContentUpdate)
+#pragma warning restore S3267
             {
-                logger.LogError(ex, "Failed to release lock for chat {ChatId}", chatId);
+                string? chunk = part.Text;
+
+                if (!string.IsNullOrWhiteSpace(chunk))
+                {
+                    messageContent.Append(chunk);
+                    await streamPublisher.PublishChunkAsync(streamId, chunk, cancellationToken);
+                }
             }
         }
     }
 
-    public async Task StreamCompletionAdvancedAsync(Guid userId, string chatId, string streamId, string modelId, IReadOnlyList<ChatCompletionMessage> messages,
-        CancellationToken cancellationToken)
+    private async Task<List<ChatMessage>> BuildChatMessagesAsync
+    (
+        IReadOnlyList<ChatCompletionMessage> messages,
+        ToolContext? toolContext,
+        CancellationToken cancellationToken
+    )
     {
-        StringBuilder messageContent = new();
+        List<ChatMessage> chatMessages = [];
 
-        try
+        if (toolContext is not null)
         {
-            string openRouterId = modelRegistry.GetOpenRouterModelId(modelId);
-            ChatClient chatClient = openAiClient.GetChatClient(openRouterId);
-
-            await streamPublisher.PublishStatusAsync
-            (
-                streamId: streamId,
-                status: StreamStatus.Pending,
-                cancellationToken: cancellationToken
-            );
-            await streamPublisher.SetStreamExpirationAsync
-            (
-                streamId: streamId,
-                expiration: StreamExpiration,
-                cancellationToken: cancellationToken
-            );
-
             string latestUserMessage = messages
                 .Where(m => m.Role == MessageRole.User)
                 .Select(m => m.Content)
                 .LastOrDefault() ?? string.Empty;
 
-            IReadOnlyList<MemoryEntry> memories = await memoryStore.GetRelevantAsync
-            (
-                userId: userId,
-                context: latestUserMessage,
-                limit: MemoryConstants.MaxMemoriesInContext,
-                cancellationToken: cancellationToken
-            );
+            IReadOnlyList<MemoryEntry> memories = await memoryStore.GetRelevantAsync(
+                toolContext.UserId,
+                latestUserMessage,
+                MemoryConstants.MaxMemoriesInContext,
+                cancellationToken);
 
-            string systemPrompt = BuildSystemPromptWithMemories(memories);
-
-            List<ChatMessage> chatMessages = [new SystemChatMessage(systemPrompt)];
-            chatMessages.AddRange(messages.Select<ChatCompletionMessage, ChatMessage>(m =>
-            {
-                return m.Role switch
-                {
-                    MessageRole.User => new UserChatMessage(m.Content),
-                    MessageRole.Assistant => new AssistantChatMessage(m.Content),
-                    MessageRole.System => new SystemChatMessage(m.Content),
-                    _ => new UserChatMessage(m.Content)
-                };
-            }));
-
-            ChatCompletionOptions options = new()
-            {
-                Tools = { ToolDefinitions.SaveMemory }
-            };
-
-            int iterations = 0;
-
-            while (iterations < MaxToolCallIterations)
-            {
-                iterations++;
-
-                List<ChatToolCall> accumulatedToolCalls = new();
-                Dictionary<int, StringBuilder> chatToolCallArguments = new();
-                Dictionary<int, string> chatToolCallIds = new();
-                Dictionary<int, string> chatToolCallNames = new();
-                StringBuilder contentBuilder = new();
-                ChatFinishReason? finishReason = null;
-
-                await foreach (StreamingChatCompletionUpdate update in chatClient.CompleteChatStreamingAsync(
-                                   chatMessages, options, cancellationToken))
-                {
-                    foreach (StreamingChatToolCallUpdate chatToolCallUpdate in update.ToolCallUpdates)
-                    {
-                        int index = chatToolCallUpdate.Index;
-
-                        if (!chatToolCallArguments.ContainsKey(index))
-                            chatToolCallArguments[index] = new StringBuilder();
-
-                        if (!string.IsNullOrWhiteSpace(chatToolCallUpdate.FunctionArgumentsUpdate?.ToString()))
-                            chatToolCallArguments[index].Append(chatToolCallUpdate.FunctionArgumentsUpdate);
-
-                        if (chatToolCallUpdate.ToolCallId is not null)
-                            chatToolCallIds[index] = chatToolCallUpdate.ToolCallId;
-
-                        if (chatToolCallUpdate.FunctionName is not null)
-                            chatToolCallNames[index] = chatToolCallUpdate.FunctionName;
-                    }
-
-#pragma warning disable S3267
-                    foreach (ChatMessageContentPart? part in update.ContentUpdate)
-#pragma warning restore S3267
-                    {
-                        string? chunk = part.Text;
-
-                        if (!string.IsNullOrWhiteSpace(chunk))
-                        {
-                            contentBuilder.Append(chunk);
-                            messageContent.Append(chunk);
-
-                            await streamPublisher.PublishChunkAsync
-                            (
-                                streamId: streamId,
-                                messageContent: chunk,
-                                cancellationToken: cancellationToken
-                            );
-                        }
-                    }
-
-                    finishReason = update.FinishReason;
-                }
-
-                foreach (int index in chatToolCallIds.Keys)
-                {
-                    if (chatToolCallNames.TryGetValue(index, out string? name) &&
-                        chatToolCallArguments.TryGetValue(index, out StringBuilder? arguments))
-                    {
-                        accumulatedToolCalls.Add(ChatToolCall.CreateFunctionToolCall
-                        (
-                            id: chatToolCallIds[index],
-                            functionName: name,
-                            functionArguments: BinaryData.FromString(arguments.ToString())
-                        ));
-                    }
-                }
-
-                if (accumulatedToolCalls.Count == 0 || finishReason != ChatFinishReason.ToolCalls)
-                    break;
-
-                AssistantChatMessage assistantChatMessage = new(accumulatedToolCalls);
-
-                if (contentBuilder.Length > 0)
-                    assistantChatMessage.Content.Add(ChatMessageContentPart.CreateTextPart(contentBuilder.ToString()));
-
-                chatMessages.Add(assistantChatMessage);
-
-                foreach (ChatToolCall chatToolCall in accumulatedToolCalls)
-                {
-                    logger.LogInformation("Executing tool call {ToolCallId} ({FunctionName}) for chat {ChatId}",
-                        chatToolCall.Id, chatToolCall.FunctionName, chatId);
-
-                    string result = await toolExecutor.ExecuteAsync
-                    (
-                        chatToolCall: chatToolCall,
-                        userId: userId,
-                        cancellationToken: cancellationToken
-                    );
-
-                    chatMessages.Add(new ToolChatMessage(chatToolCall.Id, result));
-                }
-            }
-
-            await streamPublisher.PublishStatusAsync
-            (
-                streamId: streamId,
-                status: StreamStatus.Done,
-                cancellationToken: cancellationToken
-            );
-
-            AssistantMessageGenerated assistantMessageGenerated = new()
-            {
-                EventId = Guid.NewGuid(),
-                OccurredAt = dateTimeProvider.UtcNow,
-                CorrelationId = Guid.NewGuid(),
-                ChatId = chatId,
-                MessageContent = messageContent.ToString(),
-            };
-
-            await messageBus.PublishAsync(assistantMessageGenerated, cancellationToken);
+            chatMessages.Add(new SystemChatMessage(BuildSystemPrompt(memories)));
         }
-        catch (Exception exception)
-        {
-            logger.LogError(exception, "Streaming failed for chat {ChatId}", chatId);
 
-            try
-            {
-                await streamPublisher.PublishStatusAsync
-                (
-                    streamId: streamId,
-                    status: StreamStatus.Failed,
-                    cancellationToken: cancellationToken,
-                    fault: exception.Message
-                );
-            }
-            catch (RedisException redisException)
-            {
-                logger.LogError(redisException, "Failed to publish faulted status for chat {ChatId}", chatId);
-            }
-
-            throw;
-        }
-        finally
-        {
-            try
-            {
-                await chatLockService.ReleaseLockAsync(chatId, CancellationToken.None);
-            }
-            catch (RedisException ex)
-            {
-                logger.LogError(ex, "Failed to release lock for chat {ChatId}", chatId);
-            }
-        }
+        chatMessages.AddRange(messages.Select(ConvertToChatMessage));
+        return chatMessages;
     }
 
-    private static string BuildSystemPromptWithMemories(IReadOnlyList<MemoryEntry> memories)
-    {
-        if (memories.Count == 0)
+    private static ChatMessage ConvertToChatMessage(ChatCompletionMessage message) =>
+        message.Role switch
         {
-            return "You are a helpful AI assistant. " +
-                   "If the user shares important information about themselves (preferences, facts, or instructions), " +
-                   "use the save_memory function to remember it for future conversations.";
-        }
+            MessageRole.User => new UserChatMessage(message.Content),
+            MessageRole.Assistant => new AssistantChatMessage(message.Content),
+            MessageRole.System => new SystemChatMessage(message.Content),
+            _ => new UserChatMessage(message.Content)
+        };
+
+    private static string BuildSystemPrompt(IReadOnlyList<MemoryEntry> memories)
+    {
+        const string baseInstruction = "When the user shares important information about themselves (preferences, facts, or instructions), " +
+                                       "you MUST call the save_memory function to persist it. " +
+                                       "Do NOT just say you will remember - actually invoke the function.";
+
+        if (memories.Count == 0)
+            return $"You are a helpful AI assistant. {baseInstruction}";
 
         StringBuilder sb = new();
         sb.AppendLine("You are a helpful AI assistant with access to the user's saved memories.");
         sb.AppendLine();
         sb.AppendLine("Relevant user memories:");
+
         foreach (MemoryEntry memory in memories)
-        {
             sb.AppendLine(CultureInfo.InvariantCulture, $"- [{memory.MemoryCategory}] {memory.Content}");
-        }
+
         sb.AppendLine();
-        sb.AppendLine("Use these memories to personalize your responses. " +
-                      "If the user shares new important information, use the save_memory function to remember it.");
+        sb.AppendLine($"Use these memories to personalize your responses. {baseInstruction}");
 
         return sb.ToString();
+    }
+
+    private ChatClient GetChatClient(string modelId)
+    {
+        string openRouterId = modelRegistry.GetOpenRouterModelId(modelId);
+        return openAiClient.GetChatClient(openRouterId);
+    }
+
+    private async Task InitializeStreamAsync(string streamId, CancellationToken cancellationToken)
+    {
+        await streamPublisher.PublishStatusAsync(streamId, StreamStatus.Pending, cancellationToken);
+        await streamPublisher.SetStreamExpirationAsync(streamId, StreamExpiration, cancellationToken);
+    }
+
+    private async Task FinalizeStreamAsync
+    (
+        string streamId,
+        string chatId,
+        StringBuilder messageContent,
+        CancellationToken cancellationToken
+    )
+    {
+        await streamPublisher.PublishStatusAsync(streamId, StreamStatus.Done, cancellationToken);
+
+        if (messageContent.Length > 0)
+        {
+            await messageBus.PublishAsync(new AssistantMessageGenerated
+            {
+                EventId = Guid.NewGuid(),
+                OccurredAt = dateTimeProvider.UtcNow,
+                CorrelationId = Guid.NewGuid(),
+                ChatId = chatId,
+                MessageContent = messageContent.ToString()
+            }, cancellationToken);
+        }
+    }
+
+    private async Task HandleStreamingErrorAsync
+    (
+        string chatId,
+        string streamId,
+        Exception exception,
+        CancellationToken cancellationToken
+    )
+    {
+        logger.LogError(exception, "Streaming failed for chat {ChatId}", chatId);
+
+        try
+        {
+            await streamPublisher.PublishStatusAsync(streamId, StreamStatus.Failed, cancellationToken, exception.Message);
+        }
+        catch (RedisException redisException)
+        {
+            logger.LogError(redisException, "Failed to publish faulted status for chat {ChatId}", chatId);
+        }
+    }
+
+    private async Task ReleaseChatLockAsync(string chatId)
+    {
+        try
+        {
+            await chatLockService.ReleaseLockAsync(chatId, CancellationToken.None);
+        }
+        catch (RedisException exception)
+        {
+            logger.LogError(exception, "Failed to release lock for chat {ChatId}", chatId);
+        }
+    }
+
+    private sealed record ToolContext(Guid UserId);
+
+    private sealed record StreamIterationResult
+    (
+        IReadOnlyList<ChatToolCall> ToolCalls,
+        string Content,
+        bool HasProviderError
+    );
+
+    private sealed class ToolCallAccumulator
+    {
+        private readonly Dictionary<int, StringBuilder> _arguments = [];
+        private readonly Dictionary<int, string> _ids = [];
+        private readonly Dictionary<int, string> _names = [];
+
+        public void ProcessUpdate(StreamingChatCompletionUpdate update)
+        {
+            foreach (StreamingChatToolCallUpdate toolCallUpdate in update.ToolCallUpdates)
+            {
+                int index = toolCallUpdate.Index;
+
+                _arguments.TryAdd(index, new StringBuilder());
+
+                if (!string.IsNullOrWhiteSpace(toolCallUpdate.FunctionArgumentsUpdate?.ToString()))
+                    _arguments[index].Append(toolCallUpdate.FunctionArgumentsUpdate);
+
+                if (toolCallUpdate.ToolCallId is not null)
+                    _ids[index] = toolCallUpdate.ToolCallId;
+
+                if (toolCallUpdate.FunctionName is not null)
+                    _names[index] = toolCallUpdate.FunctionName;
+            }
+        }
+
+        public List<ChatToolCall> Build()
+        {
+            List<ChatToolCall> toolCalls = [];
+
+            foreach (int index in _ids.Keys)
+            {
+                if (_names.TryGetValue(index, out string? name) &&
+                    _arguments.TryGetValue(index, out StringBuilder? arguments))
+                {
+                    toolCalls.Add(ChatToolCall.CreateFunctionToolCall(
+                        _ids[index],
+                        name,
+                        BinaryData.FromString(arguments.ToString())));
+                }
+            }
+
+            return toolCalls;
+        }
     }
 }

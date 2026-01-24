@@ -22,16 +22,28 @@ internal sealed class ToolExecutor(IMemoryStore memoryStore, ILogger<ToolExecuto
     private async Task<string> ExecuteSaveMemoryAsync(ChatToolCall chatToolCall, Guid userId,
         CancellationToken cancellationToken)
     {
+        logger.LogInformation("ExecuteSaveMemoryAsync called for user {UserId}, arguments: {Arguments}",
+            userId, chatToolCall.FunctionArguments.ToString());
+
         try
         {
             SaveMemoryArguments? arguments = JsonSerializer.Deserialize<SaveMemoryArguments>(
                 chatToolCall.FunctionArguments.ToString());
 
             if (arguments is null)
+            {
+                logger.LogWarning("Failed to deserialize save_memory arguments for user {UserId}", userId);
                 return "Failed to deserialize arguments.";
+            }
+
+            logger.LogInformation("Parsed save_memory: Content={Content}, Category={Category}",
+                arguments.Content, arguments.Category);
 
             if (!Enum.TryParse<MemoryCategory>(arguments.Category, ignoreCase: true, out MemoryCategory memoryCategory))
+            {
+                logger.LogWarning("Invalid category {Category} for user {UserId}", arguments.Category, userId);
                 return $"Invalid category: {arguments.Category}. Must be 'preference', 'fact', or 'instruction'.";
+            }
 
             string memoryId = await memoryStore.SaveAsync
             (
@@ -41,6 +53,7 @@ internal sealed class ToolExecutor(IMemoryStore memoryStore, ILogger<ToolExecuto
                 cancellationToken: cancellationToken
             );
 
+            logger.LogInformation("Memory saved successfully: {MemoryId} for user {UserId}", memoryId, userId);
             return $"Memory saved with ID: {memoryId}";
         }
         catch (ArgumentException exception)

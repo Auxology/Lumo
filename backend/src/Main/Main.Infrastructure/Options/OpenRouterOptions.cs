@@ -15,6 +15,9 @@ internal sealed class OpenRouterOptions
     [Required, MinLength(1)]
     public string DefaultModel { get; init; } = string.Empty;
 
+    [Required, MinLength(1)]
+    public string EmbeddingModel { get; init; } = string.Empty;
+
     public string? AppName { get; init; }
 
     [Url]
