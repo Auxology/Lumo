@@ -61,7 +61,7 @@ internal sealed class MemoryStore(
         logger.LogInformation
         (
             "Saved memory {MemoryId} for user {UserId} with category {Category}",
-            memoryRecord.Id, userId, memoryRecord
+            memoryRecord.Id, userId, memoryRecord.Category
         );
 
         return memoryRecord.Id;
@@ -91,7 +91,7 @@ internal sealed class MemoryStore(
 
         List<MemoryRecord> memoryRecords = await dbContext.Memories
             .Where(m => m.UserId == userId)
-            .OrderByDescending(m => m.Embedding.CosineDistance(queryVector))
+            .OrderBy(m => m.Embedding.CosineDistance(queryVector))
             .Take(limit)
             .ToListAsync(cancellationToken);
 
@@ -114,10 +114,22 @@ internal sealed class MemoryStore(
         await dbContext.Memories
             .CountAsync(m => m.UserId == userId, cancellationToken: cancellationToken);
 
-    public async Task DeleteAsync(Guid userId, CancellationToken cancellationToken)
+    public async Task DeleteAsync(Guid userId, string? memoryId, CancellationToken cancellationToken)
     {
-        MemoryRecord? memoryRecord = await dbContext.Memories
-            .FirstOrDefaultAsync(m => m.UserId == userId, cancellationToken: cancellationToken);
+        MemoryRecord? memoryRecord;
+
+        if (memoryId is not null)
+        {
+            memoryRecord = await dbContext.Memories
+                .FirstOrDefaultAsync(m => m.UserId == userId && m.Id == memoryId, cancellationToken);
+        }
+        else
+        {
+            memoryRecord = await dbContext.Memories
+                .Where(m => m.UserId == userId)
+                .OrderBy(m => m.CreatedAt)
+                .FirstOrDefaultAsync(cancellationToken);
+        }
 
         if (memoryRecord is not null)
         {

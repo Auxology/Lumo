@@ -44,7 +44,9 @@ internal sealed class ModelRegistry : IModelRegistry
         _modelMap.ContainsKey(modelId);
 
     public string GetOpenRouterModelId(string modelId) =>
-        _modelMap[modelId].OpenRouterId;
+        _modelMap.TryGetValue(modelId, out var config)
+            ? config.OpenRouterId
+            : throw new ArgumentException($"Model '{modelId}' is not in the allowed models list. Call IsModelAllowed() first.", nameof(modelId));
 
     public string GetDefaultModelId() =>
         _defaultModelId;

@@ -13,7 +13,7 @@ public interface IMemoryStore
 
     Task<int> GetCountAsync(Guid userId, CancellationToken cancellationToken);
 
-    Task DeleteAsync(Guid userId, CancellationToken cancellationToken);
+    Task DeleteAsync(Guid userId, string? memoryId, CancellationToken cancellationToken);
 
     Task DeleteAllAsync(Guid userId, CancellationToken cancellationToken);
 }
