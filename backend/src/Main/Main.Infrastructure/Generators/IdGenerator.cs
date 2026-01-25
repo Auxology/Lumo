@@ -13,4 +13,10 @@ internal sealed class IdGenerator : IIdGenerator
 
     public StreamId NewStreamId() =>
         StreamId.UnsafeFrom($"{StreamId.PrefixValue}{Ulid.NewUlid()}");
+
+    public PreferenceId NewPreferenceId() =>
+        PreferenceId.UnsafeFrom($"{PreferenceId.PrefixValue}{Ulid.NewUlid()}");
+
+    public InstructionId NewInstructionId() =>
+        InstructionId.UnsafeFrom($"{InstructionId.PrefixValue}{Ulid.NewUlid()}");
 }

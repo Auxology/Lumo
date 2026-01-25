@@ -128,9 +128,9 @@ internal sealed class ChatCompletionService(
             await InitializeStreamAsync(streamId, cancellationToken);
 
             ChatClient chatClient = GetChatClient(modelId);
-            
+
             List<ChatMessage> chatMessages = await BuildChatMessagesAsync(messages, toolContext, cancellationToken);
-            
+
             ChatCompletionOptions? options = toolContext is not null
                 ? new ChatCompletionOptions { Tools = { ToolDefinitions.SaveMemory } }
                 : null;
