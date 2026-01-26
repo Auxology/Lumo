@@ -16,7 +16,11 @@ internal sealed class MainDbContext(DbContextOptions<MainDbContext> options) : D
 
     public DbSet<Chat> Chats { get; set; }
     public DbSet<Message> Messages { get; set; }
+
     internal DbSet<MemoryRecord> Memories { get; set; }
+
+    public DbSet<Preference> Preferences { get; set; }
+    public DbSet<Instruction> Instructions { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

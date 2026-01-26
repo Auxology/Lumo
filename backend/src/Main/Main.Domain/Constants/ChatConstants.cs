@@ -7,4 +7,6 @@ public static class ChatConstants
     public const int MaxModelIdLength = 64;
 
     public const int MaxContextMessages = 20;
+
+    public const int DefaultPageSize = 10;
 }

@@ -5,6 +5,7 @@ using System.Text;
 using Contracts.IntegrationEvents.Chat;
 
 using Main.Application.Abstractions.AI;
+using Main.Application.Abstractions.Instructions;
 using Main.Application.Abstractions.Memory;
 using Main.Application.Abstractions.Stream;
 using Main.Domain.Constants;
@@ -29,6 +30,7 @@ internal sealed class ChatCompletionService(
     IStreamPublisher streamPublisher,
     IMessageBus messageBus,
     IChatLockService chatLockService,
+    IInstructionStore instructionStore,
     IMemoryStore memoryStore,
     ToolExecutor toolExecutor,
     IDateTimeProvider dateTimeProvider,
@@ -336,13 +338,18 @@ internal sealed class ChatCompletionService(
                 .Select(m => m.Content)
                 .LastOrDefault() ?? string.Empty;
 
-            IReadOnlyList<MemoryEntry> memories = await memoryStore.GetRelevantAsync(
+            IReadOnlyList<MemoryEntry> memories = await memoryStore.GetRelevantAsync
+            (
                 toolContext.UserId,
                 latestUserMessage,
                 MemoryConstants.MaxMemoriesInContext,
-                cancellationToken);
+                cancellationToken
+            );
 
-            chatMessages.Add(new SystemChatMessage(BuildSystemPrompt(memories)));
+            IReadOnlyList<InstructionEntry> instructions = await instructionStore
+                .GetForUserAsync(toolContext.UserId, cancellationToken);
+
+            chatMessages.Add(new SystemChatMessage(BuildSystemPrompt(instructions, memories)));
         }
 
         chatMessages.AddRange(messages.Select(ConvertToChatMessage));
@@ -358,25 +365,43 @@ internal sealed class ChatCompletionService(
             _ => new UserChatMessage(message.Content)
         };
 
-    private static string BuildSystemPrompt(IReadOnlyList<MemoryEntry> memories)
+    private static string BuildSystemPrompt(
+        IReadOnlyList<InstructionEntry> instructions,
+        IReadOnlyList<MemoryEntry> memories)
     {
         const string baseInstruction = "When the user shares important information about themselves (preferences, facts, or instructions), " +
                                        "you MUST call the save_memory function to persist it. " +
                                        "Do NOT just say you will remember - actually invoke the function.";
 
-        if (memories.Count == 0)
+        if (instructions.Count == 0 && memories.Count == 0)
             return $"You are a helpful AI assistant. {baseInstruction}";
 
         StringBuilder sb = new();
-        sb.AppendLine("You are a helpful AI assistant with access to the user's saved memories.");
-        sb.AppendLine();
-        sb.AppendLine("Relevant user memories:");
+        sb.AppendLine("You are a helpful AI assistant.");
 
-        foreach (MemoryEntry memory in memories)
-            sb.AppendLine(CultureInfo.InvariantCulture, $"- [{memory.MemoryCategory}] {memory.Content}");
+        if (instructions.Count > 0)
+        {
+            sb.AppendLine();
+            sb.AppendLine("User's custom instructions (follow these carefully):");
+
+            foreach (InstructionEntry instruction in instructions)
+                sb.AppendLine(CultureInfo.InvariantCulture, $"- {instruction.Content}");
+        }
+
+        if (memories.Count > 0)
+        {
+            sb.AppendLine();
+            sb.AppendLine("Relevant user memories:");
+
+            foreach (MemoryEntry memory in memories)
+                sb.AppendLine(CultureInfo.InvariantCulture, $"- [{memory.MemoryCategory}] {memory.Content}");
+
+            sb.AppendLine();
+            sb.AppendLine("Use these memories to personalize your responses.");
+        }
 
         sb.AppendLine();
-        sb.AppendLine($"Use these memories to personalize your responses. {baseInstruction}");
+        sb.AppendLine(baseInstruction);
 
         return sb.ToString();
     }

@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using Main.Application.Abstractions.AI;
 using Main.Application.Abstractions.Data;
 using Main.Application.Abstractions.Generators;
+using Main.Application.Abstractions.Instructions;
 using Main.Application.Abstractions.Memory;
 using Main.Application.Abstractions.Stream;
 using Main.Infrastructure.AI;
@@ -11,12 +12,14 @@ using Main.Infrastructure.AI.Tools;
 using Main.Infrastructure.Consumers;
 using Main.Infrastructure.Data;
 using Main.Infrastructure.Generators;
+using Main.Infrastructure.Instructions;
 using Main.Infrastructure.Memory;
 using Main.Infrastructure.Options;
 using Main.Infrastructure.Stream;
 
 using MassTransit;
 
+using Microsoft.AspNetCore.Server.IIS;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -199,6 +202,7 @@ public static class DependencyInjection
         services.AddSingleton<IStreamPublisher, StreamPublisher>();
         services.AddSingleton<IChatLockService, ChatLockService>();
 
+        services.AddScoped<IInstructionStore, InstructionStore>();
         services.AddScoped<IMemoryStore, MemoryStore>();
         services.AddScoped<ToolExecutor>();
 
