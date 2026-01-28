@@ -22,6 +22,8 @@ internal sealed class MainDbContext(DbContextOptions<MainDbContext> options) : D
     public DbSet<Preference> Preferences { get; set; }
     public DbSet<Instruction> Instructions { get; set; }
 
+    public DbSet<SharedChat> SharedChats { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

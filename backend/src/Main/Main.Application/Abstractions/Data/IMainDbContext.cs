@@ -16,5 +16,7 @@ public interface IMainDbContext
     DbSet<Preference> Preferences { get; }
     DbSet<Instruction> Instructions { get; }
 
+    DbSet<SharedChat> SharedChats { get; }
+
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
