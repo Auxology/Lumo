@@ -10,6 +10,12 @@ internal static class ChatOperationFaults
         detail: "The specified chat was not found."
     );
 
+    internal static readonly Fault InvalidModel = Fault.Validation
+    (
+        title: "Chat.InvalidModel",
+        detail: "The specified model is not available."
+    );
+
     internal static readonly Fault GenerationInProgress = Fault.Conflict
     (
         title: "Chat.GenerationInProgress",

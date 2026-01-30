@@ -1,0 +1,50 @@
+using Main.Application.Abstractions.Memory;
+using Main.Infrastructure.Data.Entities;
+
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace Main.Infrastructure.Data.Configuration;
+
+internal sealed class MemoryRecordConfiguration : IEntityTypeConfiguration<MemoryRecord>
+{
+    private const int EmbeddingDimensions = 1536;
+
+    public void Configure(EntityTypeBuilder<MemoryRecord> b)
+    {
+        b.HasKey(m => m.Id);
+
+        b.Property(m => m.Id)
+            .HasColumnType("varchar(30)");
+
+        b.Property(m => m.UserId)
+            .IsRequired()
+            .HasColumnType("uuid");
+
+        b.Property(m => m.Content)
+            .IsRequired()
+            .HasMaxLength(MemoryConstants.MaxContentLength)
+            .HasColumnType($"varchar({MemoryConstants.MaxContentLength})");
+
+        b.Property(m => m.Category)
+            .IsRequired()
+            .HasConversion<string>()
+            .HasMaxLength(20)
+            .HasColumnType("varchar(20)");
+
+        b.Property(m => m.Embedding)
+            .IsRequired()
+            .HasColumnType($"vector({EmbeddingDimensions})");
+
+        b.Property(m => m.CreatedAt)
+            .IsRequired()
+            .HasColumnType("timestamptz");
+
+        b.HasIndex(m => m.UserId);
+        b.HasIndex(m => new { m.UserId, m.CreatedAt });
+
+        b.HasIndex(m => m.Embedding)
+            .HasMethod("hnsw")
+            .HasOperators("vector_cosine_ops");
+    }
+}

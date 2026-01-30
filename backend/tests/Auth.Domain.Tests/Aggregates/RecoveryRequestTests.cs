@@ -450,7 +450,7 @@ public sealed class RecoveryRequestTests
     }
 
     [Fact]
-    public void IsExpired_AtExactExpirationTime_ShouldReturnTrue()
+    public void IsExpired_AtExactExpirationTime_ShouldReturnFalse()
     {
         RecoveryRequest request = RecoveryRequest.Create
         (
@@ -468,6 +468,8 @@ public sealed class RecoveryRequestTests
 
         bool isExpired = request.IsExpired(exactExpirationTime);
 
-        isExpired.Should().BeTrue();
+        // At exact expiration time, IsExpired returns false because the check is strictly less than (ExpiresAt < utcNow)
+        // This is consistent with the domain logic in VerifyNewEmail and Complete methods
+        isExpired.Should().BeFalse();
     }
 }

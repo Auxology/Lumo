@@ -88,7 +88,7 @@ internal sealed class GetMessageHandler(IDbConnectionFactory dbConnectionFactory
                 new { ChatId = chatId.Value, Limit = fetchLimit }
             );
 
-        List<MessageReadModel> messageList = messages.ToList();
+        List<MessageReadModel> messageList = messages.AsList();
 
         bool hasMore = messageList.Count > request.Limit;
 

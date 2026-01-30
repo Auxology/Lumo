@@ -18,7 +18,7 @@ public sealed class Chat : AggregateRoot<ChatId>
 
     public string Title { get; private set; } = string.Empty;
 
-    public string? ModelName { get; private set; }
+    public string ModelId { get; private set; } = string.Empty;
 
     public bool IsArchived { get; private set; }
 
@@ -38,17 +38,18 @@ public sealed class Chat : AggregateRoot<ChatId>
         ChatId id,
         Guid userId,
         string title,
+        string modelId,
         DateTimeOffset utcNow
     )
     {
         Id = id;
         UserId = userId;
         Title = title;
-        ModelName = null;
+        ModelId = modelId;
         IsArchived = false;
         NextSequenceNumber = 0;
         CreatedAt = utcNow;
-        UpdatedAt = null;
+        UpdatedAt = utcNow;
     }
 
     public static Outcome<Chat> Create
@@ -56,6 +57,7 @@ public sealed class Chat : AggregateRoot<ChatId>
         ChatId id,
         Guid userId,
         string title,
+        string modelId,
         DateTimeOffset utcNow
     )
     {
@@ -68,11 +70,15 @@ public sealed class Chat : AggregateRoot<ChatId>
         if (title.Length > ChatConstants.MaxTitleLength)
             return ChatFaults.TitleTooLong;
 
+        if (string.IsNullOrWhiteSpace(modelId))
+            return ChatFaults.ModelIdRequired;
+
         Chat chat = new
         (
             id: id,
             userId: userId,
             title: title,
+            modelId: modelId,
             utcNow: utcNow
         );
 

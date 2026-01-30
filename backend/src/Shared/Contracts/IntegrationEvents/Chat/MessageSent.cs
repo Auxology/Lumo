@@ -14,5 +14,7 @@ public sealed record MessageSent
 
     public required Guid UserId { get; init; }
 
+    public required string ModelId { get; init; }
+
     public required string Message { get; init; }
 };

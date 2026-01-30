@@ -13,5 +13,10 @@ public interface IMainDbContext
     DbSet<Chat> Chats { get; }
     DbSet<Message> Messages { get; }
 
+    DbSet<Preference> Preferences { get; }
+    DbSet<Instruction> Instructions { get; }
+
+    DbSet<SharedChat> SharedChats { get; }
+
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

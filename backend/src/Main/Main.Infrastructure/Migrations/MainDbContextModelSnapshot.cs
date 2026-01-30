@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+using Pgvector;
 
 #nullable disable
 
@@ -17,9 +18,10 @@ namespace Main.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.1")
+                .HasAnnotation("ProductVersion", "10.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
+            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "vector");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Main.Domain.Aggregates.Chat", b =>
@@ -36,10 +38,10 @@ namespace Main.Infrastructure.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("is_archived");
 
-                    b.Property<string>("ModelName")
+                    b.Property<string>("ModelId")
                         .HasMaxLength(64)
                         .HasColumnType("varchar(64)")
-                        .HasColumnName("model_name");
+                        .HasColumnName("model_id");
 
                     b.Property<int>("NextSequenceNumber")
                         .HasColumnType("integer")
@@ -66,6 +68,127 @@ namespace Main.Infrastructure.Migrations
                         .HasDatabaseName("ix_chats_user_id_is_archived_updated_at");
 
                     b.ToTable("chats", (string)null);
+                });
+
+            modelBuilder.Entity("Main.Domain.Aggregates.Preference", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(30)")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_preferences");
+
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_preferences_user_id");
+
+                    b.ToTable("preferences", (string)null);
+                });
+
+            modelBuilder.Entity("Main.Domain.Aggregates.SharedChat", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(30)")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("ModelId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("model_id");
+
+                    b.Property<Guid>("OwnerId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("owner_id");
+
+                    b.Property<DateTimeOffset>("SnapshotAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("snapshot_at");
+
+                    b.Property<string>("SourceChatId")
+                        .IsRequired()
+                        .HasColumnType("varchar(30)")
+                        .HasColumnName("source_chat_id");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("title");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_shared_chats");
+
+                    b.HasIndex("OwnerId")
+                        .HasDatabaseName("ix_shared_chats_owner_id");
+
+                    b.HasIndex("SourceChatId")
+                        .HasDatabaseName("ix_shared_chats_source_chat_id");
+
+                    b.ToTable("shared_chats", (string)null);
+                });
+
+            modelBuilder.Entity("Main.Domain.Entities.Instruction", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(30)")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("content");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("PreferenceId")
+                        .IsRequired()
+                        .HasColumnType("varchar(30)")
+                        .HasColumnName("preference_id");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("integer")
+                        .HasColumnName("priority");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_instructions");
+
+                    b.HasIndex("PreferenceId")
+                        .HasDatabaseName("ix_instructions_preference_id");
+
+                    b.HasIndex("PreferenceId", "Priority")
+                        .IsUnique()
+                        .HasDatabaseName("ix_instructions_preference_id_priority");
+
+                    b.ToTable("instructions", (string)null);
                 });
 
             modelBuilder.Entity("Main.Domain.Entities.Message", b =>
@@ -146,6 +269,55 @@ namespace Main.Infrastructure.Migrations
                         .HasDatabaseName("ix_users_email_address");
 
                     b.ToTable("users", (string)null);
+                });
+
+            modelBuilder.Entity("Main.Infrastructure.Data.Entities.MemoryRecord", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(30)")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("category");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("varchar(2000)")
+                        .HasColumnName("content");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("created_at");
+
+                    b.Property<Vector>("Embedding")
+                        .IsRequired()
+                        .HasColumnType("vector(1536)")
+                        .HasColumnName("embedding");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_memories");
+
+                    b.HasIndex("Embedding")
+                        .HasDatabaseName("ix_memories_embedding");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Embedding"), "hnsw");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("Embedding"), new[] { "vector_cosine_ops" });
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_memories_user_id");
+
+                    b.HasIndex("UserId", "CreatedAt")
+                        .HasDatabaseName("ix_memories_user_id_created_at");
+
+                    b.ToTable("memories", (string)null);
                 });
 
             modelBuilder.Entity("MassTransit.EntityFrameworkCoreIntegration.InboxState", b =>
@@ -366,6 +538,56 @@ namespace Main.Infrastructure.Migrations
                     b.ToTable("outbox_state", (string)null);
                 });
 
+            modelBuilder.Entity("Main.Domain.Aggregates.SharedChat", b =>
+                {
+                    b.OwnsMany("Main.Domain.ValueObjects.SharedChatMessage", "SharedChatMessages", b1 =>
+                        {
+                            b1.Property<string>("SharedChatId")
+                                .HasColumnType("varchar(30)")
+                                .HasColumnName("shared_chat_id");
+
+                            b1.Property<int>("SequenceNumber")
+                                .HasColumnType("integer")
+                                .HasColumnName("sequence_number");
+
+                            b1.Property<DateTimeOffset>("CreatedAt")
+                                .HasColumnType("timestamptz")
+                                .HasColumnName("created_at");
+
+                            b1.Property<string>("MessageContent")
+                                .IsRequired()
+                                .HasColumnType("text")
+                                .HasColumnName("message_content");
+
+                            b1.Property<string>("MessageRole")
+                                .IsRequired()
+                                .HasMaxLength(512)
+                                .HasColumnType("character varying(512)")
+                                .HasColumnName("message_role");
+
+                            b1.HasKey("SharedChatId", "SequenceNumber")
+                                .HasName("pk_shared_chat_messages");
+
+                            b1.ToTable("shared_chat_messages", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("SharedChatId")
+                                .HasConstraintName("fk_shared_chat_messages_shared_chats_shared_chat_id");
+                        });
+
+                    b.Navigation("SharedChatMessages");
+                });
+
+            modelBuilder.Entity("Main.Domain.Entities.Instruction", b =>
+                {
+                    b.HasOne("Main.Domain.Aggregates.Preference", null)
+                        .WithMany("Instructions")
+                        .HasForeignKey("PreferenceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_instructions_preferences_preference_id");
+                });
+
             modelBuilder.Entity("Main.Domain.Entities.Message", b =>
                 {
                     b.HasOne("Main.Domain.Aggregates.Chat", null)
@@ -393,6 +615,11 @@ namespace Main.Infrastructure.Migrations
             modelBuilder.Entity("Main.Domain.Aggregates.Chat", b =>
                 {
                     b.Navigation("Messages");
+                });
+
+            modelBuilder.Entity("Main.Domain.Aggregates.Preference", b =>
+                {
+                    b.Navigation("Instructions");
                 });
 #pragma warning restore 612, 618
         }

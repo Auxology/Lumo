@@ -88,6 +88,7 @@ internal sealed class SendMessageHandler(
                 ChatId = chat.Id.Value,
                 UserId = user.UserId,
                 StreamId = streamId.Value,
+                ModelId = chat.ModelId,
                 Message = request.Message
             };
 

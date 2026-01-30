@@ -15,30 +15,31 @@ public sealed class ChatTests
     private static readonly DateTimeOffset UtcNow = DateTimeOffset.UtcNow;
     private static readonly Guid ValidUserId = Guid.NewGuid();
     private const string ValidTitle = "My Chat";
-    private static readonly ChatId ValidChatId = ChatId.UnsafeFrom("test-chat-id");
-    private static readonly ChatId AnotherChatId = ChatId.UnsafeFrom("another-chat-id");
+    private const string ValidModelId = "claude-3-haiku";
+    private static readonly ChatId ValidChatId = ChatId.UnsafeFrom("cht_01JGX12345678901234567890");
+    private static readonly ChatId AnotherChatId = ChatId.UnsafeFrom("cht_01JGX09876543210987654321");
     private static readonly MessageId ValidMessageId = MessageId.UnsafeFrom("msg_01JGX123456789012345678901");
 
     [Fact]
     public void Create_WithValidData_ShouldReturnSuccess()
     {
-        Outcome<Chat> outcome = Chat.Create(ValidChatId, ValidUserId, ValidTitle, UtcNow);
+        Outcome<Chat> outcome = Chat.Create(ValidChatId, ValidUserId, ValidTitle, ValidModelId, UtcNow);
 
         outcome.IsSuccess.Should().BeTrue();
         outcome.Value.Id.Should().Be(ValidChatId);
         outcome.Value.UserId.Should().Be(ValidUserId);
         outcome.Value.Title.Should().Be(ValidTitle);
-        outcome.Value.ModelName.Should().BeNull();
+        outcome.Value.ModelId.Should().Be(ValidModelId);
         outcome.Value.IsArchived.Should().BeFalse();
         outcome.Value.CreatedAt.Should().Be(UtcNow);
-        outcome.Value.UpdatedAt.Should().BeNull();
+        outcome.Value.UpdatedAt.Should().Be(UtcNow);
         outcome.Value.Messages.Should().BeEmpty();
     }
 
     [Fact]
     public void Create_WithValidData_ShouldUseProvidedId()
     {
-        Outcome<Chat> outcome = Chat.Create(ValidChatId, ValidUserId, ValidTitle, UtcNow);
+        Outcome<Chat> outcome = Chat.Create(ValidChatId, ValidUserId, ValidTitle, ValidModelId, UtcNow);
 
         outcome.IsSuccess.Should().BeTrue();
         outcome.Value.Id.Should().Be(ValidChatId);
@@ -48,7 +49,7 @@ public sealed class ChatTests
     [Fact]
     public void Create_WithEmptyUserId_ShouldReturnFailure()
     {
-        Outcome<Chat> outcome = Chat.Create(ValidChatId, Guid.Empty, ValidTitle, UtcNow);
+        Outcome<Chat> outcome = Chat.Create(ValidChatId, Guid.Empty, ValidTitle, ValidModelId, UtcNow);
 
         outcome.IsFailure.Should().BeTrue();
         outcome.Fault.Should().Be(ChatFaults.UserIdRequired);
@@ -60,7 +61,7 @@ public sealed class ChatTests
     [InlineData(null)]
     public void Create_WithEmptyTitle_ShouldReturnFailure(string? title)
     {
-        Outcome<Chat> outcome = Chat.Create(ValidChatId, ValidUserId, title!, UtcNow);
+        Outcome<Chat> outcome = Chat.Create(ValidChatId, ValidUserId, title!, ValidModelId, UtcNow);
 
         outcome.IsFailure.Should().BeTrue();
         outcome.Fault.Should().Be(ChatFaults.TitleRequired);
@@ -71,16 +72,28 @@ public sealed class ChatTests
     {
         string title = new('a', ChatConstants.MaxTitleLength + 1);
 
-        Outcome<Chat> outcome = Chat.Create(ValidChatId, ValidUserId, title, UtcNow);
+        Outcome<Chat> outcome = Chat.Create(ValidChatId, ValidUserId, title, ValidModelId, UtcNow);
 
         outcome.IsFailure.Should().BeTrue();
         outcome.Fault.Should().Be(ChatFaults.TitleTooLong);
     }
 
+    [Theory]
+    [InlineData("")]
+    [InlineData(" ")]
+    [InlineData(null)]
+    public void Create_WithEmptyModelId_ShouldReturnFailure(string? modelId)
+    {
+        Outcome<Chat> outcome = Chat.Create(ValidChatId, ValidUserId, ValidTitle, modelId!, UtcNow);
+
+        outcome.IsFailure.Should().BeTrue();
+        outcome.Fault.Should().Be(ChatFaults.ModelIdRequired);
+    }
+
     [Fact]
     public void RenameTitle_WithValidTitle_ShouldUpdateTitle()
     {
-        Chat chat = Chat.Create(ValidChatId, ValidUserId, ValidTitle, UtcNow).Value;
+        Chat chat = Chat.Create(ValidChatId, ValidUserId, ValidTitle, ValidModelId, UtcNow).Value;
         string newTitle = "Updated Chat Title";
         DateTimeOffset updateTime = UtcNow.AddHours(1);
 
@@ -97,7 +110,7 @@ public sealed class ChatTests
     [InlineData(null)]
     public void RenameTitle_WithEmptyTitle_ShouldReturnFailure(string? title)
     {
-        Chat chat = Chat.Create(ValidChatId, ValidUserId, ValidTitle, UtcNow).Value;
+        Chat chat = Chat.Create(ValidChatId, ValidUserId, ValidTitle, ValidModelId, UtcNow).Value;
 
         Outcome outcome = chat.RenameTitle(title!, UtcNow);
 
@@ -108,7 +121,7 @@ public sealed class ChatTests
     [Fact]
     public void RenameTitle_WithTooLongTitle_ShouldReturnFailure()
     {
-        Chat chat = Chat.Create(ValidChatId, ValidUserId, ValidTitle, UtcNow).Value;
+        Chat chat = Chat.Create(ValidChatId, ValidUserId, ValidTitle, ValidModelId, UtcNow).Value;
         string title = new('a', ChatConstants.MaxTitleLength + 1);
 
         Outcome outcome = chat.RenameTitle(title, UtcNow);
@@ -120,7 +133,7 @@ public sealed class ChatTests
     [Fact]
     public void RenameTitle_OnArchivedChat_ShouldReturnFailure()
     {
-        Chat chat = Chat.Create(ValidChatId, ValidUserId, ValidTitle, UtcNow).Value;
+        Chat chat = Chat.Create(ValidChatId, ValidUserId, ValidTitle, ValidModelId, UtcNow).Value;
         chat.Archive(UtcNow);
 
         Outcome outcome = chat.RenameTitle("New Title", UtcNow);
@@ -132,7 +145,7 @@ public sealed class ChatTests
     [Fact]
     public void Archive_WhenNotArchived_ShouldReturnSuccessAndArchive()
     {
-        Chat chat = Chat.Create(ValidChatId, ValidUserId, ValidTitle, UtcNow).Value;
+        Chat chat = Chat.Create(ValidChatId, ValidUserId, ValidTitle, ValidModelId, UtcNow).Value;
         DateTimeOffset updateTime = UtcNow.AddHours(1);
 
         Outcome outcome = chat.Archive(updateTime);
@@ -145,7 +158,7 @@ public sealed class ChatTests
     [Fact]
     public void Archive_WhenAlreadyArchived_ShouldReturnFailure()
     {
-        Chat chat = Chat.Create(ValidChatId, ValidUserId, ValidTitle, UtcNow).Value;
+        Chat chat = Chat.Create(ValidChatId, ValidUserId, ValidTitle, ValidModelId, UtcNow).Value;
         chat.Archive(UtcNow);
 
         Outcome outcome = chat.Archive(UtcNow.AddHours(1));
@@ -157,7 +170,7 @@ public sealed class ChatTests
     [Fact]
     public void Unarchive_WhenArchived_ShouldReturnSuccessAndUnarchive()
     {
-        Chat chat = Chat.Create(ValidChatId, ValidUserId, ValidTitle, UtcNow).Value;
+        Chat chat = Chat.Create(ValidChatId, ValidUserId, ValidTitle, ValidModelId, UtcNow).Value;
         chat.Archive(UtcNow);
         DateTimeOffset updateTime = UtcNow.AddHours(1);
 
@@ -171,7 +184,7 @@ public sealed class ChatTests
     [Fact]
     public void Unarchive_WhenNotArchived_ShouldReturnFailure()
     {
-        Chat chat = Chat.Create(ValidChatId, ValidUserId, ValidTitle, UtcNow).Value;
+        Chat chat = Chat.Create(ValidChatId, ValidUserId, ValidTitle, ValidModelId, UtcNow).Value;
 
         Outcome outcome = chat.Unarchive(UtcNow);
 
@@ -182,7 +195,7 @@ public sealed class ChatTests
     [Fact]
     public void AddUserMessage_WithValidContent_ShouldAddMessage()
     {
-        Chat chat = Chat.Create(ValidChatId, ValidUserId, ValidTitle, UtcNow).Value;
+        Chat chat = Chat.Create(ValidChatId, ValidUserId, ValidTitle, ValidModelId, UtcNow).Value;
         string messageContent = "Hello, World!";
         DateTimeOffset updateTime = UtcNow.AddHours(1);
 
@@ -197,7 +210,7 @@ public sealed class ChatTests
     [Fact]
     public void AddUserMessage_MultipleMessages_ShouldAddAll()
     {
-        Chat chat = Chat.Create(ValidChatId, ValidUserId, ValidTitle, UtcNow).Value;
+        Chat chat = Chat.Create(ValidChatId, ValidUserId, ValidTitle, ValidModelId, UtcNow).Value;
 
         chat.AddUserMessage(MessageId.UnsafeFrom("msg_01JGX123456789012345678901"), "First message", UtcNow.AddMinutes(1));
         chat.AddUserMessage(MessageId.UnsafeFrom("msg_01JGX123456789012345678902"), "Second message", UtcNow.AddMinutes(2));
@@ -212,7 +225,7 @@ public sealed class ChatTests
     [InlineData(null)]
     public void AddUserMessage_WithEmptyContent_ShouldReturnFailure(string? content)
     {
-        Chat chat = Chat.Create(ValidChatId, ValidUserId, ValidTitle, UtcNow).Value;
+        Chat chat = Chat.Create(ValidChatId, ValidUserId, ValidTitle, ValidModelId, UtcNow).Value;
 
         Outcome<Message> outcome = chat.AddUserMessage(ValidMessageId, content!, UtcNow);
 
@@ -223,7 +236,7 @@ public sealed class ChatTests
     [Fact]
     public void AddUserMessage_OnArchivedChat_ShouldReturnFailure()
     {
-        Chat chat = Chat.Create(ValidChatId, ValidUserId, ValidTitle, UtcNow).Value;
+        Chat chat = Chat.Create(ValidChatId, ValidUserId, ValidTitle, ValidModelId, UtcNow).Value;
         chat.Archive(UtcNow);
 
         Outcome<Message> outcome = chat.AddUserMessage(ValidMessageId, "Hello", UtcNow);
@@ -235,7 +248,7 @@ public sealed class ChatTests
     [Fact]
     public void AddAssistantMessage_WithValidContent_ShouldAddMessage()
     {
-        Chat chat = Chat.Create(ValidChatId, ValidUserId, ValidTitle, UtcNow).Value;
+        Chat chat = Chat.Create(ValidChatId, ValidUserId, ValidTitle, ValidModelId, UtcNow).Value;
         string messageContent = "I'm here to help!";
         DateTimeOffset updateTime = UtcNow.AddHours(1);
 
@@ -250,7 +263,7 @@ public sealed class ChatTests
     [Fact]
     public void AddAssistantMessage_OnArchivedChat_ShouldReturnFailure()
     {
-        Chat chat = Chat.Create(ValidChatId, ValidUserId, ValidTitle, UtcNow).Value;
+        Chat chat = Chat.Create(ValidChatId, ValidUserId, ValidTitle, ValidModelId, UtcNow).Value;
         chat.Archive(UtcNow);
 
         Outcome<Message> outcome = chat.AddAssistantMessage(ValidMessageId, "Hello", UtcNow);
@@ -262,8 +275,8 @@ public sealed class ChatTests
     [Fact]
     public void Create_WithDifferentIds_ShouldHaveDifferentIds()
     {
-        Chat chat1 = Chat.Create(ValidChatId, ValidUserId, ValidTitle, UtcNow).Value;
-        Chat chat2 = Chat.Create(AnotherChatId, ValidUserId, ValidTitle, UtcNow).Value;
+        Chat chat1 = Chat.Create(ValidChatId, ValidUserId, ValidTitle, ValidModelId, UtcNow).Value;
+        Chat chat2 = Chat.Create(AnotherChatId, ValidUserId, ValidTitle, ValidModelId, UtcNow).Value;
 
         chat1.Id.Should().NotBe(chat2.Id);
     }

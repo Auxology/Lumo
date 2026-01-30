@@ -1,0 +1,77 @@
+using System.Data.Common;
+
+using Dapper;
+
+using Main.Application.Faults;
+using Main.Domain.Faults;
+using Main.Domain.ValueObjects;
+
+using SharedKernel;
+using SharedKernel.Application.Data;
+using SharedKernel.Application.Messaging;
+
+namespace Main.Application.Queries.SharedChats.GetSharedChat;
+
+internal sealed class GetSharedChatHandler(IDbConnectionFactory dbConnectionFactory)
+    : IQueryHandler<GetSharedChatQuery, GetSharedChatResponse>
+{
+    private const string SharedChatSql = """
+                                         SELECT
+                                             id as Id,
+                                             source_chat_id as SourceChatId,
+                                             owner_id as OwnerId,
+                                             title as Title,
+                                             model_id as ModelId,
+                                             snapshot_at as SnapshotAt,
+                                             created_at as CreatedAt
+                                         FROM shared_chats
+                                         WHERE id = @SharedChatId
+                                         """;
+
+    private const string MessagesSql = """
+                                       SELECT
+                                            sequence_number as SequenceNumber,
+                                            message_role as MessageRole,
+                                            message_content as MessageContent,
+                                            created_at as CreatedAt
+                                       FROM shared_chat_messages
+                                       WHERE shared_chat_id = @SharedChatId
+                                       ORDER BY sequence_number ASC
+                                       """;
+
+    public async ValueTask<Outcome<GetSharedChatResponse>> Handle(GetSharedChatQuery request,
+        CancellationToken cancellationToken)
+    {
+        Outcome<SharedChatId> sharedChatIdOutcome = SharedChatId.From(request.SharedChatId);
+
+        if (sharedChatIdOutcome.IsFailure)
+            return sharedChatIdOutcome.Fault;
+
+        SharedChatId sharedChatId = sharedChatIdOutcome.Value;
+
+        await using DbConnection connection = await dbConnectionFactory.CreateConnectionAsync(cancellationToken);
+
+        SharedChatReadModel? sharedChat = await connection.QuerySingleOrDefaultAsync<SharedChatReadModel>
+        (
+            SharedChatSql,
+            new { SharedChatId = sharedChatId }
+        );
+
+        if (sharedChat is null)
+            return SharedChatOperationFaults.NotFound;
+
+        IEnumerable<SharedChatMessageReadModel> messages = await connection.QueryAsync<SharedChatMessageReadModel>
+        (
+            MessagesSql,
+            new { SharedChatId = sharedChatId }
+        );
+
+        GetSharedChatResponse response = new
+        (
+            SharedChat: sharedChat,
+            Messages: messages.AsList()
+        );
+
+        return response;
+    }
+}

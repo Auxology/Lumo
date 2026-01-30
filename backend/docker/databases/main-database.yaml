@@ -1,6 +1,6 @@
 services:
     main-database:
-        image: postgres:${POSTGRES_VERSION:-17-alpine}
+        image: pgvector/pgvector:${PGVECTOR_POSTGRES_VERSION:-pg17}
         container_name: lumo-main-database
         ports:
             - "${MAIN_DATABASE_PORT:-5434}:5432"

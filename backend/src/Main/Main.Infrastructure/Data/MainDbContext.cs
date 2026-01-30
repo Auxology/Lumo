@@ -2,6 +2,7 @@ using Main.Application.Abstractions.Data;
 using Main.Domain.Aggregates;
 using Main.Domain.Entities;
 using Main.Domain.ReadModels;
+using Main.Infrastructure.Data.Entities;
 
 using MassTransit;
 
@@ -16,9 +17,18 @@ internal sealed class MainDbContext(DbContextOptions<MainDbContext> options) : D
     public DbSet<Chat> Chats { get; set; }
     public DbSet<Message> Messages { get; set; }
 
+    internal DbSet<MemoryRecord> Memories { get; set; }
+
+    public DbSet<Preference> Preferences { get; set; }
+    public DbSet<Instruction> Instructions { get; set; }
+
+    public DbSet<SharedChat> SharedChats { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        modelBuilder.HasPostgresExtension("vector");
 
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(MainDbContext).Assembly);
 

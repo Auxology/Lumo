@@ -23,7 +23,10 @@ internal sealed class MainDbContextFactory : IDesignTimeDbContextFactory<MainDbC
 
         DbContextOptionsBuilder<MainDbContext> optionsBuilder = new();
         optionsBuilder
-            .UseNpgsql(connectionString)
+            .UseNpgsql(connectionString, npgsqlOptions =>
+            {
+                npgsqlOptions.UseVector();
+            })
             .UseSnakeCaseNamingConvention();
 
         return new MainDbContext(optionsBuilder.Options);

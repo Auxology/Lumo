@@ -4,22 +4,29 @@ using System.ComponentModel.DataAnnotations;
 using Main.Application.Abstractions.AI;
 using Main.Application.Abstractions.Data;
 using Main.Application.Abstractions.Generators;
+using Main.Application.Abstractions.Instructions;
+using Main.Application.Abstractions.Memory;
 using Main.Application.Abstractions.Stream;
 using Main.Infrastructure.AI;
+using Main.Infrastructure.AI.Tools;
 using Main.Infrastructure.Consumers;
 using Main.Infrastructure.Data;
 using Main.Infrastructure.Generators;
+using Main.Infrastructure.Instructions;
+using Main.Infrastructure.Memory;
 using Main.Infrastructure.Options;
 using Main.Infrastructure.Stream;
 
 using MassTransit;
 
+using Microsoft.AspNetCore.Server.IIS;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 using OpenAI;
+using OpenAI.Embeddings;
 
 using SharedKernel.Application.Data;
 using SharedKernel.Application.Messaging;
@@ -69,7 +76,10 @@ public static class DependencyInjection
         services.AddDbContext<MainDbContext>(options =>
         {
             options
-                .UseNpgsql(databaseOptions.ConnectionString)
+                .UseNpgsql(databaseOptions.ConnectionString, npgSqlOptions =>
+                {
+                    npgSqlOptions.UseVector();
+                })
                 .UseSnakeCaseNamingConvention()
                 .EnableSensitiveDataLogging(enableSensitiveLogging);
         });
@@ -174,18 +184,33 @@ public static class DependencyInjection
             );
         });
 
-        services.AddSingleton(sp =>
+        services.AddSingleton<EmbeddingClient>(_ =>
         {
-            OpenAIClient client = sp.GetRequiredService<OpenAIClient>();
-            return client.GetChatClient(openRouterOptions.DefaultModel);
+            OpenAIClientOptions options = new()
+            {
+                Endpoint = new Uri(openRouterOptions.BaseUrl)
+            };
+
+            OpenAIClient client = new(
+                credential: new ApiKeyCredential(openRouterOptions.ApiKey),
+                options: options
+            );
+
+            return client.GetEmbeddingClient(openRouterOptions.EmbeddingModel);
         });
 
         services.AddSingleton<IStreamPublisher, StreamPublisher>();
         services.AddSingleton<IChatLockService, ChatLockService>();
 
+        services.AddScoped<IInstructionStore, InstructionStore>();
+        services.AddScoped<IMemoryStore, MemoryStore>();
+        services.AddScoped<ToolExecutor>();
+
         services.AddScoped<IChatCompletionService, ChatCompletionService>();
 
         services.AddSingleton<IStreamReader, StreamReader>();
+
+        services.AddSingleton<IModelRegistry, ModelRegistry>();
 
         return services;
     }

@@ -5,5 +5,6 @@ public sealed record StartChatResponse
     string ChatId,
     string StreamId,
     string ChatTitle,
+    string? ModelId,
     DateTimeOffset CreatedAt
 );

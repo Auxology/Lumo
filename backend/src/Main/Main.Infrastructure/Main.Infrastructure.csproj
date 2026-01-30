@@ -26,6 +26,8 @@
         <PackageReference Include="MassTransit.EntityFrameworkCore" />
         <PackageReference Include="OpenAI" />
         <PackageReference Include="Ulid" />
+        <PackageReference Include="Pgvector" />
+        <PackageReference Include="Pgvector.EntityFrameworkCore" />
     </ItemGroup>
 
 </Project>

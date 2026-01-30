@@ -60,11 +60,15 @@ internal sealed class ChatStartedConsumer(
             ))
             .ToListAsync(cancellationToken);
 
-        await chatCompletionService.StreamCompletionAsync
+
+
+        await chatCompletionService.StreamCompletionAdvancedAsync
         (
             chatId: chatId.Value,
             streamId: streamId.Value,
             messages: messages,
+            modelId: message.ModelId,
+            userId: message.UserId,
             cancellationToken: cancellationToken
         );
 

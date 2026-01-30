@@ -9,4 +9,10 @@ public interface IIdGenerator
     MessageId NewMessageId();
 
     StreamId NewStreamId();
+
+    PreferenceId NewPreferenceId();
+
+    InstructionId NewInstructionId();
+
+    SharedChatId NewSharedChatId();
 }

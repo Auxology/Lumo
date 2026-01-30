@@ -60,19 +60,81 @@ services:
             - Database__ConnectionString=${MAIN_DATABASE_CONNECTION_STRING:?MAIN_DATABASE_CONNECTION_STRING is required}
             - Database__EnableSensitiveDataLogging=${MAIN_DATABASE_ENABLE_SENSITIVE_DATA_LOGGING:-false}
 
-            # OpenRouterOptions
+            # OpenRouterOptions (all values must be defined in .env)
             - OpenRouter__ApiKey=${OPENROUTER_API_KEY:?OPENROUTER_API_KEY is required}
-            - OpenRouter__BaseUrl=${OPENROUTER_BASE_URL:-https://openrouter.ai/api/v1}
-            - OpenRouter__DefaultModel=${OPENROUTER_DEFAULT_MODEL:-allenai/olmo-3.1-32b-think:free}
-            - OpenRouter__AppName=${OPENROUTER_APP_NAME:-}
-            - OpenRouter__SiteUrl=${OPENROUTER_SITE_URL:-}
+            - OpenRouter__BaseUrl=${OPENROUTER_BASE_URL:?OPENROUTER_BASE_URL is required}
+            - OpenRouter__DefaultModel=${OPENROUTER_DEFAULT_MODEL:?OPENROUTER_DEFAULT_MODEL is required}
+            - OpenRouter__AppName=${OPENROUTER_APP_NAME:?OPENROUTER_APP_NAME is required}
+            - OpenRouter__SiteUrl=${OPENROUTER_SITE_URL:?OPENROUTER_SITE_URL is required}
+
+            # OpenRouter AllowedModels - Model 0 (all values must be defined in .env)
+            - OpenRouter__AllowedModels__0__Id=${OPENROUTER_ALLOWED_MODELS_0_ID:?OPENROUTER_ALLOWED_MODELS_0_ID is required}
+            - OpenRouter__AllowedModels__0__OpenRouterId=${OPENROUTER_ALLOWED_MODELS_0_OPENROUTER_ID:?OPENROUTER_ALLOWED_MODELS_0_OPENROUTER_ID is required}
+            - OpenRouter__AllowedModels__0__DisplayName=${OPENROUTER_ALLOWED_MODELS_0_DISPLAY_NAME:?OPENROUTER_ALLOWED_MODELS_0_DISPLAY_NAME is required}
+            - OpenRouter__AllowedModels__0__Provider=${OPENROUTER_ALLOWED_MODELS_0_PROVIDER:?OPENROUTER_ALLOWED_MODELS_0_PROVIDER is required}
+            - OpenRouter__AllowedModels__0__IsDefault=${OPENROUTER_ALLOWED_MODELS_0_IS_DEFAULT:?OPENROUTER_ALLOWED_MODELS_0_IS_DEFAULT is required}
+            - OpenRouter__AllowedModels__0__MaxContextTokens=${OPENROUTER_ALLOWED_MODELS_0_MAX_CONTEXT_TOKENS:?OPENROUTER_ALLOWED_MODELS_0_MAX_CONTEXT_TOKENS is required}
+            - OpenRouter__AllowedModels__0__SupportsVision=${OPENROUTER_ALLOWED_MODELS_0_SUPPORTS_VISION:?OPENROUTER_ALLOWED_MODELS_0_SUPPORTS_VISION is required}
+            - OpenRouter__AllowedModels__0__SupportsStreaming=${OPENROUTER_ALLOWED_MODELS_0_SUPPORTS_STREAMING:?OPENROUTER_ALLOWED_MODELS_0_SUPPORTS_STREAMING is required}
+
+            # OpenRouter AllowedModels - Model 1 (all values must be defined in .env)
+            - OpenRouter__AllowedModels__1__Id=${OPENROUTER_ALLOWED_MODELS_1_ID:?OPENROUTER_ALLOWED_MODELS_1_ID is required}
+            - OpenRouter__AllowedModels__1__OpenRouterId=${OPENROUTER_ALLOWED_MODELS_1_OPENROUTER_ID:?OPENROUTER_ALLOWED_MODELS_1_OPENROUTER_ID is required}
+            - OpenRouter__AllowedModels__1__DisplayName=${OPENROUTER_ALLOWED_MODELS_1_DISPLAY_NAME:?OPENROUTER_ALLOWED_MODELS_1_DISPLAY_NAME is required}
+            - OpenRouter__AllowedModels__1__Provider=${OPENROUTER_ALLOWED_MODELS_1_PROVIDER:?OPENROUTER_ALLOWED_MODELS_1_PROVIDER is required}
+            - OpenRouter__AllowedModels__1__IsDefault=${OPENROUTER_ALLOWED_MODELS_1_IS_DEFAULT:?OPENROUTER_ALLOWED_MODELS_1_IS_DEFAULT is required}
+            - OpenRouter__AllowedModels__1__MaxContextTokens=${OPENROUTER_ALLOWED_MODELS_1_MAX_CONTEXT_TOKENS:?OPENROUTER_ALLOWED_MODELS_1_MAX_CONTEXT_TOKENS is required}
+            - OpenRouter__AllowedModels__1__SupportsVision=${OPENROUTER_ALLOWED_MODELS_1_SUPPORTS_VISION:?OPENROUTER_ALLOWED_MODELS_1_SUPPORTS_VISION is required}
+            - OpenRouter__AllowedModels__1__SupportsStreaming=${OPENROUTER_ALLOWED_MODELS_1_SUPPORTS_STREAMING:?OPENROUTER_ALLOWED_MODELS_1_SUPPORTS_STREAMING is required}
+
+            # OpenRouter AllowedModels - Model 2 (all values must be defined in .env)
+            - OpenRouter__AllowedModels__2__Id=${OPENROUTER_ALLOWED_MODELS_2_ID:?OPENROUTER_ALLOWED_MODELS_2_ID is required}
+            - OpenRouter__AllowedModels__2__OpenRouterId=${OPENROUTER_ALLOWED_MODELS_2_OPENROUTER_ID:?OPENROUTER_ALLOWED_MODELS_2_OPENROUTER_ID is required}
+            - OpenRouter__AllowedModels__2__DisplayName=${OPENROUTER_ALLOWED_MODELS_2_DISPLAY_NAME:?OPENROUTER_ALLOWED_MODELS_2_DISPLAY_NAME is required}
+            - OpenRouter__AllowedModels__2__Provider=${OPENROUTER_ALLOWED_MODELS_2_PROVIDER:?OPENROUTER_ALLOWED_MODELS_2_PROVIDER is required}
+            - OpenRouter__AllowedModels__2__IsDefault=${OPENROUTER_ALLOWED_MODELS_2_IS_DEFAULT:?OPENROUTER_ALLOWED_MODELS_2_IS_DEFAULT is required}
+            - OpenRouter__AllowedModels__2__MaxContextTokens=${OPENROUTER_ALLOWED_MODELS_2_MAX_CONTEXT_TOKENS:?OPENROUTER_ALLOWED_MODELS_2_MAX_CONTEXT_TOKENS is required}
+            - OpenRouter__AllowedModels__2__SupportsVision=${OPENROUTER_ALLOWED_MODELS_2_SUPPORTS_VISION:?OPENROUTER_ALLOWED_MODELS_2_SUPPORTS_VISION is required}
+            - OpenRouter__AllowedModels__2__SupportsStreaming=${OPENROUTER_ALLOWED_MODELS_2_SUPPORTS_STREAMING:?OPENROUTER_ALLOWED_MODELS_2_SUPPORTS_STREAMING is required}
+
+            # OpenRouter AllowedModels - Model 3 (all values must be defined in .env)
+            - OpenRouter__AllowedModels__3__Id=${OPENROUTER_ALLOWED_MODELS_3_ID:?OPENROUTER_ALLOWED_MODELS_3_ID is required}
+            - OpenRouter__AllowedModels__3__OpenRouterId=${OPENROUTER_ALLOWED_MODELS_3_OPENROUTER_ID:?OPENROUTER_ALLOWED_MODELS_3_OPENROUTER_ID is required}
+            - OpenRouter__AllowedModels__3__DisplayName=${OPENROUTER_ALLOWED_MODELS_3_DISPLAY_NAME:?OPENROUTER_ALLOWED_MODELS_3_DISPLAY_NAME is required}
+            - OpenRouter__AllowedModels__3__Provider=${OPENROUTER_ALLOWED_MODELS_3_PROVIDER:?OPENROUTER_ALLOWED_MODELS_3_PROVIDER is required}
+            - OpenRouter__AllowedModels__3__IsDefault=${OPENROUTER_ALLOWED_MODELS_3_IS_DEFAULT:?OPENROUTER_ALLOWED_MODELS_3_IS_DEFAULT is required}
+            - OpenRouter__AllowedModels__3__MaxContextTokens=${OPENROUTER_ALLOWED_MODELS_3_MAX_CONTEXT_TOKENS:?OPENROUTER_ALLOWED_MODELS_3_MAX_CONTEXT_TOKENS is required}
+            - OpenRouter__AllowedModels__3__SupportsVision=${OPENROUTER_ALLOWED_MODELS_3_SUPPORTS_VISION:?OPENROUTER_ALLOWED_MODELS_3_SUPPORTS_VISION is required}
+            - OpenRouter__AllowedModels__3__SupportsStreaming=${OPENROUTER_ALLOWED_MODELS_3_SUPPORTS_STREAMING:?OPENROUTER_ALLOWED_MODELS_3_SUPPORTS_STREAMING is required}
+
+            # OpenRouter AllowedModels - Model 4 (all values must be defined in .env)
+            - OpenRouter__AllowedModels__4__Id=${OPENROUTER_ALLOWED_MODELS_4_ID:?OPENROUTER_ALLOWED_MODELS_4_ID is required}
+            - OpenRouter__AllowedModels__4__OpenRouterId=${OPENROUTER_ALLOWED_MODELS_4_OPENROUTER_ID:?OPENROUTER_ALLOWED_MODELS_4_OPENROUTER_ID is required}
+            - OpenRouter__AllowedModels__4__DisplayName=${OPENROUTER_ALLOWED_MODELS_4_DISPLAY_NAME:?OPENROUTER_ALLOWED_MODELS_4_DISPLAY_NAME is required}
+            - OpenRouter__AllowedModels__4__Provider=${OPENROUTER_ALLOWED_MODELS_4_PROVIDER:?OPENROUTER_ALLOWED_MODELS_4_PROVIDER is required}
+            - OpenRouter__AllowedModels__4__IsDefault=${OPENROUTER_ALLOWED_MODELS_4_IS_DEFAULT:?OPENROUTER_ALLOWED_MODELS_4_IS_DEFAULT is required}
+            - OpenRouter__AllowedModels__4__MaxContextTokens=${OPENROUTER_ALLOWED_MODELS_4_MAX_CONTEXT_TOKENS:?OPENROUTER_ALLOWED_MODELS_4_MAX_CONTEXT_TOKENS is required}
+            - OpenRouter__AllowedModels__4__SupportsVision=${OPENROUTER_ALLOWED_MODELS_4_SUPPORTS_VISION:?OPENROUTER_ALLOWED_MODELS_4_SUPPORTS_VISION is required}
+            - OpenRouter__AllowedModels__4__SupportsStreaming=${OPENROUTER_ALLOWED_MODELS_4_SUPPORTS_STREAMING:?OPENROUTER_ALLOWED_MODELS_4_SUPPORTS_STREAMING is required}
+
+            # OpenRouter AllowedModels - Model 5 (all values must be defined in .env)
+            - OpenRouter__AllowedModels__5__Id=${OPENROUTER_ALLOWED_MODELS_5_ID:?OPENROUTER_ALLOWED_MODELS_5_ID is required}
+            - OpenRouter__AllowedModels__5__OpenRouterId=${OPENROUTER_ALLOWED_MODELS_5_OPENROUTER_ID:?OPENROUTER_ALLOWED_MODELS_5_OPENROUTER_ID is required}
+            - OpenRouter__AllowedModels__5__DisplayName=${OPENROUTER_ALLOWED_MODELS_5_DISPLAY_NAME:?OPENROUTER_ALLOWED_MODELS_5_DISPLAY_NAME is required}
+            - OpenRouter__AllowedModels__5__Provider=${OPENROUTER_ALLOWED_MODELS_5_PROVIDER:?OPENROUTER_ALLOWED_MODELS_5_PROVIDER is required}
+            - OpenRouter__AllowedModels__5__IsDefault=${OPENROUTER_ALLOWED_MODELS_5_IS_DEFAULT:?OPENROUTER_ALLOWED_MODELS_5_IS_DEFAULT is required}
+            - OpenRouter__AllowedModels__5__MaxContextTokens=${OPENROUTER_ALLOWED_MODELS_5_MAX_CONTEXT_TOKENS:?OPENROUTER_ALLOWED_MODELS_5_MAX_CONTEXT_TOKENS is required}
+            - OpenRouter__AllowedModels__5__SupportsVision=${OPENROUTER_ALLOWED_MODELS_5_SUPPORTS_VISION:?OPENROUTER_ALLOWED_MODELS_5_SUPPORTS_VISION is required}
+            - OpenRouter__AllowedModels__5__SupportsStreaming=${OPENROUTER_ALLOWED_MODELS_5_SUPPORTS_STREAMING:?OPENROUTER_ALLOWED_MODELS_5_SUPPORTS_STREAMING is required}
+
+            - OpenRouter__EmbeddingModel=${OPENROUTER_EMBEDDING_MODEL:?OPENROUTER_EMBEDDING_MODEL is required}
 
             # RabbitMqOptions
             - RabbitMq__Host=${RABBITMQ_HOST:?RABBITMQ_HOST is required}
             - RabbitMq__Port=${RABBITMQ_PORT:?RABBITMQ_PORT is required}
             - RabbitMq__VirtualHost=${RABBITMQ_VIRTUAL_HOST:?RABBITMQ_VIRTUAL_HOST is required}
             - RabbitMq__Username=${RABBITMQ_USERNAME:?RABBITMQ_USERNAME is required}
-            - RabbitMq__Password=${RABBITMQ_PASSWORD:?RABBITMQ_PASSWORD is required}
+            - RabbitMq__Password=${RABBITMQ_PASSWORD:?RABBITMQ_PASSWORD is required}     
         networks:
             - lumo-network
         depends_on:
