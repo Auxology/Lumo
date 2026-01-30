@@ -13,4 +13,6 @@ public interface IIdGenerator
     PreferenceId NewPreferenceId();
 
     InstructionId NewInstructionId();
+
+    SharedChatId NewSharedChatId();
 }

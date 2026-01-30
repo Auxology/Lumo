@@ -19,4 +19,7 @@ internal sealed class IdGenerator : IIdGenerator
 
     public InstructionId NewInstructionId() =>
         InstructionId.UnsafeFrom($"{InstructionId.PrefixValue}{Ulid.NewUlid()}");
+
+    public SharedChatId NewSharedChatId() =>
+        SharedChatId.UnsafeFrom($"{SharedChatId.PrefixValue}{Ulid.NewUlid()}");
 }

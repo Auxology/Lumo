@@ -67,6 +67,7 @@ internal sealed class SharedChatConfiguration : IEntityTypeConfiguration<SharedC
             mb.HasKey("SharedChatId", nameof(SharedChatMessage.SequenceNumber));
 
             mb.Property(m => m.SequenceNumber)
+                .ValueGeneratedNever()
                 .IsRequired()
                 .HasColumnType("integer");
 

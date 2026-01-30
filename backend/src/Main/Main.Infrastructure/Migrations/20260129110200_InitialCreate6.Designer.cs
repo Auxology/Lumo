@@ -3,6 +3,7 @@ using System;
 using Main.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Pgvector;
@@ -12,9 +13,11 @@ using Pgvector;
 namespace Main.Infrastructure.Migrations
 {
     [DbContext(typeof(MainDbContext))]
-    partial class MainDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260129110200_InitialCreate6")]
+    partial class InitialCreate6
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -547,8 +550,11 @@ namespace Main.Infrastructure.Migrations
                                 .HasColumnName("shared_chat_id");
 
                             b1.Property<int>("SequenceNumber")
+                                .ValueGeneratedOnAdd()
                                 .HasColumnType("integer")
                                 .HasColumnName("sequence_number");
+
+                            NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b1.Property<int>("SequenceNumber"));
 
                             b1.Property<DateTimeOffset>("CreatedAt")
                                 .HasColumnType("timestamptz")
