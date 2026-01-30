@@ -64,7 +64,7 @@ public sealed class Instruction : Entity<InstructionId>
         (
             id: id,
             preferenceId: preferenceId,
-            content: content,
+            content: content.Trim(),
             priority: priority,
             utcNow: utcNow
         );
@@ -79,7 +79,7 @@ public sealed class Instruction : Entity<InstructionId>
         if (!validationOutcome.IsSuccess)
             return validationOutcome.Fault;
 
-        Content = newContent;
+        Content = newContent.Trim();
         UpdatedAt = utcNow;
 
         return Outcome.Success();

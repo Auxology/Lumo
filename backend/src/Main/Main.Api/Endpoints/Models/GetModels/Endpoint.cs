@@ -4,6 +4,8 @@ using Main.Application.Queries.Models;
 
 using Mediator;
 
+using SharedKernel.Api.Infrastructure;
+
 namespace Main.Api.Endpoints.Models.GetModels;
 
 internal sealed class Endpoint : EndpointWithoutRequest<Response>
@@ -39,7 +41,7 @@ internal sealed class Endpoint : EndpointWithoutRequest<Response>
 
         if (outcome.IsFailure)
         {
-            await Send.ResponseAsync(new Response([]), cancellation: ct);
+            await Send.ResultAsync(CustomResults.Problem(outcome, HttpContext));
             return;
         }
 

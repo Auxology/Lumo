@@ -90,9 +90,9 @@ public sealed class SharedChat : AggregateRoot<SharedChatId>
         return sharedChat;
     }
 
-    public void AddMessages(IReadOnlyList<SharedChatMessage> message, DateTimeOffset utcNow)
+    public void AddMessages(IReadOnlyList<SharedChatMessage> messages, DateTimeOffset utcNow)
     {
-        _sharedChatMessages.AddRange(message);
+        _sharedChatMessages.AddRange(messages);
         UpdatedAt = utcNow;
     }
 

@@ -40,6 +40,11 @@ internal sealed class StartChatHandler(
 
         string modelId = request.ModelId ?? modelRegistry.GetDefaultModelId();
 
+        bool isAllowed = modelRegistry.IsModelAllowed(modelId);
+
+        if (!isAllowed)
+            return ChatOperationFaults.InvalidModel;
+
         string title = await chatCompletionService.GetTitleAsync(request.Message, cancellationToken);
 
         ChatId chatId = idGenerator.NewChatId();

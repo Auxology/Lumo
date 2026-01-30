@@ -1,5 +1,6 @@
 using Main.Application.Abstractions.Data;
 using Main.Application.Abstractions.Generators;
+using Main.Application.Faults;
 using Main.Domain.Aggregates;
 using Main.Domain.Entities;
 using Main.Domain.ValueObjects;
@@ -58,7 +59,14 @@ internal sealed class AddInstructionHandler(
 
         Instruction instruction = instructionOutcome.Value;
 
-        await dbContext.SaveChangesAsync(cancellationToken);
+        try
+        {
+            await dbContext.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateException)
+        {
+            return PreferenceOperationFaults.Conflict;
+        }
 
         AddInstructionResponse response = new
         (

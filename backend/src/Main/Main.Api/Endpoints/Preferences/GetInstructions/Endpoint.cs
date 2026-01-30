@@ -4,6 +4,8 @@ using Main.Application.Queries.Preferences.GetInstructions;
 
 using Mediator;
 
+using SharedKernel.Api.Infrastructure;
+
 namespace Main.Api.Endpoints.Preferences.GetInstructions;
 
 internal sealed class Endpoint : EndpointWithoutRequest<Response>
@@ -37,7 +39,7 @@ internal sealed class Endpoint : EndpointWithoutRequest<Response>
 
         if (outcome.IsFailure)
         {
-            await Send.ResponseAsync(new Response([]), cancellation: ct);
+            await Send.ResultAsync(CustomResults.Problem(outcome, HttpContext));
             return;
         }
 

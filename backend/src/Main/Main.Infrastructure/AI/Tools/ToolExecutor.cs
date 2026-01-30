@@ -22,8 +22,8 @@ internal sealed class ToolExecutor(IMemoryStore memoryStore, ILogger<ToolExecuto
     private async Task<string> ExecuteSaveMemoryAsync(ChatToolCall chatToolCall, Guid userId,
         CancellationToken cancellationToken)
     {
-        logger.LogInformation("ExecuteSaveMemoryAsync called for user {UserId}, arguments: {Arguments}",
-            userId, chatToolCall.FunctionArguments.ToString());
+        logger.LogInformation("ExecuteSaveMemoryAsync called for user {UserId}, function: {Function}",
+            userId, chatToolCall.FunctionName);
 
         try
         {
@@ -36,8 +36,8 @@ internal sealed class ToolExecutor(IMemoryStore memoryStore, ILogger<ToolExecuto
                 return "Failed to deserialize arguments.";
             }
 
-            logger.LogInformation("Parsed save_memory: Content={Content}, Category={Category}",
-                arguments.Content, arguments.Category);
+            logger.LogInformation("Parsed save_memory: ContentLength={ContentLength}, Category={Category}",
+                arguments.Content.Length, arguments.Category);
 
             if (!Enum.TryParse<MemoryCategory>(arguments.Category, ignoreCase: true, out MemoryCategory memoryCategory))
             {

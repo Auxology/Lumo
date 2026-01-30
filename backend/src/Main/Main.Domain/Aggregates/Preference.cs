@@ -15,7 +15,7 @@ public sealed class Preference : AggregateRoot<PreferenceId>
 
     public Guid UserId { get; private set; }
 
-    public IReadOnlyCollection<Instruction> Instructions => [.. _instructions];
+    public IReadOnlyCollection<Instruction> Instructions => _instructions.AsReadOnly();
 
     public DateTimeOffset CreatedAt { get; private set; }
 
@@ -24,7 +24,7 @@ public sealed class Preference : AggregateRoot<PreferenceId>
     private Preference() { } // For EF Core
 
     [SetsRequiredMembers]
-    public Preference
+    private Preference
     (
         PreferenceId id,
         Guid userId,
@@ -64,6 +64,8 @@ public sealed class Preference : AggregateRoot<PreferenceId>
         DateTimeOffset utcNow
     )
     {
+        ArgumentNullException.ThrowIfNull(content);
+        
         if (_instructions.Count >= PreferenceConstants.MaxInstructionCount)
             return PreferenceFaults.MaxInstructionsReached;
 
@@ -98,6 +100,8 @@ public sealed class Preference : AggregateRoot<PreferenceId>
         DateTimeOffset utcNow
     )
     {
+        ArgumentNullException.ThrowIfNull(newContent);
+        
         Instruction? instruction = _instructions
             .FirstOrDefault(i => i.Id == instructionId);
 
