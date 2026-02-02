@@ -1,6 +1,6 @@
-namespace Main.Application.Queries.SharedChats.GetSharedChat;
+namespace Main.Application.Queries.SharedChats;
 
-public sealed record class SharedChatReadModel
+public sealed record class SharedChatSummaryReadModel
 {
     public required string Id { get; init; }
 

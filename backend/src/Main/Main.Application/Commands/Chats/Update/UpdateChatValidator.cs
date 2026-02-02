@@ -12,7 +12,7 @@ internal sealed class UpdateChatValidator : AbstractValidator<UpdateChatCommand>
             .NotEmpty().WithMessage("Chat ID is required");
 
         RuleFor(ucc => ucc)
-            .Must(ucc => ucc.NewTitle is not null || ucc.IsArchived is not null)
+            .Must(ucc => ucc.NewTitle is not null || ucc.IsArchived is not null || ucc.IsPinned is not null)
             .WithMessage("At least one field must be provided to update chat");
 
         RuleFor(ucc => ucc)
@@ -26,5 +26,9 @@ internal sealed class UpdateChatValidator : AbstractValidator<UpdateChatCommand>
                 .MaximumLength(ChatConstants.MaxTitleLength)
                 .WithMessage($"Title must not exceed {ChatConstants.MaxTitleLength} characters");
         });
+
+        RuleFor(ucc => ucc)
+            .Must(ucc => !(ucc.IsPinned is true && ucc.IsArchived is true))
+            .WithMessage("Cannot pin and archive a chat in the same request");
     }
 }

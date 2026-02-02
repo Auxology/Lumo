@@ -22,6 +22,8 @@ public sealed class Chat : AggregateRoot<ChatId>
 
     public bool IsArchived { get; private set; }
 
+    public bool IsPinned { get; private set; }
+
     public int NextSequenceNumber { get; private set; }
 
     public DateTimeOffset CreatedAt { get; private set; }
@@ -47,6 +49,7 @@ public sealed class Chat : AggregateRoot<ChatId>
         Title = title;
         ModelId = modelId;
         IsArchived = false;
+        IsPinned = false;
         NextSequenceNumber = 0;
         CreatedAt = utcNow;
         UpdatedAt = utcNow;
@@ -107,7 +110,35 @@ public sealed class Chat : AggregateRoot<ChatId>
         if (IsArchived)
             return ChatFaults.AlreadyArchived;
 
+        if (IsPinned)
+            IsPinned = false;
+
         IsArchived = true;
+        UpdatedAt = utcNow;
+
+        return Outcome.Success();
+    }
+
+    public Outcome Pin(DateTimeOffset utcNow)
+    {
+        if (IsPinned)
+            return ChatFaults.AlreadyPinned;
+
+        if (IsArchived)
+            IsArchived = false;
+
+        IsPinned = true;
+        UpdatedAt = utcNow;
+
+        return Outcome.Success();
+    }
+
+    public Outcome Unpin(DateTimeOffset utcNow)
+    {
+        if (!IsPinned)
+            return ChatFaults.NotPinned;
+
+        IsPinned = false;
         UpdatedAt = utcNow;
 
         return Outcome.Success();

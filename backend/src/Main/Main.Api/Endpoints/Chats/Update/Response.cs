@@ -5,5 +5,6 @@ internal sealed record Response
     string ChatId,
     string Title,
     bool IsArchived,
+    bool IsPinned,
     DateTimeOffset UpdatedAt
 );

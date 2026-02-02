@@ -23,7 +23,7 @@ internal sealed class GetSharedChatHandler(IDbConnectionFactory dbConnectionFact
                                              owner_id as OwnerId,
                                              title as Title,
                                              model_id as ModelId,
-                                             views_count as ViewCount,
+                                             view_count as ViewCount,
                                              snapshot_at as SnapshotAt,
                                              created_at as CreatedAt
                                          FROM shared_chats
@@ -56,7 +56,7 @@ internal sealed class GetSharedChatHandler(IDbConnectionFactory dbConnectionFact
         SharedChatReadModel? sharedChat = await connection.QuerySingleOrDefaultAsync<SharedChatReadModel>
         (
             SharedChatSql,
-            new { SharedChatId = sharedChatId }
+            new { SharedChatId = sharedChatId.Value }
         );
 
         if (sharedChat is null)
@@ -65,7 +65,7 @@ internal sealed class GetSharedChatHandler(IDbConnectionFactory dbConnectionFact
         IEnumerable<SharedChatMessageReadModel> messages = await connection.QueryAsync<SharedChatMessageReadModel>
         (
             MessagesSql,
-            new { SharedChatId = sharedChatId }
+            new { SharedChatId = sharedChatId.Value }
         );
 
         GetSharedChatResponse response = new

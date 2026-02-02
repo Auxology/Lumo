@@ -40,6 +40,10 @@ internal sealed class ChatConfiguration : IEntityTypeConfiguration<Chat>
             .IsRequired()
             .HasColumnType("boolean");
 
+        b.Property(c => c.IsPinned)
+            .IsRequired()
+            .HasColumnType("boolean");
+
         b.Property(c => c.CreatedAt)
             .IsRequired()
             .HasColumnType("timestamptz");

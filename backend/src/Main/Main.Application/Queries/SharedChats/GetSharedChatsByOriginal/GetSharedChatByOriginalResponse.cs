@@ -1,0 +1,3 @@
+namespace Main.Application.Queries.SharedChats.GetSharedChatsByOriginal;
+
+public sealed record GetSharedChatByOriginalResponse(IReadOnlyList<SharedChatSummaryReadModel> SharedChats);

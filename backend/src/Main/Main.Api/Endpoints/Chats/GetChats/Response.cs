@@ -6,6 +6,7 @@ internal sealed record ChatDto
     string Title,
     string? ModelName,
     bool IsArchived,
+    bool IsPinned,
     DateTimeOffset CreatedAt,
     DateTimeOffset? UpdatedAt,
     int MessagesCount

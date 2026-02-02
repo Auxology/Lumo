@@ -37,7 +37,8 @@ internal sealed class Endpoint : BaseEndpoint<Request, Response>
         (
             ChatId: endpointRequest.ChatId,
             NewTitle: endpointRequest.NewTitle,
-            IsArchived: endpointRequest.IsArchived
+            IsArchived: endpointRequest.IsArchived,
+            IsPinned: endpointRequest.IsPinned
         );
 
         await SendOutcomeAsync
@@ -49,6 +50,7 @@ internal sealed class Endpoint : BaseEndpoint<Request, Response>
                 ChatId: ucr.ChatId,
                 Title: ucr.Title,
                 IsArchived: ucr.IsArchived,
+                IsPinned: ucr.IsPinned,
                 UpdatedAt: ucr.UpdatedAt
             )
         );

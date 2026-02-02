@@ -53,6 +53,7 @@ internal sealed class Endpoint : BaseEndpoint<Request, Response>
                         Title: c.Title,
                         ModelName: c.ModelName,
                         IsArchived: c.IsArchived,
+                        IsPinned: c.IsPinned,
                         CreatedAt: c.CreatedAt,
                         UpdatedAt: c.UpdatedAt,
                         MessagesCount: c.MessagesCount

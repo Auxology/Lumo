@@ -46,9 +46,15 @@ public static class ChatFaults
         detail: "A model ID is required to create a chat."
     );
 
-    public static readonly Fault ModelNotAllowed = Fault.Validation
+    public static readonly Fault AlreadyPinned = Fault.Conflict
     (
-        title: "Chat.ModelNotAllowed",
-        detail: "The specified model is not allowed."
+        title: "Chat.AlreadyPinned",
+        detail: "The chat is already pinned."
+    );
+
+    public static readonly Fault NotPinned = Fault.Conflict
+    (
+        title: "Chat.NotPinned",
+        detail: "The chat is not pinned."
     );
 }

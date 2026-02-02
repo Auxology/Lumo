@@ -16,8 +16,9 @@ internal sealed class GetChatsHandler(IDbConnectionFactory dbConnectionFactory, 
                                        SELECT
                                            id as Id,
                                            title as Title,
-                                           model_name as ModelName,
+                                           model_id as ModelName,
                                            is_archived as IsArchived,
+                                           is_pinned as IsPinned,
                                            created_at as CreatedAt,
                                            updated_at as UpdatedAt,
                                            next_sequence_number as MessagesCount

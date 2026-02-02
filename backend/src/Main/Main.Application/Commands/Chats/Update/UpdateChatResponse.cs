@@ -5,5 +5,6 @@ public sealed record UpdateChatResponse
     string ChatId,
     string Title,
     bool IsArchived,
+    bool IsPinned,
     DateTimeOffset UpdatedAt
 );
