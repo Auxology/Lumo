@@ -6,14 +6,15 @@ using Main.Application.Faults;
 using Main.Domain.Faults;
 using Main.Domain.ValueObjects;
 
+using Mediator;
+
 using SharedKernel;
 using SharedKernel.Application.Data;
-using SharedKernel.Application.Messaging;
 
 namespace Main.Application.Queries.SharedChats.GetSharedChat;
 
-internal sealed class GetSharedChatHandler(IDbConnectionFactory dbConnectionFactory)
-    : IQueryHandler<GetSharedChatQuery, GetSharedChatResponse>
+internal sealed class GetSharedChatHandler(IDbConnectionFactory dbConnectionFactory, IPublisher publisher)
+    : SharedKernel.Application.Messaging.IQueryHandler<GetSharedChatQuery, GetSharedChatResponse>
 {
     private const string SharedChatSql = """
                                          SELECT
@@ -22,6 +23,7 @@ internal sealed class GetSharedChatHandler(IDbConnectionFactory dbConnectionFact
                                              owner_id as OwnerId,
                                              title as Title,
                                              model_id as ModelId,
+                                             views_count as ViewCount,
                                              snapshot_at as SnapshotAt,
                                              created_at as CreatedAt
                                          FROM shared_chats
@@ -71,6 +73,8 @@ internal sealed class GetSharedChatHandler(IDbConnectionFactory dbConnectionFact
             SharedChat: sharedChat,
             Messages: messages.AsList()
         );
+
+        await publisher.Publish(new SharedChatViewedNotification(request.SharedChatId), cancellationToken);
 
         return response;
     }

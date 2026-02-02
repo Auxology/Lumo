@@ -47,6 +47,7 @@ internal sealed class Endpoint : BaseEndpoint<Request, Response>
                     OwnerId: response.SharedChat.OwnerId,
                     Title: response.SharedChat.Title,
                     ModelId: response.SharedChat.ModelId,
+                    ViewCount: response.SharedChat.ViewCount,
                     SnapshotAt: response.SharedChat.SnapshotAt,
                     CreatedAt: response.SharedChat.CreatedAt),
                 Messages: response.Messages

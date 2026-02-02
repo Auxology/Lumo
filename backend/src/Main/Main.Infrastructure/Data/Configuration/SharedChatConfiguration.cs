@@ -5,6 +5,8 @@ using Main.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+using RabbitMQ.Client;
+
 using SharedKernel.Infrastructure.Data;
 
 namespace Main.Infrastructure.Data.Configuration;
@@ -46,6 +48,10 @@ internal sealed class SharedChatConfiguration : IEntityTypeConfiguration<SharedC
             .IsRequired()
             .HasMaxLength(ChatConstants.MaxModelIdLength)
             .HasColumnType($"varchar({ChatConstants.MaxModelIdLength})");
+
+        b.Property(s => s.ViewCount)
+            .IsRequired()
+            .HasColumnType("integer");
 
         b.Property(s => s.SnapshotAt)
             .IsRequired()
