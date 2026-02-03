@@ -490,3 +490,6 @@ $RECYCLE.BIN/
 **/appsettings.Development.json
 PROJECT_INDEX.md
 PROJECT_INDEX.json
+
+docs
+CLAUDE.md
