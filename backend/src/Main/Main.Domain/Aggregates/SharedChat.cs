@@ -29,7 +29,7 @@ public sealed class SharedChat : AggregateRoot<SharedChatId>
 
     public DateTimeOffset UpdatedAt { get; private set; }
 
-    public IReadOnlyList<SharedChatMessage> SharedChatMessages => [.. _sharedChatMessages];
+    public IReadOnlyList<SharedChatMessage> SharedChatMessages => _sharedChatMessages.AsReadOnly();
 
     private SharedChat() { } // For EF Core
 

@@ -21,7 +21,7 @@ public sealed class RecoveryKeyChain : AggregateRoot<RecoveryKeyChainId>
 
     public int Version { get; private set; }
 
-    public IReadOnlyCollection<RecoveryKey> RecoveryKeys => [.. _recoveryKeys];
+    public IReadOnlyCollection<RecoveryKey> RecoveryKeys => _recoveryKeys.AsReadOnly();
 
     private RecoveryKeyChain() { } // For EF Core
 

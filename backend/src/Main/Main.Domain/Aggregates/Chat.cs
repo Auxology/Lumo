@@ -30,7 +30,7 @@ public sealed class Chat : AggregateRoot<ChatId>
 
     public DateTimeOffset? UpdatedAt { get; private set; }
 
-    public IReadOnlyCollection<Message> Messages => [.. _messages];
+    public IReadOnlyCollection<Message> Messages => _messages.AsReadOnly();
 
     private Chat() { } // For EF Core
 
