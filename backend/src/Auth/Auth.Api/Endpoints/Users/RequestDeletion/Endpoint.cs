@@ -14,16 +14,17 @@ internal sealed class Endpoint : BaseEndpoint<EmptyRequest, Response>
 
     public override void Configure()
     {
-        Delete("/api/users/me");
+        Post("/api/users/me/deletion");
         Version(1);
 
         Description(d =>
         {
             d.WithSummary("Request Account Deletion")
                 .WithDescription("Initiates the process to delete the currently authenticated user's account.")
-                .Produces<Response>(200)
+                .Produces<Response>(202, "application/json")
                 .ProducesProblemDetails(401)
                 .ProducesProblemDetails(404)
+                .ProducesProblemDetails(409)
                 .WithTags(CustomTags.Users);
         });
     }
@@ -41,6 +42,7 @@ internal sealed class Endpoint : BaseEndpoint<EmptyRequest, Response>
                 RequestedAt: rudr.RequestedAt,
                 WillBeDeletedAt: rudr.WillBeDeletedAt
             ),
+            successStatusCode: 202,
             cancellationToken: ct
         );
     }

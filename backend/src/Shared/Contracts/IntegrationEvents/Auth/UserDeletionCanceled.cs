@@ -11,4 +11,8 @@ public sealed record UserDeletionCanceled
     public required Guid UserId { get; init; }
 
     public required string EmailAddress { get; init; }
+
+    public required string IpAddress { get; init; }
+
+    public required string UserAgent { get; init; }
 };

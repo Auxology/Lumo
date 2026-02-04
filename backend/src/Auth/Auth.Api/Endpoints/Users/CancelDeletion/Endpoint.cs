@@ -21,9 +21,10 @@ internal sealed class Endpoint : BaseEndpoint<EmptyRequest, Response>
         {
             d.WithSummary("Cancel User Deletion")
                 .WithDescription("Cancels the deletion process of the authenticated user's account.")
-                .Produces<Response>(200)
+                .Produces<Response>(200, "application/json")
                 .ProducesProblemDetails(401)
                 .ProducesProblemDetails(404)
+                .ProducesProblemDetails(409)
                 .WithTags(CustomTags.Users);
         });
     }

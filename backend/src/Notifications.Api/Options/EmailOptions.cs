@@ -32,4 +32,13 @@ internal sealed class EmailOptions
 
     [Required, MinLength(1)]
     public string EmailChangeRequestedTemplateName { get; init; } = string.Empty;
+
+    [Required, MinLength(1)]
+    public string UserDeletionRequestedTemplateName { get; init; } = string.Empty;
+
+    [Required, MinLength(1)]
+    public string UserDeletionCanceledTemplateName { get; init; } = string.Empty;
+
+    [Required, MinLength(1)]
+    public string UserDeletedTemplateName { get; init; } = string.Empty;
 }

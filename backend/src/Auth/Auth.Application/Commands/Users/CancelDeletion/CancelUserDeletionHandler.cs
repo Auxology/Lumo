@@ -16,6 +16,7 @@ namespace Auth.Application.Commands.Users.CancelDeletion;
 internal sealed class CancelUserDeletionHandler(
     IAuthDbContext dbContext,
     IUserContext userContext,
+    IRequestContext requestContext,
     IMessageBus messageBus,
     IDateTimeProvider dateTimeProvider) : ICommandHandler<CancelUserDeletionCommand, CancelUserDeletionResponse>
 {
@@ -39,13 +40,28 @@ internal sealed class CancelUserDeletionHandler(
         if (cancelDeletionOutcome.IsFailure)
             return cancelDeletionOutcome.Fault;
 
+        Outcome<Fingerprint> fingerprintOutcome = Fingerprint.Create
+        (
+            ipAddress: requestContext.IpAddress,
+            userAgent: requestContext.UserAgent,
+            timezone: requestContext.Timezone,
+            language: requestContext.Language,
+            normalizedBrowser: requestContext.NormalizedBrowser,
+            normalizedOs: requestContext.NormalizedOs
+        );
+
+        if (fingerprintOutcome.IsFailure)
+            return fingerprintOutcome.Fault;
+
         UserDeletionCanceled userDeletionCanceled = new()
         {
             EventId = Guid.NewGuid(),
             OccurredAt = dateTimeProvider.UtcNow,
-            CorrelationId = Guid.NewGuid(),
+            CorrelationId = Guid.Parse(requestContext.CorrelationId),
             UserId = user.Id.Value,
-            EmailAddress = user.EmailAddress.Value
+            EmailAddress = user.EmailAddress.Value,
+            IpAddress = fingerprintOutcome.Value.IpAddress,
+            UserAgent = fingerprintOutcome.Value.UserAgent
         };
 
         await messageBus.PublishAsync(userDeletionCanceled, cancellationToken);

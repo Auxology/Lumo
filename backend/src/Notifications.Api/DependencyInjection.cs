@@ -82,6 +82,10 @@ internal static class DependencyInjection
             bus.AddConsumer<UserEmailAddressChangedConsumer>();
             bus.AddConsumer<RecoveryInitiatedConsumer>();
             bus.AddConsumer<EmailChangeRequestedConsumer>();
+            bus.AddConsumer<UserDeletionRequestedConsumer>();
+            bus.AddConsumer<UserDeletionCanceledConsumer>();
+            bus.AddConsumer<UserDeletedConsumer>()
+                .Endpoint(e => e.Name = "notifications-user-deleted");
 
             bus.AddEntityFrameworkOutbox<NotificationDbContext>(outbox =>
             {
