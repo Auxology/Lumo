@@ -86,7 +86,7 @@ internal sealed class RemixChatHandler(
                     messageContent: message.MessageContent,
                     utcNow: dateTimeProvider.UtcNow
                 );
-                
+
                 if (messageOutcome.IsFailure)
                     return messageOutcome.Fault;
             }
@@ -98,7 +98,7 @@ internal sealed class RemixChatHandler(
                     messageContent: message.MessageContent,
                     utcNow: dateTimeProvider.UtcNow
                 );
-                
+
                 if (messageOutcome.IsFailure)
                     return messageOutcome.Fault;
             }
@@ -108,12 +108,12 @@ internal sealed class RemixChatHandler(
 
         if (!lockAcquired)
             return ChatOperationFaults.GenerationInProgress;
-        
-        string latestUserMessage = originalChat.Messages                                                                                                                                                                                   
-            .Where(m => m.MessageRole == MessageRole.User)                                                                                                                                                                           
-            .Select(m => m.MessageContent)                                                                                                                                                                                           
+
+        string latestUserMessage = originalChat.Messages
+            .Where(m => m.MessageRole == MessageRole.User)
+            .Select(m => m.MessageContent)
             .LastOrDefault() ?? string.Empty;
-        
+
         try
         {
             StreamId streamId = idGenerator.NewStreamId();

@@ -26,6 +26,8 @@
         <PackageReference Include="MassTransit.RabbitMQ" />
         <PackageReference Include="MassTransit.EntityFrameworkCore" />
         <PackageReference Include="Ulid" />
+        <PackageReference Include="TickerQ" />
+        <PackageReference Include="TickerQ.EntityFrameworkCore" />
     </ItemGroup>
 
 </Project>

@@ -1,5 +1,3 @@
-using Contracts.Requests;
-
 using FastEndpoints;
 
 using Gateway.Api.Authentication;
