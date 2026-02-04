@@ -65,7 +65,7 @@ public sealed class Preference : AggregateRoot<PreferenceId>
     )
     {
         ArgumentNullException.ThrowIfNull(content);
-        
+
         if (_instructions.Count >= PreferenceConstants.MaxInstructionCount)
             return PreferenceFaults.MaxInstructionsReached;
 
@@ -101,7 +101,7 @@ public sealed class Preference : AggregateRoot<PreferenceId>
     )
     {
         ArgumentNullException.ThrowIfNull(newContent);
-        
+
         Instruction? instruction = _instructions
             .FirstOrDefault(i => i.Id == instructionId);
 

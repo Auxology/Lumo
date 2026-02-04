@@ -53,4 +53,16 @@ public static class UserFaults
         title: "User.EmailAddressSameAsCurrent",
         detail: "The new email address must be different from the current one."
     );
+
+    public static readonly Fault UserAlreadyDeleted = Fault.Conflict
+    (
+        title: "User.AlreadyDeleted",
+        detail: "This user account has already been deleted."
+    );
+
+    public static readonly Fault UserNotDeleted = Fault.Conflict
+    (
+        title: "User.NotDeleted",
+        detail: "This user account is not marked as deleted."
+    );
 }

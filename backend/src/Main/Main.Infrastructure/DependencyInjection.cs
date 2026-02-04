@@ -115,6 +115,8 @@ public static class DependencyInjection
         {
             bus.AddConsumer<UserSignedUpConsumer>()
                 .Endpoint(e => e.Name = "main-user-signed-up");
+            bus.AddConsumer<UserDeletedConsumer>()
+                .Endpoint(e => e.Name = "main-user-deleted");
             bus.AddConsumer<ChatStartedConsumer>();
             bus.AddConsumer<AssistantMessageGeneratedConsumer>();
             bus.AddConsumer<MessageSentConsumer>();

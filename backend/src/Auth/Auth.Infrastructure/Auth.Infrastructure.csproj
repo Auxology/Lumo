@@ -16,7 +16,7 @@
 
     <ItemGroup>
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
         <PackageReference Include="EFCore.NamingConventions" />
         <PackageReference Include="Dapper" />
         <PackageReference Include="AspNetCore.HealthChecks.NpgSql" />
@@ -26,6 +26,8 @@
         <PackageReference Include="MassTransit.RabbitMQ" />
         <PackageReference Include="MassTransit.EntityFrameworkCore" />
         <PackageReference Include="Ulid" />
+        <PackageReference Include="TickerQ" />
+        <PackageReference Include="TickerQ.EntityFrameworkCore" />
     </ItemGroup>
 
 </Project>

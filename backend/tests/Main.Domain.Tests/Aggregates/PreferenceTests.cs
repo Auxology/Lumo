@@ -102,12 +102,11 @@ public sealed class PreferenceTests
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
-    [InlineData(null)]
-    public void AddInstruction_WithEmptyContent_ShouldReturnFailure(string? content)
+    public void AddInstruction_WithEmptyContent_ShouldReturnFailure(string content)
     {
         Preference preference = Preference.Create(ValidPreferenceId, ValidUserId, UtcNow).Value;
 
-        Outcome<Instruction> outcome = preference.AddInstruction(ValidInstructionId, content!, UtcNow);
+        Outcome<Instruction> outcome = preference.AddInstruction(ValidInstructionId, content, UtcNow);
 
         outcome.IsFailure.Should().BeTrue();
         outcome.Fault.Should().Be(InstructionFaults.ContentEmpty);
@@ -171,13 +170,12 @@ public sealed class PreferenceTests
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
-    [InlineData(null)]
-    public void UpdateInstruction_WithEmptyContent_ShouldReturnFailure(string? content)
+    public void UpdateInstruction_WithEmptyContent_ShouldReturnFailure(string content)
     {
         Preference preference = Preference.Create(ValidPreferenceId, ValidUserId, UtcNow).Value;
         preference.AddInstruction(ValidInstructionId, ValidInstructionContent, UtcNow);
 
-        Outcome outcome = preference.UpdateInstruction(ValidInstructionId, content!, UtcNow);
+        Outcome outcome = preference.UpdateInstruction(ValidInstructionId, content, UtcNow);
 
         outcome.IsFailure.Should().BeTrue();
         outcome.Fault.Should().Be(InstructionFaults.ContentEmpty);

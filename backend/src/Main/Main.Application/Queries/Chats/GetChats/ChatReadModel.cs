@@ -10,6 +10,8 @@ public sealed record class ChatReadModel
 
     public bool IsArchived { get; init; }
 
+    public bool IsPinned { get; init; }
+
     public DateTimeOffset CreatedAt { get; init; }
 
     public DateTimeOffset? UpdatedAt { get; init; }

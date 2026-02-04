@@ -6,5 +6,6 @@ public sealed record UpdateChatCommand
 (
     string ChatId,
     string? NewTitle,
-    bool? IsArchived
+    bool? IsArchived,
+    bool? IsPinned
 ) : ICommand<UpdateChatResponse>;

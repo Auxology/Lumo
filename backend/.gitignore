@@ -31,6 +31,7 @@ x86/
 [Aa][Rr][Mm]64/
 bld/
 [Bb]in/
+**/bin\\*
 [Oo]bj/
 [Ll]og/
 [Ll]ogs/
@@ -489,3 +490,6 @@ $RECYCLE.BIN/
 **/appsettings.Development.json
 PROJECT_INDEX.md
 PROJECT_INDEX.json
+
+docs
+CLAUDE.md

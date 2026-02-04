@@ -12,6 +12,8 @@ public sealed record class SharedChatReadModel
 
     public required string ModelId { get; init; }
 
+    public required int ViewCount { get; init; }
+
     public required DateTimeOffset SnapshotAt { get; init; }
 
     public required DateTimeOffset CreatedAt { get; init; }

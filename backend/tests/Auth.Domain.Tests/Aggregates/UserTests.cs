@@ -231,4 +231,54 @@ public sealed class UserTests
         outcome.IsFailure.Should().BeTrue();
         outcome.Fault.Should().Be(UserFaults.EmailAddressSameAsCurrent);
     }
+
+    [Fact]
+    public void MarkAsDeleted_WhenNotDeleted_ShouldSetDeletedAt()
+    {
+        User user = User.Create("John Doe", ValidEmail, UtcNow).Value;
+        DateTimeOffset deleteTime = UtcNow.AddHours(1);
+
+        Outcome outcome = user.MarkAsDeleted(deleteTime);
+
+        outcome.IsSuccess.Should().BeTrue();
+        user.DeletedAt.Should().Be(deleteTime);
+        user.UpdatedAt.Should().Be(deleteTime);
+    }
+
+    [Fact]
+    public void MarkAsDeleted_WhenAlreadyDeleted_ShouldReturnFailure()
+    {
+        User user = User.Create("John Doe", ValidEmail, UtcNow).Value;
+        user.MarkAsDeleted(UtcNow);
+
+        Outcome outcome = user.MarkAsDeleted(UtcNow.AddHours(1));
+
+        outcome.IsFailure.Should().BeTrue();
+        outcome.Fault.Should().Be(UserFaults.UserAlreadyDeleted);
+    }
+
+    [Fact]
+    public void CancelDeletion_WhenDeleted_ShouldClearDeletedAt()
+    {
+        User user = User.Create("John Doe", ValidEmail, UtcNow).Value;
+        user.MarkAsDeleted(UtcNow);
+        DateTimeOffset cancelTime = UtcNow.AddHours(1);
+
+        Outcome outcome = user.CancelDeletion(cancelTime);
+
+        outcome.IsSuccess.Should().BeTrue();
+        user.DeletedAt.Should().BeNull();
+        user.UpdatedAt.Should().Be(cancelTime);
+    }
+
+    [Fact]
+    public void CancelDeletion_WhenNotDeleted_ShouldReturnFailure()
+    {
+        User user = User.Create("John Doe", ValidEmail, UtcNow).Value;
+
+        Outcome outcome = user.CancelDeletion(UtcNow);
+
+        outcome.IsFailure.Should().BeTrue();
+        outcome.Fault.Should().Be(UserFaults.UserNotDeleted);
+    }
 }

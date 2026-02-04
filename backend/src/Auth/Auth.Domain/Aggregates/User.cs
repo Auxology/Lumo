@@ -25,6 +25,8 @@ public sealed class User : AggregateRoot<UserId>
 
     public DateTimeOffset? VerifiedAt { get; private set; }
 
+    public DateTimeOffset? DeletedAt { get; private set; }
+
     private User() { } // For EF Core
 
     [SetsRequiredMembers]
@@ -43,6 +45,7 @@ public sealed class User : AggregateRoot<UserId>
         CreatedAt = utcNow;
         UpdatedAt = null;
         VerifiedAt = null;
+        DeletedAt = null;
     }
 
     public static Outcome<User> Create
@@ -125,5 +128,27 @@ public sealed class User : AggregateRoot<UserId>
     {
         AvatarKey = null;
         UpdatedAt = utcNow;
+    }
+
+    public Outcome MarkAsDeleted(DateTimeOffset utcNow)
+    {
+        if (DeletedAt != null)
+            return UserFaults.UserAlreadyDeleted;
+
+        DeletedAt = utcNow;
+        UpdatedAt = utcNow;
+
+        return Outcome.Success();
+    }
+
+    public Outcome CancelDeletion(DateTimeOffset utcNow)
+    {
+        if (DeletedAt == null)
+            return UserFaults.UserNotDeleted;
+
+        DeletedAt = null;
+        UpdatedAt = utcNow;
+
+        return Outcome.Success();
     }
 }

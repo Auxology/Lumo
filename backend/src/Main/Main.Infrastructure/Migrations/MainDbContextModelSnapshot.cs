@@ -38,6 +38,10 @@ namespace Main.Infrastructure.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("is_archived");
 
+                    b.Property<bool>("IsPinned")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_pinned");
+
                     b.Property<string>("ModelId")
                         .HasMaxLength(64)
                         .HasColumnType("varchar(64)")
@@ -136,6 +140,10 @@ namespace Main.Infrastructure.Migrations
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("timestamptz")
                         .HasColumnName("updated_at");
+
+                    b.Property<int>("ViewCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("view_count");
 
                     b.HasKey("Id")
                         .HasName("pk_shared_chats");

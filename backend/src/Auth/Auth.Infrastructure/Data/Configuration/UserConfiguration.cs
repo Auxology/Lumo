@@ -57,11 +57,18 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
             .IsRequired(false)
             .HasColumnType("timestamptz");
 
+        b.Property(u => u.DeletedAt)
+            .IsRequired(false)
+            .HasColumnType("timestamptz");
+
         b.HasIndex(u => u.EmailAddress)
             .IsUnique();
 
         b.HasIndex(u => u.IsVerified);
 
         b.HasIndex(u => u.CreatedAt);
+
+        b.HasIndex(u => u.DeletedAt)
+            .HasFilter("deleted_at IS NOT NULL");
     }
 }

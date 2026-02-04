@@ -1,5 +1,4 @@
 using Contracts.Requests;
-using Contracts.Responses;
 
 using FastEndpoints;
 

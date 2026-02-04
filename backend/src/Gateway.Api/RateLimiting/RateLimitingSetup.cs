@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Threading.RateLimiting;
 
 using Gateway.Api.Faults;
 using Gateway.Api.Options;
@@ -48,7 +49,7 @@ internal static class RateLimitingSetup
             limiterOptions.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
             limiterOptions.OnRejected = async (context, cancellationToken) =>
             {
-                if (context.Lease.TryGetMetadata(System.Threading.RateLimiting.MetadataName.RetryAfter,
+                if (context.Lease.TryGetMetadata(MetadataName.RetryAfter,
                         out TimeSpan retryAfter))
                     context.HttpContext.Response.Headers.RetryAfter =
                         ((int)retryAfter.TotalSeconds).ToString(CultureInfo.InvariantCulture);
@@ -104,7 +105,7 @@ internal static class RateLimitingSetup
             limiterOptions.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
             limiterOptions.OnRejected = async (context, cancellationToken) =>
             {
-                if (context.Lease.TryGetMetadata(System.Threading.RateLimiting.MetadataName.RetryAfter,
+                if (context.Lease.TryGetMetadata(MetadataName.RetryAfter,
                         out TimeSpan retryAfter))
                     context.HttpContext.Response.Headers.RetryAfter =
                         ((int)retryAfter.TotalSeconds).ToString(CultureInfo.InvariantCulture);

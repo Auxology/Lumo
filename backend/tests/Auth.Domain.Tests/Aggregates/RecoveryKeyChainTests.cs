@@ -261,4 +261,163 @@ public sealed class RecoveryKeyChainTests
 
         chain.Version.Should().Be(4);
     }
+
+    [Fact]
+    public void MarkKeyAsUsed_WithValidKey_ShouldMarkKeyAsUsed()
+    {
+        RecoveryKeyChain chain = RecoveryKeyChain.Create
+        (
+            id: CreateValidRecoveryKeyChainId(),
+            userId: ValidUserId,
+            recoverKeyInputs: CreateValidRecoveryKeyInputs(),
+            utcNow: UtcNow
+        ).Value;
+
+        Fingerprint fingerprint = CreateValidFingerprint();
+        DateTimeOffset useTime = UtcNow.AddHours(1);
+
+        Outcome outcome = chain.MarkKeyAsUsed("identifier-1", fingerprint, useTime);
+
+        outcome.IsSuccess.Should().BeTrue();
+        chain.RecoveryKeys.First(k => k.Identifier == "identifier-1").IsUsed.Should().BeTrue();
+    }
+
+    [Fact]
+    public void MarkKeyAsUsed_WithNonExistentKey_ShouldReturnFailure()
+    {
+        RecoveryKeyChain chain = RecoveryKeyChain.Create
+        (
+            id: CreateValidRecoveryKeyChainId(),
+            userId: ValidUserId,
+            recoverKeyInputs: CreateValidRecoveryKeyInputs(),
+            utcNow: UtcNow
+        ).Value;
+
+        Fingerprint fingerprint = CreateValidFingerprint();
+
+        Outcome outcome = chain.MarkKeyAsUsed("non-existent", fingerprint, UtcNow);
+
+        outcome.IsFailure.Should().BeTrue();
+        outcome.Fault.Should().Be(RecoveryKeyChainFaults.KeyNotFoundOrUsed);
+    }
+
+    [Fact]
+    public void MarkKeyAsUsed_WithAlreadyUsedKey_ShouldReturnFailure()
+    {
+        RecoveryKeyChain chain = RecoveryKeyChain.Create
+        (
+            id: CreateValidRecoveryKeyChainId(),
+            userId: ValidUserId,
+            recoverKeyInputs: CreateValidRecoveryKeyInputs(),
+            utcNow: UtcNow
+        ).Value;
+
+        Fingerprint fingerprint = CreateValidFingerprint();
+        chain.MarkKeyAsUsed("identifier-1", fingerprint, UtcNow);
+
+        Outcome outcome = chain.MarkKeyAsUsed("identifier-1", fingerprint, UtcNow.AddHours(1));
+
+        outcome.IsFailure.Should().BeTrue();
+        outcome.Fault.Should().Be(RecoveryKeyChainFaults.KeyNotFoundOrUsed);
+    }
+
+    [Fact]
+    public void GetVerifierHashForKey_WithExistingUnusedKey_ShouldReturnHash()
+    {
+        RecoveryKeyChain chain = RecoveryKeyChain.Create
+        (
+            id: CreateValidRecoveryKeyChainId(),
+            userId: ValidUserId,
+            recoverKeyInputs: CreateValidRecoveryKeyInputs(),
+            utcNow: UtcNow
+        ).Value;
+
+        string? hash = chain.GetVerifierHashForKey("identifier-1");
+
+        hash.Should().Be("verifier-hash-1");
+    }
+
+    [Fact]
+    public void GetVerifierHashForKey_WithNonExistentKey_ShouldReturnNull()
+    {
+        RecoveryKeyChain chain = RecoveryKeyChain.Create
+        (
+            id: CreateValidRecoveryKeyChainId(),
+            userId: ValidUserId,
+            recoverKeyInputs: CreateValidRecoveryKeyInputs(),
+            utcNow: UtcNow
+        ).Value;
+
+        string? hash = chain.GetVerifierHashForKey("non-existent");
+
+        hash.Should().BeNull();
+    }
+
+    [Fact]
+    public void GetVerifierHashForKey_WithUsedKey_ShouldReturnNull()
+    {
+        RecoveryKeyChain chain = RecoveryKeyChain.Create
+        (
+            id: CreateValidRecoveryKeyChainId(),
+            userId: ValidUserId,
+            recoverKeyInputs: CreateValidRecoveryKeyInputs(),
+            utcNow: UtcNow
+        ).Value;
+
+        Fingerprint fingerprint = CreateValidFingerprint();
+        chain.MarkKeyAsUsed("identifier-1", fingerprint, UtcNow);
+
+        string? hash = chain.GetVerifierHashForKey("identifier-1");
+
+        hash.Should().BeNull();
+    }
+
+    [Fact]
+    public void GetRemainingKeyCount_WithAllUnused_ShouldReturnTotalCount()
+    {
+        RecoveryKeyChain chain = RecoveryKeyChain.Create
+        (
+            id: CreateValidRecoveryKeyChainId(),
+            userId: ValidUserId,
+            recoverKeyInputs: CreateValidRecoveryKeyInputs(),
+            utcNow: UtcNow
+        ).Value;
+
+        int count = chain.GetRemainingKeyCount();
+
+        count.Should().Be(RecoveryKeyConstants.MaxKeysPerChain);
+    }
+
+    [Fact]
+    public void GetRemainingKeyCount_AfterUsingKeys_ShouldReturnDecrementedCount()
+    {
+        RecoveryKeyChain chain = RecoveryKeyChain.Create
+        (
+            id: CreateValidRecoveryKeyChainId(),
+            userId: ValidUserId,
+            recoverKeyInputs: CreateValidRecoveryKeyInputs(),
+            utcNow: UtcNow
+        ).Value;
+
+        Fingerprint fingerprint = CreateValidFingerprint();
+        chain.MarkKeyAsUsed("identifier-1", fingerprint, UtcNow);
+        chain.MarkKeyAsUsed("identifier-2", fingerprint, UtcNow);
+
+        int count = chain.GetRemainingKeyCount();
+
+        count.Should().Be(RecoveryKeyConstants.MaxKeysPerChain - 2);
+    }
+
+    private static Fingerprint CreateValidFingerprint()
+    {
+        return Fingerprint.Create
+        (
+            ipAddress: "192.168.1.1",
+            userAgent: "Mozilla/5.0",
+            timezone: "Europe/London",
+            language: "en-US",
+            normalizedBrowser: "Chrome 120",
+            normalizedOs: "Windows 10"
+        ).Value;
+    }
 }

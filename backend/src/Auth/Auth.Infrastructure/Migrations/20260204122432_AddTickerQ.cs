@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Auth.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate2 : Migration
+    public partial class AddTickerQ : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -182,7 +182,8 @@ namespace Auth.Infrastructure.Migrations
                     is_verified = table.Column<bool>(type: "boolean", nullable: false),
                     created_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: false),
                     updated_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: true),
-                    verified_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: true)
+                    verified_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: true),
+                    deleted_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -432,6 +433,12 @@ namespace Auth.Infrastructure.Migrations
                 name: "ix_users_created_at",
                 table: "users",
                 column: "created_at");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_users_deleted_at",
+                table: "users",
+                column: "deleted_at",
+                filter: "deleted_at IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "ix_users_email_address",

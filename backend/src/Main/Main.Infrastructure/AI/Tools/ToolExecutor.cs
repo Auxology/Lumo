@@ -14,7 +14,7 @@ internal sealed class ToolExecutor(IMemoryStore memoryStore, ILogger<ToolExecuto
     {
         return chatToolCall.FunctionName switch
         {
-            "save_memory" => await ExecuteSaveMemoryAsync(chatToolCall, userId, cancellationToken),
+            "__sm" => await ExecuteSaveMemoryAsync(chatToolCall, userId, cancellationToken),
             _ => $"Unknown function: {chatToolCall.FunctionName}"
         };
     }

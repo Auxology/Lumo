@@ -55,6 +55,21 @@ internal sealed class UpdateChatHandler(
                 return unarchiveOutcome.Fault;
         }
 
+        if (request.IsPinned is true)
+        {
+            Outcome pinOutcome = chat.Pin(dateTimeProvider.UtcNow);
+
+            if (pinOutcome.IsFailure)
+                return pinOutcome.Fault;
+        }
+        else if (request.IsPinned is false)
+        {
+            Outcome unpinOutcome = chat.Unpin(dateTimeProvider.UtcNow);
+
+            if (unpinOutcome.IsFailure)
+                return unpinOutcome.Fault;
+        }
+
         if (request.NewTitle is not null)
         {
             Outcome titleOutcome = chat.RenameTitle(request.NewTitle, dateTimeProvider.UtcNow);
@@ -70,7 +85,8 @@ internal sealed class UpdateChatHandler(
             ChatId: chat.Id.Value,
             Title: chat.Title,
             IsArchived: chat.IsArchived,
-            UpdatedAt: chat.UpdatedAt ?? dateTimeProvider.UtcNow
+            UpdatedAt: chat.UpdatedAt ?? dateTimeProvider.UtcNow,
+            IsPinned: chat.IsPinned
         );
 
         return response;

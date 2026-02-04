@@ -9,6 +9,7 @@ using Auth.Application.Abstractions.Storage;
 using Auth.Infrastructure.Authentication;
 using Auth.Infrastructure.Data;
 using Auth.Infrastructure.Generators;
+using Auth.Infrastructure.Jobs;
 using Auth.Infrastructure.Options;
 using Auth.Infrastructure.Storage;
 
@@ -23,9 +24,12 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using SharedKernel.Application.Data;
 using SharedKernel.Application.Messaging;
 using SharedKernel.Infrastructure;
-using SharedKernel.Infrastructure.Data;
 using SharedKernel.Infrastructure.Messaging;
 using SharedKernel.Infrastructure.Options;
+
+using TickerQ.DependencyInjection;
+using TickerQ.EntityFrameworkCore.Customizer;
+using TickerQ.EntityFrameworkCore.DependencyInjection;
 
 namespace Auth.Infrastructure;
 
@@ -40,7 +44,8 @@ public static class DependencyInjection
             .AddAuthenticationInternal()
             .AddAuthorization()
             .AddStorage(configuration)
-            .AddMessaging(configuration);
+            .AddMessaging(configuration)
+            .AddBackgroundJobs();
 
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
@@ -157,6 +162,15 @@ public static class DependencyInjection
         });
 
         services.AddScoped<IMessageBus, MessageBus>();
+
+        return services;
+    }
+
+    private static IServiceCollection AddBackgroundJobs(this IServiceCollection services)
+    {
+        services.AddScoped<ICronJobHelper, CronJobHelper>();
+
+        services.AddTickerQ();
 
         return services;
     }

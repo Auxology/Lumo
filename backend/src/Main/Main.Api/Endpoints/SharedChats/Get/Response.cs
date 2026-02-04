@@ -7,6 +7,7 @@ internal sealed record SharedChatDto
     Guid OwnerId,
     string Title,
     string ModelId,
+    int ViewCount,
     DateTimeOffset SnapshotAt,
     DateTimeOffset CreatedAt
 );

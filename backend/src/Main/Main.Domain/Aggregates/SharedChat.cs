@@ -21,13 +21,15 @@ public sealed class SharedChat : AggregateRoot<SharedChatId>
 
     public string ModelId { get; private set; } = string.Empty;
 
+    public int ViewCount { get; private set; }
+
     public DateTimeOffset SnapshotAt { get; private set; }
 
     public DateTimeOffset CreatedAt { get; private set; }
 
     public DateTimeOffset UpdatedAt { get; private set; }
 
-    public IReadOnlyList<SharedChatMessage> SharedChatMessages => [.. _sharedChatMessages];
+    public IReadOnlyList<SharedChatMessage> SharedChatMessages => _sharedChatMessages.AsReadOnly();
 
     private SharedChat() { } // For EF Core
 
@@ -47,6 +49,7 @@ public sealed class SharedChat : AggregateRoot<SharedChatId>
         OwnerId = ownerId;
         Title = title;
         ModelId = modelId;
+        ViewCount = 0;
         SnapshotAt = utcNow;
         CreatedAt = utcNow;
         UpdatedAt = utcNow;

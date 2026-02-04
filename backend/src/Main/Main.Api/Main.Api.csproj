@@ -10,6 +10,7 @@
         <PackageReference Include="FastEndpoints" />
         <PackageReference Include="FastEndpoints.Swagger" />
         <PackageReference Include="Scalar.AspNetCore" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" PrivateAssets="all" />
         <PackageReference Include="RedisRateLimiting.AspNetCore" />
     </ItemGroup>
 
