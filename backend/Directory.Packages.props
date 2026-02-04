@@ -4,7 +4,7 @@
     </PropertyGroup>
     <ItemGroup>
         <!-- Static code analysis -->
-        <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.18.0.131500" />
+        <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.19.0.132793" />
         <!-- Application -->
         <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.2" />
         <PackageVersion Include="Mediator.SourceGenerator" Version="3.1.0-preview.14" />
@@ -35,7 +35,7 @@
         <!-- Otel Instrumentations -->
         <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.15.0" />
         <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.15.0" />
-        <PackageVersion Include="OpenTelemetry.Instrumentation.SqlClient" Version="1.14.0-beta.1" />
+        <PackageVersion Include="OpenTelemetry.Instrumentation.SqlClient" Version="1.15.0" />
         <PackageVersion Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="1.14.0-beta.2" />
         <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.15.0" />
         <PackageVersion Include="OpenTelemetry.Instrumentation.Process" Version="1.14.0-beta.2" />
@@ -62,9 +62,9 @@
         <PackageVersion Include="UAParser" Version="3.1.47" />
 
         <!-- AWS SDK -->
-        <PackageVersion Include="AWSSDK.S3" Version="4.0.17.3" />
-        <PackageVersion Include="AWSSDK.Extensions.NETCore.Setup" Version="4.0.3.21" />
-        <PackageVersion Include="AWSSDK.SimpleEmailV2" Version="4.0.11.4" />
+        <PackageVersion Include="AWSSDK.S3" Version="4.0.18.2" />
+        <PackageVersion Include="AWSSDK.Extensions.NETCore.Setup" Version="4.0.3.22" />
+        <PackageVersion Include="AWSSDK.SimpleEmailV2" Version="4.0.11.5" />
 
         <!-- MassTransit -->
         <!-- Avoid updating MassTransit versions beyond 8.5.x, as newer version required license -->
@@ -83,7 +83,7 @@
         <PackageVersion Include="FastEndpoints" Version="7.2.0" />
         <PackageVersion Include="FastEndpoints.Swagger" Version="7.2.0" />
         <PackageVersion Include="FastEndpoints.Generator" Version="7.2.0" />
-        <PackageVersion Include="Scalar.AspNetCore" Version="2.12.14" />
+        <PackageVersion Include="Scalar.AspNetCore" Version="2.12.32" />
         <PackageVersion Include="RedisRateLimiting.AspNetCore" Version="1.2.1" />
         <!-- Tests -->
         <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />

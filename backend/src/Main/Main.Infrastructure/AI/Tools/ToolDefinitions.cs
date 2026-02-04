@@ -6,7 +6,7 @@ internal static class ToolDefinitions
 {
     internal static ChatTool SaveMemory => ChatTool.CreateFunctionTool
     (
-        functionName: "save_memory",
+        functionName: "__sm",
         functionDescription:
         "Save important information about the user to memory for future conversations. " +
         "Use this when the user shares preferences, personal facts, or instructions they want you to remember. " +
