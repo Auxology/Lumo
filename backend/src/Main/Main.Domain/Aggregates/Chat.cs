@@ -213,7 +213,7 @@ public sealed class Chat : AggregateRoot<ChatId>
 
         int targetSequenceNumber = targetMessage.SequenceNumber;
 
-        _messages.RemoveAll(m => m.SequenceNumber >= targetSequenceNumber);
+        _messages.RemoveAll(m => m.SequenceNumber > targetSequenceNumber);
 
         Outcome editOutcome = targetMessage.EditContent(newContent, utcNow);
 
