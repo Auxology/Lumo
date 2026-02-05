@@ -60,7 +60,8 @@ internal sealed class ShareChatHandler(
                 SequenceNumber: m.SequenceNumber,
                 MessageRole: m.MessageRole,
                 MessageContent: m.MessageContent,
-                CreatedAt: m.CreatedAt
+                CreatedAt: m.CreatedAt,
+                EditedAt: m.EditedAt
             ))
             .ToList();
 

@@ -39,4 +39,10 @@ public static class MessageFaults
         title: "Message.InvalidSequenceNumber",
         detail: "The sequence number must be a non-negative integer."
     );
+
+    public static readonly Fault MessageNotFound = Fault.NotFound
+    (
+        title: "Message.MessageNotFound",
+        detail: "The specified message was not found."
+    );
 }

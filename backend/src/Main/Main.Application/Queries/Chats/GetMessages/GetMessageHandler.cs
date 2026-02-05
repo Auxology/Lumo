@@ -31,7 +31,8 @@ internal sealed class GetMessageHandler(IDbConnectionFactory dbConnectionFactory
                                             message_content as MessageContent,
                                             token_count as TokenCount,
                                             sequence_number as SequenceNumber,
-                                            created_at as CreatedAt
+                                            created_at as CreatedAt,
+                                            edited_at as EditedAt
                                           FROM messages
                                           WHERE chat_id = @ChatId
                                           ORDER BY sequence_number desc 
@@ -46,7 +47,8 @@ internal sealed class GetMessageHandler(IDbConnectionFactory dbConnectionFactory
                                                       message_content as MessageContent,
                                                       token_count as TokenCount,
                                                       sequence_number as SequenceNumber,
-                                                      created_at as CreatedAt
+                                                      created_at as CreatedAt,
+                                                      edited_at as EditedAt
                                                     FROM messages
                                                     WHERE chat_id = @ChatId AND sequence_number < @Cursor
                                                     ORDER BY sequence_number desc

@@ -10,7 +10,8 @@ internal sealed record MessageDto
     string MessageContent,
     long? TokenCount,
     int SequenceNumber,
-    DateTimeOffset CreatedAt
+    DateTimeOffset CreatedAt,
+    DateTimeOffset EditedAt
 );
 
 internal sealed record PaginationDto

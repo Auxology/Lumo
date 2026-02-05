@@ -35,7 +35,8 @@ internal sealed class GetSharedChatHandler(IDbConnectionFactory dbConnectionFact
                                             sequence_number as SequenceNumber,
                                             message_role as MessageRole,
                                             message_content as MessageContent,
-                                            created_at as CreatedAt
+                                            created_at as CreatedAt,
+                                            edited_at as EditedAt
                                        FROM shared_chat_messages
                                        WHERE shared_chat_id = @SharedChatId
                                        ORDER BY sequence_number ASC

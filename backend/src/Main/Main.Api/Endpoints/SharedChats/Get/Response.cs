@@ -17,7 +17,8 @@ internal sealed record SharedChatMessageDto
     int SequenceNumber,
     string MessageRole,
     string MessageContent,
-    DateTimeOffset CreatedAt
+    DateTimeOffset CreatedAt,
+    DateTimeOffset EditedAt
 );
 
 internal sealed record Response
