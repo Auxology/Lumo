@@ -45,4 +45,10 @@ public static class MessageFaults
         title: "Message.MessageNotFound",
         detail: "The specified message was not found."
     );
+    
+    public static readonly Fault MessageEditNotAllowed = Fault.Validation
+    (
+        title: "Message.MessageEditNotAllowed",
+        detail: "Editing this message is not allowed."
+    );
 }

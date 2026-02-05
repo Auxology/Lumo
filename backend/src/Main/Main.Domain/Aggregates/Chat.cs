@@ -211,6 +211,9 @@ public sealed class Chat : AggregateRoot<ChatId>
         if (targetMessage is null)
             return MessageFaults.MessageNotFound;
 
+        if (targetMessage.MessageRole != MessageRole.User)
+            return MessageFaults.MessageEditNotAllowed;
+
         int targetSequenceNumber = targetMessage.SequenceNumber;
 
         _messages.RemoveAll(m => m.SequenceNumber > targetSequenceNumber);

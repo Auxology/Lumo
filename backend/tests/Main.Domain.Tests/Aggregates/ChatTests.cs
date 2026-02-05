@@ -280,4 +280,130 @@ public sealed class ChatTests
 
         chat1.Id.Should().NotBe(chat2.Id);
     }
+
+    #region EditMessageAndRemoveSubsequent Tests
+
+    [Fact]
+    public void EditMessageAndRemoveSubsequent_WithValidData_ShouldEditMessageAndRemoveSubsequent()
+    {
+        Chat chat = Chat.Create(ValidChatId, ValidUserId, ValidTitle, ValidModelId, UtcNow).Value;
+        MessageId messageId1 = MessageId.UnsafeFrom("msg_01JGX123456789012345678901");
+        MessageId messageId2 = MessageId.UnsafeFrom("msg_01JGX123456789012345678902");
+        MessageId messageId3 = MessageId.UnsafeFrom("msg_01JGX123456789012345678903");
+
+        chat.AddUserMessage(messageId1, "First message", UtcNow.AddMinutes(1));
+        chat.AddAssistantMessage(messageId2, "Second message", UtcNow.AddMinutes(2));
+        chat.AddUserMessage(messageId3, "Third message", UtcNow.AddMinutes(3));
+
+        DateTimeOffset editTime = UtcNow.AddHours(1);
+        string newContent = "Edited first message";
+
+        Outcome outcome = chat.EditMessageAndRemoveSubsequent(messageId1, newContent, editTime);
+
+        outcome.IsSuccess.Should().BeTrue();
+        chat.Messages.Should().HaveCount(1);
+        chat.Messages.First().MessageContent.Should().Be(newContent);
+        chat.Messages.First().EditedAt.Should().Be(editTime);
+        chat.UpdatedAt.Should().Be(editTime);
+    }
+
+    [Fact]
+    public void EditMessageAndRemoveSubsequent_ShouldKeepMessagesBefore()
+    {
+        Chat chat = Chat.Create(ValidChatId, ValidUserId, ValidTitle, ValidModelId, UtcNow).Value;
+        MessageId messageId1 = MessageId.UnsafeFrom("msg_01JGX123456789012345678901");
+        MessageId messageId2 = MessageId.UnsafeFrom("msg_01JGX123456789012345678902");
+        MessageId messageId3 = MessageId.UnsafeFrom("msg_01JGX123456789012345678903");
+
+        chat.AddUserMessage(messageId1, "First message", UtcNow.AddMinutes(1));
+        chat.AddAssistantMessage(messageId2, "Second message", UtcNow.AddMinutes(2));
+        chat.AddUserMessage(messageId3, "Third message", UtcNow.AddMinutes(3));
+
+        Outcome outcome = chat.EditMessageAndRemoveSubsequent(messageId2, "Edited second", UtcNow.AddHours(1));
+
+        outcome.IsSuccess.Should().BeTrue();
+        chat.Messages.Should().HaveCount(2);
+        chat.Messages.First().Id.Should().Be(messageId1);
+        chat.Messages.Last().Id.Should().Be(messageId2);
+        chat.Messages.Last().MessageContent.Should().Be("Edited second");
+    }
+
+    [Fact]
+    public void EditMessageAndRemoveSubsequent_ShouldUpdateNextSequenceNumber()
+    {
+        Chat chat = Chat.Create(ValidChatId, ValidUserId, ValidTitle, ValidModelId, UtcNow).Value;
+        MessageId messageId1 = MessageId.UnsafeFrom("msg_01JGX123456789012345678901");
+        MessageId messageId2 = MessageId.UnsafeFrom("msg_01JGX123456789012345678902");
+        MessageId messageId3 = MessageId.UnsafeFrom("msg_01JGX123456789012345678903");
+
+        chat.AddUserMessage(messageId1, "First message", UtcNow.AddMinutes(1));
+        chat.AddAssistantMessage(messageId2, "Second message", UtcNow.AddMinutes(2));
+        chat.AddUserMessage(messageId3, "Third message", UtcNow.AddMinutes(3));
+
+        chat.NextSequenceNumber.Should().Be(3);
+
+        chat.EditMessageAndRemoveSubsequent(messageId1, "Edited first", UtcNow.AddHours(1));
+
+        chat.NextSequenceNumber.Should().Be(1);
+    }
+
+    [Fact]
+    public void EditMessageAndRemoveSubsequent_OnArchivedChat_ShouldReturnFailure()
+    {
+        Chat chat = Chat.Create(ValidChatId, ValidUserId, ValidTitle, ValidModelId, UtcNow).Value;
+        chat.AddUserMessage(ValidMessageId, "Hello", UtcNow.AddMinutes(1));
+        chat.Archive(UtcNow.AddMinutes(2));
+
+        Outcome outcome = chat.EditMessageAndRemoveSubsequent(ValidMessageId, "New content", UtcNow.AddHours(1));
+
+        outcome.IsFailure.Should().BeTrue();
+        outcome.Fault.Should().Be(ChatFaults.CannotModifyArchivedChat);
+    }
+
+    [Fact]
+    public void EditMessageAndRemoveSubsequent_WithNonExistentMessage_ShouldReturnFailure()
+    {
+        Chat chat = Chat.Create(ValidChatId, ValidUserId, ValidTitle, ValidModelId, UtcNow).Value;
+        chat.AddUserMessage(ValidMessageId, "Hello", UtcNow.AddMinutes(1));
+        MessageId nonExistentId = MessageId.UnsafeFrom("msg_01JGX000000000000000000000");
+
+        Outcome outcome = chat.EditMessageAndRemoveSubsequent(nonExistentId, "New content", UtcNow.AddHours(1));
+
+        outcome.IsFailure.Should().BeTrue();
+        outcome.Fault.Should().Be(MessageFaults.MessageNotFound);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData(" ")]
+    [InlineData(null)]
+    public void EditMessageAndRemoveSubsequent_WithEmptyContent_ShouldReturnFailure(string? newContent)
+    {
+        Chat chat = Chat.Create(ValidChatId, ValidUserId, ValidTitle, ValidModelId, UtcNow).Value;
+        chat.AddUserMessage(ValidMessageId, "Hello", UtcNow.AddMinutes(1));
+
+        Outcome outcome = chat.EditMessageAndRemoveSubsequent(ValidMessageId, newContent!, UtcNow.AddHours(1));
+
+        outcome.IsFailure.Should().BeTrue();
+        outcome.Fault.Should().Be(MessageFaults.MessageContentRequired);
+    }
+
+    [Fact]
+    public void EditMessageAndRemoveSubsequent_LastMessage_ShouldOnlyEditNotRemove()
+    {
+        Chat chat = Chat.Create(ValidChatId, ValidUserId, ValidTitle, ValidModelId, UtcNow).Value;
+        MessageId messageId1 = MessageId.UnsafeFrom("msg_01JGX123456789012345678901");
+        MessageId messageId2 = MessageId.UnsafeFrom("msg_01JGX123456789012345678902");
+
+        chat.AddUserMessage(messageId1, "First message", UtcNow.AddMinutes(1));
+        chat.AddAssistantMessage(messageId2, "Second message", UtcNow.AddMinutes(2));
+
+        Outcome outcome = chat.EditMessageAndRemoveSubsequent(messageId2, "Edited second", UtcNow.AddHours(1));
+
+        outcome.IsSuccess.Should().BeTrue();
+        chat.Messages.Should().HaveCount(2);
+        chat.Messages.Last().MessageContent.Should().Be("Edited second");
+    }
+
+    #endregion
 }
