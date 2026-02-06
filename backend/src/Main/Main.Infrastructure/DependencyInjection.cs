@@ -124,6 +124,7 @@ public static class DependencyInjection
             bus.AddConsumer<MessageSentConsumer>();
             bus.AddConsumer<EphemeralChatStartedConsumer>();
             bus.AddConsumer<AssistantEphemeralMessageGeneratedConsumer>();
+            bus.AddConsumer<EphemeralMessageSentConsumer>();
 
             bus.AddEntityFrameworkOutbox<MainDbContext>(outbox =>
             {
