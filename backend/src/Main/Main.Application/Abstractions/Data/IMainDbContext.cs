@@ -15,6 +15,7 @@ public interface IMainDbContext
 
     DbSet<Preference> Preferences { get; }
     DbSet<Instruction> Instructions { get; }
+    DbSet<FavoriteModel> FavoriteModels { get; }
 
     DbSet<SharedChat> SharedChats { get; }
 

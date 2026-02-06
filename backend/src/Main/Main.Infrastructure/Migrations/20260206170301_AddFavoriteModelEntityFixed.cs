@@ -1,17 +1,21 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+using Pgvector;
 
 #nullable disable
 
 namespace Main.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate2 : Migration
+    public partial class AddFavoriteModelEntityFixed : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.AlterDatabase()
+                .Annotation("Npgsql:PostgresExtension:vector", ",,");
+
             migrationBuilder.CreateTable(
                 name: "chats",
                 columns: table => new
@@ -19,8 +23,9 @@ namespace Main.Infrastructure.Migrations
                     id = table.Column<string>(type: "varchar(30)", nullable: false),
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
                     title = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false),
-                    model_name = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: true),
+                    model_id = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: true),
                     is_archived = table.Column<bool>(type: "boolean", nullable: false),
+                    is_pinned = table.Column<bool>(type: "boolean", nullable: false),
                     next_sequence_number = table.Column<int>(type: "integer", nullable: false),
                     created_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: false),
                     updated_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: true)
@@ -54,6 +59,22 @@ namespace Main.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "memories",
+                columns: table => new
+                {
+                    id = table.Column<string>(type: "varchar(30)", nullable: false),
+                    user_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    content = table.Column<string>(type: "varchar(2000)", maxLength: 2000, nullable: false),
+                    category = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false),
+                    embedding = table.Column<Vector>(type: "vector(1536)", nullable: false),
+                    created_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_memories", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "outbox_state",
                 columns: table => new
                 {
@@ -67,6 +88,39 @@ namespace Main.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("pk_outbox_state", x => x.outbox_id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "preferences",
+                columns: table => new
+                {
+                    id = table.Column<string>(type: "varchar(30)", nullable: false),
+                    user_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    created_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: false),
+                    updated_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_preferences", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "shared_chats",
+                columns: table => new
+                {
+                    id = table.Column<string>(type: "varchar(30)", nullable: false),
+                    source_chat_id = table.Column<string>(type: "varchar(30)", nullable: false),
+                    owner_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    title = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false),
+                    model_id = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: false),
+                    view_count = table.Column<int>(type: "integer", nullable: false),
+                    snapshot_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: false),
+                    created_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: false),
+                    updated_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_shared_chats", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -93,7 +147,8 @@ namespace Main.Infrastructure.Migrations
                     message_content = table.Column<string>(type: "text", nullable: false),
                     token_count = table.Column<long>(type: "bigint", nullable: true),
                     sequence_number = table.Column<int>(type: "integer", nullable: false),
-                    created_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: false)
+                    created_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: false),
+                    edited_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -148,15 +203,118 @@ namespace Main.Infrastructure.Migrations
                         principalColumn: "outbox_id");
                 });
 
+            migrationBuilder.CreateTable(
+                name: "favorite_models",
+                columns: table => new
+                {
+                    id = table.Column<string>(type: "varchar(30)", nullable: false),
+                    preference_id = table.Column<string>(type: "varchar(30)", nullable: false),
+                    model_id = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: false),
+                    created_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_favorite_models", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_favorite_models_preferences_preference_id",
+                        column: x => x.preference_id,
+                        principalTable: "preferences",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "instructions",
+                columns: table => new
+                {
+                    id = table.Column<string>(type: "varchar(30)", nullable: false),
+                    preference_id = table.Column<string>(type: "varchar(30)", nullable: false),
+                    content = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false),
+                    priority = table.Column<int>(type: "integer", nullable: false),
+                    created_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: false),
+                    updated_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_instructions", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_instructions_preferences_preference_id",
+                        column: x => x.preference_id,
+                        principalTable: "preferences",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "shared_chat_messages",
+                columns: table => new
+                {
+                    sequence_number = table.Column<int>(type: "integer", nullable: false),
+                    shared_chat_id = table.Column<string>(type: "varchar(30)", nullable: false),
+                    message_role = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: false),
+                    message_content = table.Column<string>(type: "text", nullable: false),
+                    created_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: false),
+                    edited_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_shared_chat_messages", x => new { x.shared_chat_id, x.sequence_number });
+                    table.ForeignKey(
+                        name: "fk_shared_chat_messages_shared_chats_shared_chat_id",
+                        column: x => x.shared_chat_id,
+                        principalTable: "shared_chats",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "ix_chats_user_id_is_archived_updated_at",
                 table: "chats",
                 columns: new[] { "user_id", "is_archived", "updated_at" });
 
             migrationBuilder.CreateIndex(
+                name: "ix_favorite_models_preference_id",
+                table: "favorite_models",
+                column: "preference_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_favorite_models_preference_id_model_id",
+                table: "favorite_models",
+                columns: new[] { "preference_id", "model_id" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "ix_inbox_state_delivered",
                 table: "inbox_state",
                 column: "delivered");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_instructions_preference_id",
+                table: "instructions",
+                column: "preference_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_instructions_preference_id_priority",
+                table: "instructions",
+                columns: new[] { "preference_id", "priority" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "ix_memories_embedding",
+                table: "memories",
+                column: "embedding")
+                .Annotation("Npgsql:IndexMethod", "hnsw")
+                .Annotation("Npgsql:IndexOperators", new[] { "vector_cosine_ops" });
+
+            migrationBuilder.CreateIndex(
+                name: "ix_memories_user_id",
+                table: "memories",
+                column: "user_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_memories_user_id_created_at",
+                table: "memories",
+                columns: new[] { "user_id", "created_at" });
 
             migrationBuilder.CreateIndex(
                 name: "ix_messages_chat_id",
@@ -197,6 +355,22 @@ namespace Main.Infrastructure.Migrations
                 column: "created");
 
             migrationBuilder.CreateIndex(
+                name: "ix_preferences_user_id",
+                table: "preferences",
+                column: "user_id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "ix_shared_chats_owner_id",
+                table: "shared_chats",
+                column: "owner_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_shared_chats_source_chat_id",
+                table: "shared_chats",
+                column: "source_chat_id");
+
+            migrationBuilder.CreateIndex(
                 name: "ix_users_email_address",
                 table: "users",
                 column: "email_address",
@@ -207,13 +381,28 @@ namespace Main.Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "favorite_models");
+
+            migrationBuilder.DropTable(
+                name: "instructions");
+
+            migrationBuilder.DropTable(
+                name: "memories");
+
+            migrationBuilder.DropTable(
                 name: "messages");
 
             migrationBuilder.DropTable(
                 name: "outbox_message");
 
             migrationBuilder.DropTable(
+                name: "shared_chat_messages");
+
+            migrationBuilder.DropTable(
                 name: "users");
+
+            migrationBuilder.DropTable(
+                name: "preferences");
 
             migrationBuilder.DropTable(
                 name: "chats");
@@ -223,6 +412,9 @@ namespace Main.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "outbox_state");
+
+            migrationBuilder.DropTable(
+                name: "shared_chats");
         }
     }
 }

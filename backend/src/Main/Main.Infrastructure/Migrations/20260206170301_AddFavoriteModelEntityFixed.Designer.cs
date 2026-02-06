@@ -13,8 +13,8 @@ using Pgvector;
 namespace Main.Infrastructure.Migrations
 {
     [DbContext(typeof(MainDbContext))]
-    [Migration("20260202163429_Update")]
-    partial class Update
+    [Migration("20260206170301_AddFavoriteModelEntityFixed")]
+    partial class AddFavoriteModelEntityFixed
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -160,6 +160,40 @@ namespace Main.Infrastructure.Migrations
                     b.ToTable("shared_chats", (string)null);
                 });
 
+            modelBuilder.Entity("Main.Domain.Entities.FavoriteModel", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(30)")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("ModelId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("model_id");
+
+                    b.Property<string>("PreferenceId")
+                        .IsRequired()
+                        .HasColumnType("varchar(30)")
+                        .HasColumnName("preference_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_favorite_models");
+
+                    b.HasIndex("PreferenceId")
+                        .HasDatabaseName("ix_favorite_models_preference_id");
+
+                    b.HasIndex("PreferenceId", "ModelId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_favorite_models_preference_id_model_id");
+
+                    b.ToTable("favorite_models", (string)null);
+                });
+
             modelBuilder.Entity("Main.Domain.Entities.Instruction", b =>
                 {
                     b.Property<string>("Id")
@@ -216,6 +250,10 @@ namespace Main.Infrastructure.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamptz")
                         .HasColumnName("created_at");
+
+                    b.Property<DateTimeOffset>("EditedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("edited_at");
 
                     b.Property<string>("MessageContent")
                         .IsRequired()
@@ -565,6 +603,10 @@ namespace Main.Infrastructure.Migrations
                                 .HasColumnType("timestamptz")
                                 .HasColumnName("created_at");
 
+                            b1.Property<DateTimeOffset>("EditedAt")
+                                .HasColumnType("timestamp with time zone")
+                                .HasColumnName("edited_at");
+
                             b1.Property<string>("MessageContent")
                                 .IsRequired()
                                 .HasColumnType("text")
@@ -587,6 +629,16 @@ namespace Main.Infrastructure.Migrations
                         });
 
                     b.Navigation("SharedChatMessages");
+                });
+
+            modelBuilder.Entity("Main.Domain.Entities.FavoriteModel", b =>
+                {
+                    b.HasOne("Main.Domain.Aggregates.Preference", null)
+                        .WithMany("FavoriteModels")
+                        .HasForeignKey("PreferenceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_favorite_models_preferences_preference_id");
                 });
 
             modelBuilder.Entity("Main.Domain.Entities.Instruction", b =>
@@ -630,6 +682,8 @@ namespace Main.Infrastructure.Migrations
 
             modelBuilder.Entity("Main.Domain.Aggregates.Preference", b =>
                 {
+                    b.Navigation("FavoriteModels");
+
                     b.Navigation("Instructions");
                 });
 #pragma warning restore 612, 618

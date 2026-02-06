@@ -179,16 +179,16 @@ namespace Main.Infrastructure.Migrations
                         .HasColumnName("preference_id");
 
                     b.HasKey("Id")
-                        .HasName("pk_favorite_model");
+                        .HasName("pk_favorite_models");
 
                     b.HasIndex("PreferenceId")
-                        .HasDatabaseName("ix_favorite_model_preference_id");
+                        .HasDatabaseName("ix_favorite_models_preference_id");
 
                     b.HasIndex("PreferenceId", "ModelId")
                         .IsUnique()
-                        .HasDatabaseName("ix_favorite_model_preference_id_model_id");
+                        .HasDatabaseName("ix_favorite_models_preference_id_model_id");
 
-                    b.ToTable("favorite_model", (string)null);
+                    b.ToTable("favorite_models", (string)null);
                 });
 
             modelBuilder.Entity("Main.Domain.Entities.Instruction", b =>
@@ -635,7 +635,7 @@ namespace Main.Infrastructure.Migrations
                         .HasForeignKey("PreferenceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_favorite_model_preferences_preference_id");
+                        .HasConstraintName("fk_favorite_models_preferences_preference_id");
                 });
 
             modelBuilder.Entity("Main.Domain.Entities.Instruction", b =>
