@@ -39,6 +39,12 @@ internal sealed class PreferenceConfiguration : IEntityTypeConfiguration<Prefere
             .HasPrincipalKey(p => p.Id)
             .OnDelete(DeleteBehavior.Cascade);
 
+        b.HasMany(p => p.FavoriteModels)
+            .WithOne()
+            .HasForeignKey(f => f.PreferenceId)
+            .HasPrincipalKey(p => p.Id)
+            .OnDelete(DeleteBehavior.Cascade);
+
         b.HasIndex(p => p.UserId)
             .IsUnique();
     }

@@ -39,6 +39,7 @@ internal sealed class Endpoint : BaseEndpoint<Request, Response>
             outcome: await _sender.Send(command, ct),
             mapper: air => new Response
             (
+                PreferenceId: air.PreferenceId,
                 InstructionId: air.InstructionId,
                 Content: air.Content,
                 Priority: air.Priority,
