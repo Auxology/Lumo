@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Text;
 
 using Contracts.IntegrationEvents.Chat;
+using Contracts.IntegrationEvents.EphemeralChat;
 
 using Main.Application.Abstractions.AI;
 using Main.Application.Abstractions.Instructions;
@@ -149,7 +150,10 @@ internal sealed class ChatCompletionService(
                 cancellationToken: cancellationToken
             );
 
-            await FinalizeStreamAsync(streamId, chatId, messageContent, cancellationToken);
+            if (toolContext is null)
+                await FinalizeStreamAsync(streamId, chatId, messageContent, cancellationToken);
+            else
+                await FinalizeStreamAdvancedAsync(streamId, chatId, messageContent, cancellationToken);
         }
         catch (Exception exception)
         {
@@ -425,7 +429,7 @@ internal sealed class ChatCompletionService(
         await streamPublisher.SetStreamExpirationAsync(streamId, StreamExpiration, cancellationToken);
     }
 
-    private async Task FinalizeStreamAsync
+    private async Task FinalizeStreamAdvancedAsync
     (
         string streamId,
         string chatId,
@@ -443,6 +447,29 @@ internal sealed class ChatCompletionService(
                 OccurredAt = dateTimeProvider.UtcNow,
                 CorrelationId = Guid.NewGuid(),
                 ChatId = chatId,
+                MessageContent = messageContent.ToString()
+            }, cancellationToken);
+        }
+    }
+
+    private async Task FinalizeStreamAsync
+    (
+        string streamId,
+        string chatId,
+        StringBuilder messageContent,
+        CancellationToken cancellationToken
+    )
+    {
+        await streamPublisher.PublishStatusAsync(streamId, StreamStatus.Done, cancellationToken);
+
+        if (messageContent.Length > 0)
+        {
+            await messageBus.PublishAsync(new AssistantEphemeralMessageGenerated
+            {
+                EventId = Guid.NewGuid(),
+                OccurredAt = dateTimeProvider.UtcNow,
+                CorrelationId = Guid.NewGuid(),
+                EphemeralChatId = chatId,
                 MessageContent = messageContent.ToString()
             }, cancellationToken);
         }
