@@ -127,6 +127,56 @@ services:
             - OpenRouter__AllowedModels__5__SupportsVision=${OPENROUTER_ALLOWED_MODELS_5_SUPPORTS_VISION:?OPENROUTER_ALLOWED_MODELS_5_SUPPORTS_VISION is required}
             - OpenRouter__AllowedModels__5__SupportsStreaming=${OPENROUTER_ALLOWED_MODELS_5_SUPPORTS_STREAMING:?OPENROUTER_ALLOWED_MODELS_5_SUPPORTS_STREAMING is required}
 
+            # OpenRouter AllowedModels - Model 6 (all values must be defined in .env)
+            - OpenRouter__AllowedModels__6__Id=${OPENROUTER_ALLOWED_MODELS_6_ID:?OPENROUTER_ALLOWED_MODELS_6_ID is required}
+            - OpenRouter__AllowedModels__6__OpenRouterId=${OPENROUTER_ALLOWED_MODELS_6_OPENROUTER_ID:?OPENROUTER_ALLOWED_MODELS_6_OPENROUTER_ID is required}
+            - OpenRouter__AllowedModels__6__DisplayName=${OPENROUTER_ALLOWED_MODELS_6_DISPLAY_NAME:?OPENROUTER_ALLOWED_MODELS_6_DISPLAY_NAME is required}
+            - OpenRouter__AllowedModels__6__Provider=${OPENROUTER_ALLOWED_MODELS_6_PROVIDER:?OPENROUTER_ALLOWED_MODELS_6_PROVIDER is required}
+            - OpenRouter__AllowedModels__6__IsDefault=${OPENROUTER_ALLOWED_MODELS_6_IS_DEFAULT:?OPENROUTER_ALLOWED_MODELS_6_IS_DEFAULT is required}
+            - OpenRouter__AllowedModels__6__MaxContextTokens=${OPENROUTER_ALLOWED_MODELS_6_MAX_CONTEXT_TOKENS:?OPENROUTER_ALLOWED_MODELS_6_MAX_CONTEXT_TOKENS is required}
+            - OpenRouter__AllowedModels__6__SupportsVision=${OPENROUTER_ALLOWED_MODELS_6_SUPPORTS_VISION:?OPENROUTER_ALLOWED_MODELS_6_SUPPORTS_VISION is required}
+            - OpenRouter__AllowedModels__6__SupportsStreaming=${OPENROUTER_ALLOWED_MODELS_6_SUPPORTS_STREAMING:?OPENROUTER_ALLOWED_MODELS_6_SUPPORTS_STREAMING is required}
+
+            # OpenRouter AllowedModels - Model 7 (all values must be defined in .env)
+            - OpenRouter__AllowedModels__7__Id=${OPENROUTER_ALLOWED_MODELS_7_ID:?OPENROUTER_ALLOWED_MODELS_7_ID is required}
+            - OpenRouter__AllowedModels__7__OpenRouterId=${OPENROUTER_ALLOWED_MODELS_7_OPENROUTER_ID:?OPENROUTER_ALLOWED_MODELS_7_OPENROUTER_ID is required}
+            - OpenRouter__AllowedModels__7__DisplayName=${OPENROUTER_ALLOWED_MODELS_7_DISPLAY_NAME:?OPENROUTER_ALLOWED_MODELS_7_DISPLAY_NAME is required}
+            - OpenRouter__AllowedModels__7__Provider=${OPENROUTER_ALLOWED_MODELS_7_PROVIDER:?OPENROUTER_ALLOWED_MODELS_7_PROVIDER is required}
+            - OpenRouter__AllowedModels__7__IsDefault=${OPENROUTER_ALLOWED_MODELS_7_IS_DEFAULT:?OPENROUTER_ALLOWED_MODELS_7_IS_DEFAULT is required}
+            - OpenRouter__AllowedModels__7__MaxContextTokens=${OPENROUTER_ALLOWED_MODELS_7_MAX_CONTEXT_TOKENS:?OPENROUTER_ALLOWED_MODELS_7_MAX_CONTEXT_TOKENS is required}
+            - OpenRouter__AllowedModels__7__SupportsVision=${OPENROUTER_ALLOWED_MODELS_7_SUPPORTS_VISION:?OPENROUTER_ALLOWED_MODELS_7_SUPPORTS_VISION is required}
+            - OpenRouter__AllowedModels__7__SupportsStreaming=${OPENROUTER_ALLOWED_MODELS_7_SUPPORTS_STREAMING:?OPENROUTER_ALLOWED_MODELS_7_SUPPORTS_STREAMING is required}
+
+            # OpenRouter AllowedModels - Model 8 (all values must be defined in .env)
+            - OpenRouter__AllowedModels__8__Id=${OPENROUTER_ALLOWED_MODELS_8_ID:?OPENROUTER_ALLOWED_MODELS_8_ID is required}
+            - OpenRouter__AllowedModels__8__OpenRouterId=${OPENROUTER_ALLOWED_MODELS_8_OPENROUTER_ID:?OPENROUTER_ALLOWED_MODELS_8_OPENROUTER_ID is required}
+            - OpenRouter__AllowedModels__8__DisplayName=${OPENROUTER_ALLOWED_MODELS_8_DISPLAY_NAME:?OPENROUTER_ALLOWED_MODELS_8_DISPLAY_NAME is required}
+            - OpenRouter__AllowedModels__8__Provider=${OPENROUTER_ALLOWED_MODELS_8_PROVIDER:?OPENROUTER_ALLOWED_MODELS_8_PROVIDER is required}
+            - OpenRouter__AllowedModels__8__IsDefault=${OPENROUTER_ALLOWED_MODELS_8_IS_DEFAULT:?OPENROUTER_ALLOWED_MODELS_8_IS_DEFAULT is required}
+            - OpenRouter__AllowedModels__8__MaxContextTokens=${OPENROUTER_ALLOWED_MODELS_8_MAX_CONTEXT_TOKENS:?OPENROUTER_ALLOWED_MODELS_8_MAX_CONTEXT_TOKENS is required}
+            - OpenRouter__AllowedModels__8__SupportsVision=${OPENROUTER_ALLOWED_MODELS_8_SUPPORTS_VISION:?OPENROUTER_ALLOWED_MODELS_8_SUPPORTS_VISION is required}
+            - OpenRouter__AllowedModels__8__SupportsStreaming=${OPENROUTER_ALLOWED_MODELS_8_SUPPORTS_STREAMING:?OPENROUTER_ALLOWED_MODELS_8_SUPPORTS_STREAMING is required}
+
+            # OpenRouter AllowedModels - Model 9 (all values must be defined in .env)
+            - OpenRouter__AllowedModels__9__Id=${OPENROUTER_ALLOWED_MODELS_9_ID:?OPENROUTER_ALLOWED_MODELS_9_ID is required}
+            - OpenRouter__AllowedModels__9__OpenRouterId=${OPENROUTER_ALLOWED_MODELS_9_OPENROUTER_ID:?OPENROUTER_ALLOWED_MODELS_9_OPENROUTER_ID is required}
+            - OpenRouter__AllowedModels__9__DisplayName=${OPENROUTER_ALLOWED_MODELS_9_DISPLAY_NAME:?OPENROUTER_ALLOWED_MODELS_9_DISPLAY_NAME is required}
+            - OpenRouter__AllowedModels__9__Provider=${OPENROUTER_ALLOWED_MODELS_9_PROVIDER:?OPENROUTER_ALLOWED_MODELS_9_PROVIDER is required}
+            - OpenRouter__AllowedModels__9__IsDefault=${OPENROUTER_ALLOWED_MODELS_9_IS_DEFAULT:?OPENROUTER_ALLOWED_MODELS_9_IS_DEFAULT is required}
+            - OpenRouter__AllowedModels__9__MaxContextTokens=${OPENROUTER_ALLOWED_MODELS_9_MAX_CONTEXT_TOKENS:?OPENROUTER_ALLOWED_MODELS_9_MAX_CONTEXT_TOKENS is required}
+            - OpenRouter__AllowedModels__9__SupportsVision=${OPENROUTER_ALLOWED_MODELS_9_SUPPORTS_VISION:?OPENROUTER_ALLOWED_MODELS_9_SUPPORTS_VISION is required}
+            - OpenRouter__AllowedModels__9__SupportsStreaming=${OPENROUTER_ALLOWED_MODELS_9_SUPPORTS_STREAMING:?OPENROUTER_ALLOWED_MODELS_9_SUPPORTS_STREAMING is required}
+
+            # OpenRouter AllowedModels - Model 10 (all values must be defined in .env)
+            - OpenRouter__AllowedModels__10__Id=${OPENROUTER_ALLOWED_MODELS_10_ID:?OPENROUTER_ALLOWED_MODELS_10_ID is required}
+            - OpenRouter__AllowedModels__10__OpenRouterId=${OPENROUTER_ALLOWED_MODELS_10_OPENROUTER_ID:?OPENROUTER_ALLOWED_MODELS_10_OPENROUTER_ID is required}
+            - OpenRouter__AllowedModels__10__DisplayName=${OPENROUTER_ALLOWED_MODELS_10_DISPLAY_NAME:?OPENROUTER_ALLOWED_MODELS_10_DISPLAY_NAME is required}
+            - OpenRouter__AllowedModels__10__Provider=${OPENROUTER_ALLOWED_MODELS_10_PROVIDER:?OPENROUTER_ALLOWED_MODELS_10_PROVIDER is required}
+            - OpenRouter__AllowedModels__10__IsDefault=${OPENROUTER_ALLOWED_MODELS_10_IS_DEFAULT:?OPENROUTER_ALLOWED_MODELS_10_IS_DEFAULT is required}
+            - OpenRouter__AllowedModels__10__MaxContextTokens=${OPENROUTER_ALLOWED_MODELS_10_MAX_CONTEXT_TOKENS:?OPENROUTER_ALLOWED_MODELS_10_MAX_CONTEXT_TOKENS is required}
+            - OpenRouter__AllowedModels__10__SupportsVision=${OPENROUTER_ALLOWED_MODELS_10_SUPPORTS_VISION:?OPENROUTER_ALLOWED_MODELS_10_SUPPORTS_VISION is required}
+            - OpenRouter__AllowedModels__10__SupportsStreaming=${OPENROUTER_ALLOWED_MODELS_10_SUPPORTS_STREAMING:?OPENROUTER_ALLOWED_MODELS_10_SUPPORTS_STREAMING is required}
+
             - OpenRouter__EmbeddingModel=${OPENROUTER_EMBEDDING_MODEL:?OPENROUTER_EMBEDDING_MODEL is required}
 
             # RabbitMqOptions
