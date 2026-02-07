@@ -4,6 +4,8 @@ using Main.Application.Commands.Preferences.RemoveInstruction;
 
 using Mediator;
 
+using SharedKernel.Api.Constants;
+
 namespace Main.Api.Endpoints.Preferences.RemoveInstruction;
 
 internal sealed class Endpoint : BaseEndpoint<Request>
@@ -25,8 +27,8 @@ internal sealed class Endpoint : BaseEndpoint<Request>
             d.WithSummary("Remove Instruction")
                 .WithDescription("Permanently removes an instruction from the user's preferences.")
                 .Produces(204)
-                .ProducesProblemDetails(400, "application/json")
-                .ProducesProblemDetails(404, "application/json")
+                .ProducesProblemDetails(400, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(404, HttpContentTypeConstants.Json)
                 .WithTags(CustomTags.Preferences);
         });
     }

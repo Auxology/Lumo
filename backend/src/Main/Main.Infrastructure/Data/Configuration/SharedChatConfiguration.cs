@@ -55,15 +55,15 @@ internal sealed class SharedChatConfiguration : IEntityTypeConfiguration<SharedC
 
         b.Property(s => s.SnapshotAt)
             .IsRequired()
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.Property(s => s.CreatedAt)
             .IsRequired()
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.Property(s => s.UpdatedAt)
             .IsRequired()
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.OwnsMany(s => s.SharedChatMessages, mb =>
         {
@@ -88,7 +88,7 @@ internal sealed class SharedChatConfiguration : IEntityTypeConfiguration<SharedC
 
             mb.Property(m => m.CreatedAt)
                 .IsRequired()
-                .HasColumnType("timestamptz");
+                .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
         });
 
         b.HasIndex(s => s.OwnerId);

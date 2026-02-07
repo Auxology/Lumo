@@ -4,6 +4,8 @@ using Main.Application.Commands.Chats.SendMessage;
 
 using Mediator;
 
+using SharedKernel.Api.Constants;
+
 namespace Main.Api.Endpoints.Chats.SendMessage;
 
 internal sealed class Endpoint : BaseEndpoint<Request, Response>
@@ -28,9 +30,9 @@ internal sealed class Endpoint : BaseEndpoint<Request, Response>
                 .WithDescription(
                     "Sends a user message to an existing chat and queues AI response generation. " +
                     "The AI response will be streamed via Redis Pub/Sub.")
-                .Produces<Response>(202, "application/json")
-                .ProducesProblemDetails(400, "application/json")
-                .ProducesProblemDetails(404, "application/json")
+                .Produces<Response>(202, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(400, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(404, HttpContentTypeConstants.Json)
                 .WithTags(CustomTags.Chats);
         });
     }

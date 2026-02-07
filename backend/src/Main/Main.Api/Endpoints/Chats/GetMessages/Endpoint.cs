@@ -4,6 +4,8 @@ using Main.Application.Queries.Chats.GetMessages;
 
 using Mediator;
 
+using SharedKernel.Api.Constants;
+
 namespace Main.Api.Endpoints.Chats.GetMessages;
 
 internal sealed class Endpoint : BaseEndpoint<Request, Response>
@@ -27,9 +29,9 @@ internal sealed class Endpoint : BaseEndpoint<Request, Response>
                     "Retrieves paginated messages for a chat. " +
                     "Messages are returned in chronological order (oldest first). " +
                     "Use the cursor parameter to load older messages.")
-                .Produces<Response>(200, "application/json")
-                .ProducesProblemDetails(400, "application/json")
-                .ProducesProblemDetails(404, "application/json")
+                .Produces<Response>(200, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(400, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(404, HttpContentTypeConstants.Json)
                 .WithTags(CustomTags.Chats);
         });
     }

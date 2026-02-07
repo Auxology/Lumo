@@ -4,6 +4,8 @@ using Main.Application.Commands.Preferences.RemoveFavoriteModel;
 
 using Mediator;
 
+using SharedKernel.Api.Constants;
+
 namespace Main.Api.Endpoints.Preferences.RemoveFavoriteModel;
 
 internal sealed class Endpoint : BaseEndpoint<Request>
@@ -25,8 +27,8 @@ internal sealed class Endpoint : BaseEndpoint<Request>
             d.WithSummary("Remove Favorite Model")
                 .WithDescription("Removes a model from the user's favorites.")
                 .Produces(204)
-                .ProducesProblemDetails(400, "application/json")
-                .ProducesProblemDetails(404, "application/json")
+                .ProducesProblemDetails(400, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(404, HttpContentTypeConstants.Json)
                 .WithTags(CustomTags.Preferences);
         });
     }

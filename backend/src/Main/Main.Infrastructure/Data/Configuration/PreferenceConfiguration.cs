@@ -4,6 +4,8 @@ using Main.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+using SharedKernel.Infrastructure.Data;
+
 namespace Main.Infrastructure.Data.Configuration;
 
 internal sealed class PreferenceConfiguration : IEntityTypeConfiguration<Preference>
@@ -27,11 +29,11 @@ internal sealed class PreferenceConfiguration : IEntityTypeConfiguration<Prefere
 
         b.Property(p => p.CreatedAt)
             .IsRequired()
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.Property(p => p.UpdatedAt)
             .IsRequired()
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.HasMany(p => p.Instructions)
             .WithOne()

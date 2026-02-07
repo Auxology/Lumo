@@ -4,6 +4,8 @@ using Main.Application.Commands.Preferences.AddInstruction;
 
 using Mediator;
 
+using SharedKernel.Api.Constants;
+
 namespace Main.Api.Endpoints.Preferences.AddInstruction;
 
 internal sealed class Endpoint : BaseEndpoint<Request, Response>
@@ -24,8 +26,8 @@ internal sealed class Endpoint : BaseEndpoint<Request, Response>
         {
             d.WithSummary("Add Instruction")
                 .WithDescription("Adds a new custom instruction to the user's preferences.")
-                .Produces<Response>(201, "application/json")
-                .ProducesProblemDetails(400, "application/json")
+                .Produces<Response>(201, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(400, HttpContentTypeConstants.Json)
                 .WithTags(CustomTags.Preferences);
         });
     }

@@ -50,15 +50,15 @@ internal sealed class LoginRequestConfiguration : IEntityTypeConfiguration<Login
 
         b.Property(lr => lr.CreatedAt)
             .IsRequired()
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.Property(lr => lr.ExpiresAt)
             .IsRequired()
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.Property(lr => lr.ConsumedAt)
             .IsRequired(false)
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.HasIndex(lr => lr.UserId);
 

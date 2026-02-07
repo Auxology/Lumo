@@ -4,6 +4,7 @@ using Main.Application.Queries.Memories.GetUsage;
 
 using Mediator;
 
+using SharedKernel.Api.Constants;
 using SharedKernel.Api.Infrastructure;
 
 namespace Main.Api.Endpoints.Memories.GetUsage;
@@ -22,7 +23,7 @@ internal sealed class Endpoint : EndpointWithoutRequest<Response>
         Description(d => d
             .WithSummary("Get Memory Usage")
             .WithDescription("Returns current memory count and limit for the authenticated user.")
-            .Produces<Response>(200, "application/json")
+            .Produces<Response>(200, HttpContentTypeConstants.Json)
             .WithTags(CustomTags.Memories));
     }
 

@@ -7,6 +7,7 @@ using Main.Application.Abstractions.Stream;
 using Main.Domain.ValueObjects;
 
 using SharedKernel;
+using SharedKernel.Api.Constants;
 using SharedKernel.Api.Infrastructure;
 
 namespace Main.Api.Endpoints.Chats.Stream;
@@ -35,8 +36,8 @@ internal sealed class Endpoint : Endpoint<Request>
                     "Requires streamId query parameter from SendMessage response. " +
                     "Compatible with Vercel AI SDK Data Stream Protocol.")
                 .Produces(200, contentType: "text/event-stream")
-                .ProducesProblemDetails(400, "application/json")
-                .ProducesProblemDetails(404, "application/json")
+                .ProducesProblemDetails(400, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(404, HttpContentTypeConstants.Json)
                 .WithTags(CustomTags.Chats);
         });
     }

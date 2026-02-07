@@ -6,6 +6,8 @@ using FastEndpoints;
 
 using Mediator;
 
+using SharedKernel.Api.Constants;
+
 namespace Auth.Api.Endpoints.Sessions.Logout;
 
 internal sealed class Endpoint : BaseEndpoint<LogoutApiRequest>
@@ -28,8 +30,8 @@ internal sealed class Endpoint : BaseEndpoint<LogoutApiRequest>
             d.WithSummary("Logout")
                 .WithDescription("Logs out the current session by invalidating the refresh token.")
                 .Produces(204)
-                .ProducesProblemDetails(400, "application/json")
-                .ProducesProblemDetails(401, "application/json")
+                .ProducesProblemDetails(400, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(401, HttpContentTypeConstants.Json)
                 .WithTags(CustomTags.Sessions);
         });
     }

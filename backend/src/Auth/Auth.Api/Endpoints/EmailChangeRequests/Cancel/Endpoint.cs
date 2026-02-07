@@ -4,6 +4,8 @@ using FastEndpoints;
 
 using Mediator;
 
+using SharedKernel.Api.Constants;
+
 namespace Auth.Api.Endpoints.EmailChangeRequests.Cancel;
 
 internal sealed class Endpoint : BaseEndpoint<Request>
@@ -25,8 +27,8 @@ internal sealed class Endpoint : BaseEndpoint<Request>
             d.WithSummary("Cancel Email Change")
                 .WithDescription("Cancels a pending email change request.")
                 .Produces(204)
-                .ProducesProblemDetails(401, "application/json")
-                .ProducesProblemDetails(404, "application/json")
+                .ProducesProblemDetails(401, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(404, HttpContentTypeConstants.Json)
                 .WithTags(CustomTags.EmailChangeRequests);
         });
     }

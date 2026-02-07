@@ -46,15 +46,15 @@ internal sealed class SessionConfiguration : IEntityTypeConfiguration<Session>
 
         b.Property(s => s.CreatedAt)
             .IsRequired()
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.Property(s => s.ExpiresAt)
             .IsRequired()
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.Property(s => s.LastRefreshedAt)
             .IsRequired(false)
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.Property(s => s.RevokeReason)
             .IsRequired(false)
@@ -63,7 +63,7 @@ internal sealed class SessionConfiguration : IEntityTypeConfiguration<Session>
 
         b.Property(s => s.RevokedAt)
             .IsRequired(false)
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.Property(s => s.Version)
             .IsRequired()

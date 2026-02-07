@@ -4,6 +4,8 @@ using FastEndpoints;
 
 using Mediator;
 
+using SharedKernel.Api.Constants;
+
 namespace Auth.Api.Endpoints.Users.SignUp;
 
 internal sealed class Endpoint : BaseEndpoint<Request, Response>
@@ -25,9 +27,9 @@ internal sealed class Endpoint : BaseEndpoint<Request, Response>
         {
             d.WithSummary("Sign Up")
                 .WithDescription("Creates a new user account.")
-                .Produces<Response>(201, "application/json")
-                .ProducesProblemDetails(400, "application/json")
-                .ProducesProblemDetails(409, "application/json")
+                .Produces<Response>(201, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(400, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(409, HttpContentTypeConstants.Json)
                 .WithTags(CustomTags.Users);
         });
     }

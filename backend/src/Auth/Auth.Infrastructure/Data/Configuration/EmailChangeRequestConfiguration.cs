@@ -59,19 +59,19 @@ internal sealed class EmailChangeRequestConfiguration : IEntityTypeConfiguration
 
         b.Property(ecr => ecr.CreatedAt)
             .IsRequired()
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.Property(ecr => ecr.ExpiresAt)
             .IsRequired()
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.Property(ecr => ecr.CompletedAt)
             .IsRequired(false)
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.Property(ecr => ecr.CancelledAt)
             .IsRequired(false)
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.HasIndex(ecr => ecr.UserId);
         b.HasIndex(ecr => ecr.CreatedAt);

@@ -5,6 +5,8 @@ using Main.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+using SharedKernel.Infrastructure.Data;
+
 namespace Main.Infrastructure.Data.Configuration;
 
 internal sealed class FavoriteModelConfiguration : IEntityTypeConfiguration<FavoriteModel>
@@ -38,7 +40,7 @@ internal sealed class FavoriteModelConfiguration : IEntityTypeConfiguration<Favo
 
         b.Property(f => f.CreatedAt)
             .IsRequired()
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.HasIndex(f => f.PreferenceId);
 

@@ -4,6 +4,8 @@ using Main.Infrastructure.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+using SharedKernel.Infrastructure.Data;
+
 namespace Main.Infrastructure.Data.Configuration;
 
 internal sealed class MemoryRecordConfiguration : IEntityTypeConfiguration<MemoryRecord>
@@ -38,7 +40,7 @@ internal sealed class MemoryRecordConfiguration : IEntityTypeConfiguration<Memor
 
         b.Property(m => m.CreatedAt)
             .IsRequired()
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.HasIndex(m => m.UserId);
         b.HasIndex(m => new { m.UserId, m.CreatedAt });

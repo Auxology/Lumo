@@ -39,7 +39,7 @@ internal sealed class RecoveryKeyConfiguration : IEntityTypeConfiguration<Recove
 
         b.Property(rk => rk.UsedAt)
             .IsRequired(false)
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.ComplexProperty(rk => rk.Fingerprint, fp => fp.ConfigureFingerprint());
 

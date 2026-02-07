@@ -7,6 +7,8 @@ using FastEndpoints;
 
 using Mediator;
 
+using SharedKernel.Api.Constants;
+
 namespace Auth.Api.Endpoints.Sessions.Refresh;
 
 internal sealed class Endpoint : BaseEndpoint<RefreshSessionApiRequest, RefreshSessionApiResponse>
@@ -28,9 +30,9 @@ internal sealed class Endpoint : BaseEndpoint<RefreshSessionApiRequest, RefreshS
         {
             d.WithSummary("Refresh Session")
                 .WithDescription("Refreshes an expired access token using a valid refresh token.")
-                .Produces<RefreshSessionApiResponse>(200, "application/json")
-                .ProducesProblemDetails(400, "application/json")
-                .ProducesProblemDetails(401, "application/json")
+                .Produces<RefreshSessionApiResponse>(200, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(400, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(401, HttpContentTypeConstants.Json)
                 .WithTags(CustomTags.Sessions);
         });
     }

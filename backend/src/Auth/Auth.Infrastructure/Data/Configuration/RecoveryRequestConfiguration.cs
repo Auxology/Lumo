@@ -60,19 +60,19 @@ internal sealed class RecoveryRequestConfiguration : IEntityTypeConfiguration<Re
 
         b.Property(rr => rr.CreatedAt)
             .IsRequired()
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.Property(rr => rr.ExpiresAt)
             .IsRequired()
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.Property(rr => rr.NewEmailVerifiedAt)
             .IsRequired(false)
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.Property(rr => rr.CompletedAt)
             .IsRequired(false)
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.HasIndex(rr => rr.TokenKey).IsUnique();
         b.HasIndex(rr => rr.UserId);

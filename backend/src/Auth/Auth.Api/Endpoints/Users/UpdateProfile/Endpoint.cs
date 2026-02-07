@@ -4,6 +4,8 @@ using FastEndpoints;
 
 using Mediator;
 
+using SharedKernel.Api.Constants;
+
 namespace Auth.Api.Endpoints.Users.UpdateProfile;
 
 internal sealed class Endpoint : BaseEndpoint<Request>
@@ -25,9 +27,9 @@ internal sealed class Endpoint : BaseEndpoint<Request>
             d.WithSummary("Update Profile")
                 .WithDescription("Updates the current user's profile. All fields are optional.")
                 .Produces(204)
-                .ProducesProblemDetails(400, "application/json")
-                .ProducesProblemDetails(401, "application/json")
-                .ProducesProblemDetails(404, "application/json")
+                .ProducesProblemDetails(400, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(401, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(404, HttpContentTypeConstants.Json)
                 .WithTags(CustomTags.Users);
         });
     }

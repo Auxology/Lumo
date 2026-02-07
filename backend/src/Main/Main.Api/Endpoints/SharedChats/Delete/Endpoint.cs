@@ -4,6 +4,8 @@ using Main.Application.Commands.SharedChats.DeleteSharedChat;
 
 using Mediator;
 
+using SharedKernel.Api.Constants;
+
 namespace Main.Api.Endpoints.SharedChats.Delete;
 
 internal sealed class Endpoint : BaseEndpoint<Request>
@@ -25,8 +27,8 @@ internal sealed class Endpoint : BaseEndpoint<Request>
             d.WithSummary("Delete Shared Chat")
                 .WithDescription("Permanently deletes a shared chat snapshot.")
                 .Produces(204)
-                .ProducesProblemDetails(400, "application/json")
-                .ProducesProblemDetails(404, "application/json")
+                .ProducesProblemDetails(400, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(404, HttpContentTypeConstants.Json)
                 .WithTags(CustomTags.SharedChats);
         });
     }

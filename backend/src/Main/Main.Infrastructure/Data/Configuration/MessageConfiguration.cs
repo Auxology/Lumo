@@ -51,11 +51,11 @@ internal sealed class MessageConfiguration : IEntityTypeConfiguration<Message>
 
         b.Property(m => m.CreatedAt)
             .IsRequired()
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.Property(m => m.EditedAt)
             .IsRequired()
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.HasIndex(m => m.ChatId);
 

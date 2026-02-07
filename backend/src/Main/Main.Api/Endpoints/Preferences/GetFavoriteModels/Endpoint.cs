@@ -4,6 +4,7 @@ using Main.Application.Queries.Preferences.GetFavoriteModels;
 
 using Mediator;
 
+using SharedKernel.Api.Constants;
 using SharedKernel.Api.Infrastructure;
 
 namespace Main.Api.Endpoints.Preferences.GetFavoriteModels;
@@ -26,7 +27,7 @@ internal sealed class Endpoint : EndpointWithoutRequest<Response>
         {
             d.WithSummary("Get Favorite Models")
                 .WithDescription("Retrieves all favorite models for the authenticated user.")
-                .Produces<Response>(200, "application/json")
+                .Produces<Response>(200, HttpContentTypeConstants.Json)
                 .WithTags(CustomTags.Preferences);
         });
     }

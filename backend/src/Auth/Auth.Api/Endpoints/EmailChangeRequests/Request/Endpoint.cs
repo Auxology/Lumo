@@ -4,6 +4,8 @@ using FastEndpoints;
 
 using Mediator;
 
+using SharedKernel.Api.Constants;
+
 namespace Auth.Api.Endpoints.EmailChangeRequests.Request;
 
 internal sealed class Endpoint : BaseEndpoint<Request, Response>
@@ -24,10 +26,10 @@ internal sealed class Endpoint : BaseEndpoint<Request, Response>
         {
             d.WithSummary("Request Email Change")
                 .WithDescription("Initiates an email change request. Sends verification to the new email address.")
-                .Produces<Response>(201, "application/json")
-                .ProducesProblemDetails(400, "application/json")
-                .ProducesProblemDetails(401, "application/json")
-                .ProducesProblemDetails(409, "application/json")
+                .Produces<Response>(201, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(400, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(401, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(409, HttpContentTypeConstants.Json)
                 .WithTags(CustomTags.EmailChangeRequests);
         });
     }

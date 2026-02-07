@@ -7,6 +7,8 @@ using FastEndpoints;
 
 using Mediator;
 
+using SharedKernel.Api.Constants;
+
 namespace Auth.Api.Endpoints.LoginRequests.Verify;
 
 internal sealed class Endpoint : BaseEndpoint<VerifyLoginApiRequest, VerifyLoginApiResponse>
@@ -28,9 +30,9 @@ internal sealed class Endpoint : BaseEndpoint<VerifyLoginApiRequest, VerifyLogin
         {
             d.WithSummary("Verify Login Request")
                 .WithDescription("Verifies a login request using OTP or magic link token and returns session tokens.")
-                .Produces<VerifyLoginApiResponse>(200, "application/json")
-                .ProducesProblemDetails(400, "application/json")
-                .ProducesProblemDetails(401, "application/json")
+                .Produces<VerifyLoginApiResponse>(200, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(400, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(401, HttpContentTypeConstants.Json)
                 .WithTags(CustomTags.LoginRequests);
         });
     }
