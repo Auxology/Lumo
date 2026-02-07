@@ -27,7 +27,7 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
         b.Property(u => u.DisplayName)
             .IsRequired()
             .HasMaxLength(UserConstants.MaxDisplayNameLength)
-            .HasColumnType("varchar");
+            .HasColumnType(DataConfigurationConstants.DefaultStringColumnType);
 
         b.Property(u => u.EmailAddress)
             .IsRequired()
@@ -37,11 +37,11 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
                 email => email.Value,
                 value => EmailAddress.UnsafeFromString(value)
             )
-            .HasColumnType("varchar");
+            .HasColumnType(DataConfigurationConstants.DefaultStringColumnType);
 
         b.Property(u => u.AvatarKey)
             .IsRequired(false)
-            .HasColumnType("varchar");
+            .HasColumnType(DataConfigurationConstants.DefaultStringColumnType);
 
         b.Property(u => u.IsVerified)
             .IsRequired()

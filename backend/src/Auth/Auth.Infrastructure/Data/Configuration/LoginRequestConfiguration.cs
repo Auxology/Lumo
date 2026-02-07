@@ -20,7 +20,7 @@ internal sealed class LoginRequestConfiguration : IEntityTypeConfiguration<Login
                 id => id.Value,
                 s => LoginRequestId.UnsafeFrom(s)
             )
-            .HasColumnType($"varchar({LoginRequestId.Length})");
+            .HasColumnType($"{DataConfigurationConstants.DefaultStringColumnType}({LoginRequestId.Length})");
 
         b.Property(lr => lr.UserId)
             .IsRequired()
@@ -34,17 +34,17 @@ internal sealed class LoginRequestConfiguration : IEntityTypeConfiguration<Login
         b.Property(lr => lr.TokenKey)
             .IsRequired()
             .HasMaxLength(DataConfigurationConstants.DefaultStringMaxLength)
-            .HasColumnType("varchar");
+            .HasColumnType(DataConfigurationConstants.DefaultStringColumnType);
 
         b.Property(lr => lr.OtpTokenHash)
             .IsRequired()
             .HasMaxLength(DataConfigurationConstants.DefaultStringMaxLength)
-            .HasColumnType("varchar");
+            .HasColumnType(DataConfigurationConstants.DefaultStringColumnType);
 
         b.Property(lr => lr.MagicLinkTokenHash)
             .IsRequired()
             .HasMaxLength(DataConfigurationConstants.DefaultStringMaxLength)
-            .HasColumnType("varchar");
+            .HasColumnType(DataConfigurationConstants.DefaultStringColumnType);
 
         b.ComplexProperty(lr => lr.Fingerprint, fp => fp.ConfigureFingerprint());
 

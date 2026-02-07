@@ -21,7 +21,7 @@ internal sealed class MessageConfiguration : IEntityTypeConfiguration<Message>
                 id => id.Value,
                 s => MessageId.UnsafeFrom(s)
             )
-            .HasColumnType($"varchar({MessageId.Length})");
+            .HasColumnType($"{DataConfigurationConstants.DefaultStringColumnType}({MessageId.Length})");
 
         b.Property(m => m.ChatId)
             .ValueGeneratedNever()
@@ -30,7 +30,7 @@ internal sealed class MessageConfiguration : IEntityTypeConfiguration<Message>
                 id => id.Value,
                 s => ChatId.UnsafeFrom(s)
             )
-            .HasColumnType($"varchar({ChatId.Length})");
+            .HasColumnType($"{DataConfigurationConstants.DefaultStringColumnType}({ChatId.Length})");
 
         b.Property(m => m.MessageRole)
             .IsRequired()

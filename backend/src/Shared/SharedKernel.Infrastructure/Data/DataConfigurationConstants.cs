@@ -17,4 +17,6 @@ public static class DataConfigurationConstants
     public const int MaxNormalizedOsLength = 128;
 
     public const string DefaultTimeColumnType = "timestamptz";
+
+    public const string DefaultStringColumnType = "varchar";
 }

@@ -21,7 +21,7 @@ internal sealed class PreferenceConfiguration : IEntityTypeConfiguration<Prefere
                 id => id.Value,
                 s => PreferenceId.UnsafeFrom(s)
             )
-            .HasColumnType($"varchar({PreferenceId.Length})");
+            .HasColumnType($"{DataConfigurationConstants.DefaultStringColumnType}({PreferenceId.Length})");
 
         b.Property(p => p.UserId)
             .IsRequired()

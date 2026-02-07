@@ -15,17 +15,17 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
 
         b.Property(u => u.DisplayName)
             .IsRequired()
-            .HasColumnType("varchar(1000)");
+            .HasColumnType($"{DataConfigurationConstants.DefaultStringColumnType}(1000)");
 
         b.Property(u => u.EmailAddress)
             .IsRequired()
             .HasMaxLength(DataConfigurationConstants.DefaultStringMaxLength)
-            .HasColumnType($"varchar({DataConfigurationConstants.DefaultStringMaxLength})");
+            .HasColumnType($"{DataConfigurationConstants.DefaultStringColumnType}({DataConfigurationConstants.DefaultStringMaxLength})");
 
         b.Property(u => u.AvatarKey)
             .IsRequired(false)
             .HasMaxLength(DataConfigurationConstants.DefaultStringMaxLength)
-            .HasColumnType($"varchar({DataConfigurationConstants.DefaultStringMaxLength})");
+            .HasColumnType($"{DataConfigurationConstants.DefaultStringColumnType}({DataConfigurationConstants.DefaultStringMaxLength})");
 
         b.HasIndex(u => u.EmailAddress)
             .IsUnique();

@@ -21,7 +21,7 @@ internal sealed class SessionConfiguration : IEntityTypeConfiguration<Session>
                 id => id.Value,
                 s => SessionId.UnsafeFrom(s)
             )
-            .HasColumnType($"varchar({SessionId.Length})");
+            .HasColumnType($"{DataConfigurationConstants.DefaultStringColumnType}({SessionId.Length})");
 
         b.Property(s => s.UserId)
             .IsRequired()
@@ -37,12 +37,12 @@ internal sealed class SessionConfiguration : IEntityTypeConfiguration<Session>
         b.Property(s => s.RefreshTokenKey)
             .IsRequired()
             .HasMaxLength(DataConfigurationConstants.DefaultStringMaxLength)
-            .HasColumnType("varchar");
+            .HasColumnType(DataConfigurationConstants.DefaultStringColumnType);
 
         b.Property(s => s.RefreshTokenHash)
             .IsRequired()
             .HasMaxLength(DataConfigurationConstants.DefaultStringMaxLength)
-            .HasColumnType("varchar");
+            .HasColumnType(DataConfigurationConstants.DefaultStringColumnType);
 
         b.Property(s => s.CreatedAt)
             .IsRequired()

@@ -21,7 +21,7 @@ internal sealed class EmailChangeRequestConfiguration : IEntityTypeConfiguration
                 id => id.Value,
                 s => EmailChangeRequestId.UnsafeFrom(s)
             )
-            .HasColumnType($"varchar({EmailChangeRequestId.Length})");
+            .HasColumnType($"{DataConfigurationConstants.DefaultStringColumnType}({EmailChangeRequestId.Length})");
 
         b.Property(ecr => ecr.UserId)
             .IsRequired()
@@ -38,7 +38,7 @@ internal sealed class EmailChangeRequestConfiguration : IEntityTypeConfiguration
                 .HasColumnName("current_email_address")
                 .IsRequired()
                 .HasMaxLength(254)
-                .HasColumnType("varchar");
+                .HasColumnType(DataConfigurationConstants.DefaultStringColumnType);
         });
 
         b.ComplexProperty(ecr => ecr.NewEmailAddress, ea =>
@@ -47,13 +47,13 @@ internal sealed class EmailChangeRequestConfiguration : IEntityTypeConfiguration
                 .HasColumnName("new_email_address")
                 .IsRequired()
                 .HasMaxLength(254)
-                .HasColumnType("varchar");
+                .HasColumnType(DataConfigurationConstants.DefaultStringColumnType);
         });
 
         b.Property(ecr => ecr.OtpTokenHash)
             .IsRequired()
             .HasMaxLength(DataConfigurationConstants.DefaultStringMaxLength)
-            .HasColumnType("varchar");
+            .HasColumnType(DataConfigurationConstants.DefaultStringColumnType);
 
         b.ComplexProperty(ecr => ecr.Fingerprint, fp => fp.ConfigureFingerprint());
 

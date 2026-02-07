@@ -21,7 +21,7 @@ internal sealed class RecoveryKeyChainConfiguration : IEntityTypeConfiguration<R
                 id => id.Value,
                 s => RecoveryKeyChainId.UnsafeFrom(s)
             )
-            .HasColumnType($"varchar({RecoveryKeyChainId.Length})");
+            .HasColumnType($"{DataConfigurationConstants.DefaultStringColumnType}({RecoveryKeyChainId.Length})");
 
         b.Property(rkc => rkc.UserId)
             .IsRequired()
