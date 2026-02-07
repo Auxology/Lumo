@@ -55,7 +55,8 @@ internal sealed class Endpoint : BaseEndpoint<Request, Response>
                         MessageRole: m.MessageRole,
                         TokenCount: m.TokenCount,
                         SequenceNumber: m.SequenceNumber,
-                        CreatedAt: m.CreatedAt
+                        CreatedAt: m.CreatedAt,
+                        EditedAt: m.EditedAt
                     ))
                     .ToList(),
                 Pagination: new PaginationDto

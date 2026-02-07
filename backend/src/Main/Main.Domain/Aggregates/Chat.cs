@@ -195,4 +195,38 @@ public sealed class Chat : AggregateRoot<ChatId>
 
     public Outcome<Message> AddAssistantMessage(MessageId messageId, string messageContent, DateTimeOffset utcNow) =>
         AddMessage(messageId, messageContent, MessageRole.Assistant, utcNow);
+
+    public Outcome EditMessageAndRemoveSubsequent
+    (
+        MessageId messageId,
+        string newContent,
+        DateTimeOffset utcNow
+    )
+    {
+        if (IsArchived)
+            return ChatFaults.CannotModifyArchivedChat;
+
+        Message? targetMessage = _messages.FirstOrDefault(m => m.Id == messageId);
+
+        if (targetMessage is null)
+            return MessageFaults.MessageNotFound;
+
+        if (targetMessage.MessageRole != MessageRole.User)
+            return MessageFaults.MessageEditNotAllowed;
+
+        int targetSequenceNumber = targetMessage.SequenceNumber;
+
+        _messages.RemoveAll(m => m.SequenceNumber > targetSequenceNumber);
+
+        Outcome editOutcome = targetMessage.EditContent(newContent, utcNow);
+
+        if (editOutcome.IsFailure)
+            return editOutcome.Fault;
+
+        NextSequenceNumber = targetSequenceNumber + 1;
+
+        UpdatedAt = utcNow;
+
+        return Outcome.Success();
+    }
 }

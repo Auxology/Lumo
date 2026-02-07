@@ -13,9 +13,13 @@ public sealed class Preference : AggregateRoot<PreferenceId>
 {
     private readonly List<Instruction> _instructions = [];
 
+    private readonly List<FavoriteModel> _favoriteModels = [];
+
     public Guid UserId { get; private set; }
 
     public IReadOnlyCollection<Instruction> Instructions => _instructions.AsReadOnly();
+
+    public IReadOnlyCollection<FavoriteModel> FavoriteModels => _favoriteModels.AsReadOnly();
 
     public DateTimeOffset CreatedAt { get; private set; }
 
@@ -131,6 +135,56 @@ public sealed class Preference : AggregateRoot<PreferenceId>
             return PreferenceFaults.InstructionNotFound;
 
         _instructions.Remove(instruction);
+        UpdatedAt = utcNow;
+
+        return Outcome.Success();
+    }
+
+    public Outcome<FavoriteModel> AddFavoriteModel
+    (
+        FavoriteModelId favoriteModelId,
+        string modelId,
+        DateTimeOffset utcNow
+    )
+    {
+        bool alreadyAdded = _favoriteModels
+            .Any(fm => fm.ModelId == modelId);
+
+        if (alreadyAdded)
+            return PreferenceFaults.AlreadyInFavorites;
+
+        Outcome<FavoriteModel> favoriteModelOutcome = FavoriteModel.Create
+        (
+            id: favoriteModelId,
+            preferenceId: Id,
+            modelId: modelId,
+            utcNow: utcNow
+        );
+
+        if (favoriteModelOutcome.IsFailure)
+            return favoriteModelOutcome.Fault;
+
+        FavoriteModel favoriteModel = favoriteModelOutcome.Value;
+
+        _favoriteModels.Add(favoriteModel);
+        UpdatedAt = utcNow;
+
+        return favoriteModel;
+    }
+
+    public Outcome RemoveFavoriteModel
+    (
+        FavoriteModelId favoriteModelId,
+        DateTimeOffset utcNow
+    )
+    {
+        FavoriteModel? favoriteModel = _favoriteModels
+            .FirstOrDefault(fm => fm.Id == favoriteModelId);
+
+        if (favoriteModel is null)
+            return PreferenceFaults.ModelNotInFavorites;
+
+        _favoriteModels.Remove(favoriteModel);
         UpdatedAt = utcNow;
 
         return Outcome.Success();

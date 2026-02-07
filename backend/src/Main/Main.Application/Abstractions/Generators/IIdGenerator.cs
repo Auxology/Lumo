@@ -15,4 +15,8 @@ public interface IIdGenerator
     InstructionId NewInstructionId();
 
     SharedChatId NewSharedChatId();
+
+    EphemeralChatId NewEphemeralChatId();
+
+    FavoriteModelId NewFavoriteModelId();
 }

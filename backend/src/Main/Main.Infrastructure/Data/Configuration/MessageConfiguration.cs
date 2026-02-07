@@ -53,6 +53,10 @@ internal sealed class MessageConfiguration : IEntityTypeConfiguration<Message>
             .IsRequired()
             .HasColumnType("timestamptz");
 
+        b.Property(m => m.EditedAt)
+            .IsRequired()
+            .HasColumnType("timestamptz");
+
         b.HasIndex(m => m.ChatId);
 
         b.HasIndex(m => new { m.ChatId, m.SequenceNumber })

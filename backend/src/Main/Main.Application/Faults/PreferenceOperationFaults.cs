@@ -15,4 +15,10 @@ internal static class PreferenceOperationFaults
         title: "Preference.Conflict",
         detail: "A concurrent operation conflicted with this request. Please try again."
     );
+
+    internal static readonly Fault ModelNotFound = Fault.NotFound
+    (
+        title: "Preference.ModelNotFound",
+        detail: "The specified model was not found in the model registry."
+    );
 }

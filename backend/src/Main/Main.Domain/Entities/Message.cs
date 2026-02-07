@@ -22,6 +22,8 @@ public sealed class Message : Entity<MessageId>
 
     public DateTimeOffset CreatedAt { get; private set; }
 
+    public DateTimeOffset EditedAt { get; private set; }
+
     private Message() { } // For EF Core
 
     [SetsRequiredMembers]
@@ -42,6 +44,7 @@ public sealed class Message : Entity<MessageId>
         TokenCount = null;
         SequenceNumber = sequenceNumber;
         CreatedAt = utcNow;
+        EditedAt = utcNow;
     }
 
     internal static Outcome<Message> Create
@@ -80,5 +83,16 @@ public sealed class Message : Entity<MessageId>
         );
 
         return message;
+    }
+
+    internal Outcome EditContent(string newContent, DateTimeOffset utcNow)
+    {
+        if (string.IsNullOrWhiteSpace(newContent))
+            return MessageFaults.MessageContentRequired;
+
+        MessageContent = newContent;
+        EditedAt = utcNow;
+
+        return Outcome.Success();
     }
 }

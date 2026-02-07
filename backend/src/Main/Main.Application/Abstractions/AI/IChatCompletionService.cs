@@ -9,6 +9,7 @@ public interface IChatCompletionService
         string chatId,
         string streamId,
         string modelId,
+        string correlationId,
         IReadOnlyList<ChatCompletionMessage> messages,
         CancellationToken cancellationToken
     );
@@ -19,6 +20,7 @@ public interface IChatCompletionService
         string chatId,
         string streamId,
         string modelId,
+        string correlationId,
         IReadOnlyList<ChatCompletionMessage> messages,
         CancellationToken cancellationToken
     );

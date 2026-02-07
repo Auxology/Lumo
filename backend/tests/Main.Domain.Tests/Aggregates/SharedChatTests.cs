@@ -146,8 +146,8 @@ public sealed class SharedChatTests
 
         List<SharedChatMessage> messages =
         [
-            new SharedChatMessage(0, MessageRole.User, "Hello", UtcNow),
-            new SharedChatMessage(1, MessageRole.Assistant, "Hi there!", UtcNow.AddSeconds(1))
+            new SharedChatMessage(0, MessageRole.User, "Hello", UtcNow, UtcNow),
+            new SharedChatMessage(1, MessageRole.Assistant, "Hi there!", UtcNow.AddSeconds(1), UtcNow.AddSeconds(1))
         ];
         DateTimeOffset updateTime = UtcNow.AddHours(1);
 
@@ -172,13 +172,13 @@ public sealed class SharedChatTests
 
         List<SharedChatMessage> initialMessages =
         [
-            new SharedChatMessage(0, MessageRole.User, "First", UtcNow)
+            new SharedChatMessage(0, MessageRole.User, "First", UtcNow, UtcNow)
         ];
         sharedChat.AddMessages(initialMessages, UtcNow);
 
         List<SharedChatMessage> additionalMessages =
         [
-            new SharedChatMessage(1, MessageRole.Assistant, "Second", UtcNow.AddSeconds(1))
+            new SharedChatMessage(1, MessageRole.Assistant, "Second", UtcNow.AddSeconds(1), UtcNow.AddSeconds(1))
         ];
         sharedChat.AddMessages(additionalMessages, UtcNow.AddHours(1));
 
@@ -202,14 +202,14 @@ public sealed class SharedChatTests
 
         List<SharedChatMessage> initialMessages =
         [
-            new SharedChatMessage(0, MessageRole.User, "Old message", UtcNow)
+            new SharedChatMessage(0, MessageRole.User, "Old message", UtcNow, UtcNow)
         ];
         sharedChat.AddMessages(initialMessages, UtcNow);
 
         List<SharedChatMessage> newMessages =
         [
-            new SharedChatMessage(0, MessageRole.User, "New message 1", UtcNow.AddHours(1)),
-            new SharedChatMessage(1, MessageRole.Assistant, "New message 2", UtcNow.AddHours(1).AddSeconds(1))
+            new SharedChatMessage(0, MessageRole.User, "New message 1", UtcNow.AddHours(1), UtcNow.AddHours(1)),
+            new SharedChatMessage(1, MessageRole.Assistant, "New message 2", UtcNow.AddHours(1).AddSeconds(1), UtcNow.AddHours(1).AddSeconds(1))
         ];
         DateTimeOffset refreshTime = UtcNow.AddHours(2);
 
@@ -235,7 +235,7 @@ public sealed class SharedChatTests
 
         List<SharedChatMessage> initialMessages =
         [
-            new SharedChatMessage(0, MessageRole.User, "Message", UtcNow)
+            new SharedChatMessage(0, MessageRole.User, "Message", UtcNow, UtcNow)
         ];
         sharedChat.AddMessages(initialMessages, UtcNow);
 

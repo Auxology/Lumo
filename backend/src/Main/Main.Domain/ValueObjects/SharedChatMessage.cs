@@ -7,5 +7,6 @@ public sealed record SharedChatMessage
     int SequenceNumber,
     MessageRole MessageRole,
     string MessageContent,
-    DateTimeOffset CreatedAt
+    DateTimeOffset CreatedAt,
+    DateTimeOffset EditedAt
 );

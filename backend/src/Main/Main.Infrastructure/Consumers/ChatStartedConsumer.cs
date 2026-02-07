@@ -60,8 +60,6 @@ internal sealed class ChatStartedConsumer(
             ))
             .ToListAsync(cancellationToken);
 
-
-
         await chatCompletionService.StreamCompletionAdvancedAsync
         (
             chatId: chatId.Value,
@@ -69,6 +67,7 @@ internal sealed class ChatStartedConsumer(
             messages: messages,
             modelId: message.ModelId,
             userId: message.UserId,
+            correlationId: message.CorrelationId.ToString(),
             cancellationToken: cancellationToken
         );
 

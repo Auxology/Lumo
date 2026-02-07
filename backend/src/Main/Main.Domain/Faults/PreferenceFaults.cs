@@ -21,4 +21,16 @@ public static class PreferenceFaults
         title: "Preference.InstructionNotFound",
         detail: "The specified instruction was not found in the preference."
     );
+
+    public static readonly Fault AlreadyInFavorites = Fault.Validation
+    (
+        title: "Preference.AlreadyInFavorites",
+        detail: "The model is already in the user's favorites."
+    );
+
+    public static readonly Fault ModelNotInFavorites = Fault.NotFound
+    (
+        title: "Preference.ModelNotInFavorites",
+        detail: "The specified model was not found in the user's favorites."
+    );
 }

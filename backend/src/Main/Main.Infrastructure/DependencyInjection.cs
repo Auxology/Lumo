@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 using Main.Application.Abstractions.AI;
 using Main.Application.Abstractions.Data;
+using Main.Application.Abstractions.Ephemeral;
 using Main.Application.Abstractions.Generators;
 using Main.Application.Abstractions.Instructions;
 using Main.Application.Abstractions.Memory;
@@ -11,6 +12,7 @@ using Main.Infrastructure.AI;
 using Main.Infrastructure.AI.Tools;
 using Main.Infrastructure.Consumers;
 using Main.Infrastructure.Data;
+using Main.Infrastructure.Ephemeral;
 using Main.Infrastructure.Generators;
 using Main.Infrastructure.Instructions;
 using Main.Infrastructure.Memory;
@@ -120,6 +122,9 @@ public static class DependencyInjection
             bus.AddConsumer<ChatStartedConsumer>();
             bus.AddConsumer<AssistantMessageGeneratedConsumer>();
             bus.AddConsumer<MessageSentConsumer>();
+            bus.AddConsumer<EphemeralChatStartedConsumer>();
+            bus.AddConsumer<AssistantEphemeralMessageGeneratedConsumer>();
+            bus.AddConsumer<EphemeralMessageSentConsumer>();
 
             bus.AddEntityFrameworkOutbox<MainDbContext>(outbox =>
             {
@@ -213,6 +218,8 @@ public static class DependencyInjection
         services.AddSingleton<IStreamReader, StreamReader>();
 
         services.AddSingleton<IModelRegistry, ModelRegistry>();
+
+        services.AddScoped<IEphemeralChatStore, EphemeralChatStore>();
 
         return services;
     }

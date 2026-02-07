@@ -24,5 +24,12 @@
       <ProjectReference Include="..\Main.Domain\Main.Domain.csproj" />
       <ProjectReference Include="..\Main.Infrastructure\Main.Infrastructure.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="**\*.config" />
+      <_ContentIncludedByDefault Remove="**\*.json" />
+      <_ContentIncludedByDefault Remove="**\*.cshtml" />
+      <_ContentIncludedByDefault Remove="**\*.razor" />
+    </ItemGroup>
     
 </Project>

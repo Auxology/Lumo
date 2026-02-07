@@ -22,4 +22,10 @@ internal sealed class IdGenerator : IIdGenerator
 
     public SharedChatId NewSharedChatId() =>
         SharedChatId.UnsafeFrom($"{SharedChatId.PrefixValue}{Ulid.NewUlid()}");
+
+    public EphemeralChatId NewEphemeralChatId() =>
+        EphemeralChatId.UnsafeFrom($"{EphemeralChatId.PrefixValue}{Ulid.NewUlid()}");
+
+    public FavoriteModelId NewFavoriteModelId() =>
+        FavoriteModelId.UnsafeFrom($"{FavoriteModelId.PrefixValue}{Ulid.NewUlid()}");
 }

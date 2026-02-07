@@ -16,10 +16,8 @@ internal sealed class ChatLockService(
     private readonly ChatStreamingOptions _chatStreamingOptions = chatStreamingOptions.Value;
 
     private const string LockKeyPrefix = "chat:lock:";
-    private const string LockValue = "generating";
 
-
-    public async Task<bool> TryAcquireLockAsync(string chatId, CancellationToken cancellationToken)
+    public async Task<bool> TryAcquireLockAsync(string chatId, string ownerId, CancellationToken cancellationToken)
     {
         string lockKey = $"{LockKeyPrefix}{chatId}";
 
@@ -30,7 +28,7 @@ internal sealed class ChatLockService(
             bool acquired = await db.StringSetAsync
             (
                 key: lockKey,
-                value: LockValue,
+                value: ownerId,
                 expiry: _chatStreamingOptions.GenerationLockExpiration,
                 when: When.NotExists
             );
@@ -53,7 +51,7 @@ internal sealed class ChatLockService(
         }
     }
 
-    public async Task ReleaseLockAsync(string chatId, CancellationToken cancellationToken)
+    public async Task ReleaseLockAsync(string chatId, string ownerId, CancellationToken cancellationToken)
     {
         string lockKey = $"{LockKeyPrefix}{chatId}";
 
@@ -61,8 +59,18 @@ internal sealed class ChatLockService(
 
         try
         {
-            await db.KeyDeleteAsync(lockKey);
-            logger.LogInformation("Released lock for chatId: {ChatId}", chatId);
+            ITransaction transaction = db.CreateTransaction();
+
+            transaction.AddCondition(Condition.StringEqual(lockKey, ownerId));
+
+            _ = transaction.KeyDeleteAsync(lockKey);
+
+            bool committed = await transaction.ExecuteAsync();
+
+            if (committed)
+                logger.LogInformation("Released lock for chatId: {ChatId}", chatId);
+            else
+                logger.LogWarning("Lock not owned by this request for chatId: {ChatId}", chatId);
         }
         catch (RedisException exception)
         {

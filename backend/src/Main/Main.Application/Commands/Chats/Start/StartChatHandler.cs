@@ -75,35 +75,56 @@ internal sealed class StartChatHandler(
         if (messageOutcome.IsFailure)
             return messageOutcome.Fault;
 
-        await chatLockService.TryAcquireLockAsync(chat.Id.Value, cancellationToken);
-
-        StreamId streamId = idGenerator.NewStreamId();
-
-        ChatStarted chatStarted = new()
-        {
-            EventId = Guid.NewGuid(),
-            OccurredAt = dateTimeProvider.UtcNow,
-            CorrelationId = Guid.Parse(requestContext.CorrelationId),
-            ChatId = chat.Id.Value,
-            UserId = user.UserId,
-            StreamId = streamId.Value,
-            ModelId = modelId,
-            InitialMessage = request.Message
-        };
-
-        await dbContext.Chats.AddAsync(chat, cancellationToken);
-        await messageBus.PublishAsync(chatStarted, cancellationToken);
-        await dbContext.SaveChangesAsync(cancellationToken);
-
-        StartChatResponse response = new
+        bool lockAcquired = await chatLockService.TryAcquireLockAsync
         (
-            ChatId: chat.Id.Value,
-            StreamId: streamId.Value,
-            ChatTitle: title,
-            ModelId: modelId,
-            CreatedAt: chat.CreatedAt
+            chatId: chat.Id.Value,
+            ownerId: requestContext.CorrelationId,
+            cancellationToken: cancellationToken
         );
 
-        return response;
+        if (!lockAcquired)
+            return ChatOperationFaults.GenerationInProgress;
+
+        try
+        {
+            StreamId streamId = idGenerator.NewStreamId();
+
+            ChatStarted chatStarted = new()
+            {
+                EventId = Guid.NewGuid(),
+                OccurredAt = dateTimeProvider.UtcNow,
+                CorrelationId = Guid.Parse(requestContext.CorrelationId),
+                ChatId = chat.Id.Value,
+                UserId = user.UserId,
+                StreamId = streamId.Value,
+                ModelId = modelId,
+                InitialMessage = request.Message
+            };
+
+            await dbContext.Chats.AddAsync(chat, cancellationToken);
+            await messageBus.PublishAsync(chatStarted, cancellationToken);
+            await dbContext.SaveChangesAsync(cancellationToken);
+
+            StartChatResponse response = new
+            (
+                ChatId: chat.Id.Value,
+                StreamId: streamId.Value,
+                ChatTitle: title,
+                ModelId: modelId,
+                CreatedAt: chat.CreatedAt
+            );
+
+            return response;
+        }
+        catch
+        {
+            await chatLockService.ReleaseLockAsync
+            (
+                chatId: chat.Id.Value,
+                ownerId: requestContext.CorrelationId,
+                cancellationToken
+            );
+            throw;
+        }
     }
 }

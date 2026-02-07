@@ -9,4 +9,6 @@ public sealed record SharedChatMessageReadModel
     public required string MessageContent { get; init; }
 
     public required DateTimeOffset CreatedAt { get; init; }
+
+    public required DateTimeOffset EditedAt { get; init; }
 }
