@@ -75,8 +75,13 @@ internal sealed class StartChatHandler(
         if (messageOutcome.IsFailure)
             return messageOutcome.Fault;
 
-        bool lockAcquired = await chatLockService.TryAcquireLockAsync(chat.Id.Value, cancellationToken);
-        
+        bool lockAcquired = await chatLockService.TryAcquireLockAsync
+        (
+            chatId: chat.Id.Value,
+            ownerId: requestContext.CorrelationId,
+            cancellationToken: cancellationToken
+        );
+
         if (!lockAcquired)
             return ChatOperationFaults.GenerationInProgress;
 
@@ -113,7 +118,12 @@ internal sealed class StartChatHandler(
         }
         catch
         {
-            await chatLockService.ReleaseLockAsync(chat.Id.Value, cancellationToken);
+            await chatLockService.ReleaseLockAsync
+            (
+                chatId: chat.Id.Value,
+                ownerId: requestContext.CorrelationId,
+                cancellationToken
+            );
             throw;
         }
     }

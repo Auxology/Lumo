@@ -62,6 +62,7 @@ internal sealed class EphemeralMessageSentConsumer(
             streamId: streamId.Value,
             modelId: message.ModelId,
             messages: messages,
+            correlationId: message.CorrelationId.ToString(),
             cancellationToken: cancellationToken
         );
 

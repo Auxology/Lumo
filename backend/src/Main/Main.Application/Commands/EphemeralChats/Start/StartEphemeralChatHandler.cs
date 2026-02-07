@@ -65,8 +65,13 @@ internal sealed class StartEphemeralChatHandler(
             CreatedAt = dateTimeProvider.UtcNow
         };
 
-        bool lockAcquired = await chatLockService.TryAcquireLockAsync(ephemeralChatId.Value, cancellationToken);
-        
+        bool lockAcquired = await chatLockService.TryAcquireLockAsync
+        (
+            chatId: ephemeralChatId.Value,
+            ownerId: requestContext.CorrelationId,
+            cancellationToken: cancellationToken
+        );
+
         if (!lockAcquired)
             return ChatOperationFaults.GenerationInProgress;
 
@@ -100,7 +105,12 @@ internal sealed class StartEphemeralChatHandler(
         }
         catch
         {
-            await chatLockService.ReleaseLockAsync(ephemeralChatId.Value, cancellationToken);
+            await chatLockService.ReleaseLockAsync
+            (
+                chatId: ephemeralChatId.Value,
+                ownerId: requestContext.CorrelationId,
+                cancellationToken
+            );
             throw;
         }
     }

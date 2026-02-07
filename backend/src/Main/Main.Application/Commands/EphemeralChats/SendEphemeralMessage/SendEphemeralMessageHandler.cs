@@ -43,7 +43,12 @@ internal sealed class SendEphemeralMessageHandler(
         if (ephemeralChat is null || ephemeralChat.UserId != userId)
             return EphemeralChatOperationFaults.NotFound;
 
-        bool lockAcquired = await chatLockService.TryAcquireLockAsync(ephemeralChat.EphemeralChatId, cancellationToken);
+        bool lockAcquired = await chatLockService.TryAcquireLockAsync
+        (
+            chatId: ephemeralChat.EphemeralChatId,
+            ownerId: requestContext.CorrelationId,
+            cancellationToken: cancellationToken
+        );
 
         if (!lockAcquired)
             return EphemeralChatOperationFaults.GenerationInProgress;
@@ -92,7 +97,12 @@ internal sealed class SendEphemeralMessageHandler(
         }
         catch
         {
-            await chatLockService.ReleaseLockAsync(ephemeralChat.EphemeralChatId, cancellationToken);
+            await chatLockService.ReleaseLockAsync
+            (
+                chatId: ephemeralChat.EphemeralChatId,
+                ownerId: requestContext.CorrelationId,
+                cancellationToken: cancellationToken
+            );
             throw;
         }
     }

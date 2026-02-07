@@ -67,6 +67,7 @@ internal sealed class ChatStartedConsumer(
             messages: messages,
             modelId: message.ModelId,
             userId: message.UserId,
+            correlationId: message.CorrelationId.ToString(),
             cancellationToken: cancellationToken
         );
 

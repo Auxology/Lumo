@@ -79,6 +79,7 @@ internal sealed class ChatCompletionService(
         string chatId,
         string streamId,
         string modelId,
+        string correlationId,
         IReadOnlyList<ChatCompletionMessage> messages,
         CancellationToken cancellationToken
         )
@@ -89,6 +90,7 @@ internal sealed class ChatCompletionService(
             streamId: streamId,
             modelId: modelId,
             messages: messages,
+            correlationId: correlationId,
             toolContext: null,
             cancellationToken: cancellationToken
         );
@@ -100,6 +102,7 @@ internal sealed class ChatCompletionService(
         string chatId,
         string streamId,
         string modelId,
+        string correlationId,
         IReadOnlyList<ChatCompletionMessage> messages,
         CancellationToken cancellationToken)
     {
@@ -109,6 +112,7 @@ internal sealed class ChatCompletionService(
             streamId: streamId,
             modelId: modelId,
             messages: messages,
+            correlationId: correlationId,
             toolContext: new ToolContext(userId),
             cancellationToken: cancellationToken
         );
@@ -119,6 +123,7 @@ internal sealed class ChatCompletionService(
         string chatId,
         string streamId,
         string modelId,
+        string correlationId,
         IReadOnlyList<ChatCompletionMessage> messages,
         ToolContext? toolContext,
         CancellationToken cancellationToken
@@ -162,7 +167,7 @@ internal sealed class ChatCompletionService(
         }
         finally
         {
-            await ReleaseChatLockAsync(chatId);
+            await ReleaseChatLockAsync(chatId, correlationId);
         }
     }
 
@@ -495,11 +500,16 @@ internal sealed class ChatCompletionService(
         }
     }
 
-    private async Task ReleaseChatLockAsync(string chatId)
+    private async Task ReleaseChatLockAsync(string chatId, string ownerId)
     {
         try
         {
-            await chatLockService.ReleaseLockAsync(chatId, CancellationToken.None);
+            await chatLockService.ReleaseLockAsync
+            (
+                chatId: chatId,
+                ownerId: ownerId,
+                cancellationToken: CancellationToken.None
+            );
         }
         catch (RedisException exception)
         {

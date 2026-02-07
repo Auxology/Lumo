@@ -104,7 +104,12 @@ internal sealed class RemixChatHandler(
             }
         }
 
-        bool lockAcquired = await chatLockService.TryAcquireLockAsync(newChat.Id.Value, cancellationToken);
+        bool lockAcquired = await chatLockService.TryAcquireLockAsync
+        (
+            chatId: newChat.Id.Value,
+            ownerId: requestContext.CorrelationId,
+            cancellationToken: cancellationToken
+        );
 
         if (!lockAcquired)
             return ChatOperationFaults.GenerationInProgress;
@@ -147,7 +152,12 @@ internal sealed class RemixChatHandler(
         }
         catch
         {
-            await chatLockService.ReleaseLockAsync(newChat.Id.Value, cancellationToken);
+            await chatLockService.ReleaseLockAsync
+            (
+                chatId: newChat.Id.Value,
+                ownerId: requestContext.CorrelationId,
+                cancellationToken: cancellationToken
+            );
             throw;
         }
     }

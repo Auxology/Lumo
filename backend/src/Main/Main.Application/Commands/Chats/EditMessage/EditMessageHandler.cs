@@ -63,7 +63,12 @@ internal sealed class EditMessageHandler(
         if (targetMessage is null)
             return MessageOperationFaults.NotFound;
 
-        bool lockAcquired = await chatLockService.TryAcquireLockAsync(chat.Id.Value, cancellationToken);
+        bool lockAcquired = await chatLockService.TryAcquireLockAsync
+        (
+            chatId: chat.Id.Value,
+            ownerId: requestContext.CorrelationId,
+            cancellationToken: cancellationToken
+        );
 
         if (!lockAcquired)
             return ChatOperationFaults.GenerationInProgress;
@@ -77,7 +82,12 @@ internal sealed class EditMessageHandler(
 
         if (editOutcome.IsFailure)
         {
-            await chatLockService.ReleaseLockAsync(chat.Id.Value, cancellationToken);
+            await chatLockService.ReleaseLockAsync
+            (
+                chatId: chat.Id.Value,
+                ownerId: requestContext.CorrelationId,
+                cancellationToken: cancellationToken
+            );
             return editOutcome.Fault;
         }
 
@@ -114,7 +124,12 @@ internal sealed class EditMessageHandler(
         }
         catch
         {
-            await chatLockService.ReleaseLockAsync(chat.Id.Value, cancellationToken);
+            await chatLockService.ReleaseLockAsync
+            (
+                chatId: chat.Id.Value,
+                ownerId: requestContext.CorrelationId,
+                cancellationToken: cancellationToken
+            );
             throw;
         }
     }
