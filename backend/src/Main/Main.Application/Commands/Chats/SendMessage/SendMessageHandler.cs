@@ -49,11 +49,6 @@ internal sealed class SendMessageHandler(
         if (chat is null)
             return ChatOperationFaults.NotFound;
 
-        bool isGenerating = await chatLockService.IsGeneratingAsync(chat.Id.Value, cancellationToken);
-
-        if (isGenerating)
-            return ChatOperationFaults.GenerationInProgress;
-
         bool lockAcquired = await chatLockService.TryAcquireLockAsync(chat.Id.Value, cancellationToken);
 
         if (!lockAcquired)

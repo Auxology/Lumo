@@ -65,32 +65,43 @@ internal sealed class StartEphemeralChatHandler(
             CreatedAt = dateTimeProvider.UtcNow
         };
 
-        await chatLockService.TryAcquireLockAsync(ephemeralChatId.Value, cancellationToken);
+        bool lockAcquired = await chatLockService.TryAcquireLockAsync(ephemeralChatId.Value, cancellationToken);
+        
+        if (!lockAcquired)
+            return ChatOperationFaults.GenerationInProgress;
 
-        StreamId streamId = idGenerator.NewStreamId();
-
-        EphemeralChatStarted ephemeralChatStarted = new()
+        try
         {
-            EventId = Guid.NewGuid(),
-            OccurredAt = dateTimeProvider.UtcNow,
-            CorrelationId = Guid.Parse(requestContext.CorrelationId),
-            EphemeralChatId = ephemeralChat.EphemeralChatId,
-            UserId = ephemeralChat.UserId,
-            StreamId = streamId.Value,
-            ModelId = ephemeralChat.ModelId,
-            InitialMessage = ephemeralMessage.MessageContent
-        };
+            StreamId streamId = idGenerator.NewStreamId();
 
-        await ephemeralChatStore.SaveAsync(ephemeralChat, cancellationToken);
-        await messageBus.PublishAsync(ephemeralChatStarted, cancellationToken);
-        await dbContext.SaveChangesAsync(cancellationToken);
+            EphemeralChatStarted ephemeralChatStarted = new()
+            {
+                EventId = Guid.NewGuid(),
+                OccurredAt = dateTimeProvider.UtcNow,
+                CorrelationId = Guid.Parse(requestContext.CorrelationId),
+                EphemeralChatId = ephemeralChat.EphemeralChatId,
+                UserId = ephemeralChat.UserId,
+                StreamId = streamId.Value,
+                ModelId = ephemeralChat.ModelId,
+                InitialMessage = ephemeralMessage.MessageContent
+            };
 
-        StartEphemeralChatResponse response = new
-        (
-            EphemeralChatId: ephemeralChatId.Value,
-            StreamId: streamId.Value
-        );
+            await ephemeralChatStore.SaveAsync(ephemeralChat, cancellationToken);
+            await messageBus.PublishAsync(ephemeralChatStarted, cancellationToken);
+            await dbContext.SaveChangesAsync(cancellationToken);
 
-        return response;
+            StartEphemeralChatResponse response = new
+            (
+                EphemeralChatId: ephemeralChatId.Value,
+                StreamId: streamId.Value
+            );
+
+            return response;
+        }
+        catch
+        {
+            await chatLockService.ReleaseLockAsync(ephemeralChatId.Value, cancellationToken);
+            throw;
+        }
     }
 }

@@ -43,11 +43,6 @@ internal sealed class SendEphemeralMessageHandler(
         if (ephemeralChat is null || ephemeralChat.UserId != userId)
             return EphemeralChatOperationFaults.NotFound;
 
-        bool isGenerating = await chatLockService.IsGeneratingAsync(ephemeralChat.EphemeralChatId, cancellationToken);
-
-        if (isGenerating)
-            return EphemeralChatOperationFaults.GenerationInProgress;
-
         bool lockAcquired = await chatLockService.TryAcquireLockAsync(ephemeralChat.EphemeralChatId, cancellationToken);
 
         if (!lockAcquired)

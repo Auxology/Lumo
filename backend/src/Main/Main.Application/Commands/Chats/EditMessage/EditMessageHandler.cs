@@ -63,11 +63,6 @@ internal sealed class EditMessageHandler(
         if (targetMessage is null)
             return MessageOperationFaults.NotFound;
 
-        bool isGenerating = await chatLockService.IsGeneratingAsync(chat.Id.Value, cancellationToken);
-
-        if (isGenerating)
-            return ChatOperationFaults.GenerationInProgress;
-
         bool lockAcquired = await chatLockService.TryAcquireLockAsync(chat.Id.Value, cancellationToken);
 
         if (!lockAcquired)
