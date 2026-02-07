@@ -213,6 +213,7 @@ public static class DependencyInjection
         services.AddScoped<IMemoryStore, MemoryStore>();
         services.AddScoped<ToolExecutor>();
 
+        services.AddScoped<ITitleGenerator, TitleGenerator>();
         services.AddScoped<IChatCompletionService, ChatCompletionService>();
 
         services.AddSingleton<IStreamReader, StreamReader>();
