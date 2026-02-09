@@ -3,8 +3,6 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 
-using SharedKernel;
-
 namespace SharedKernel.Api.Infrastructure;
 
 public static class CustomResults

@@ -7,7 +7,6 @@ using Microsoft.Extensions.Options;
 using Npgsql;
 
 using SharedKernel.Application.Data;
-using SharedKernel.Infrastructure.Data;
 
 namespace Auth.Infrastructure.Data;
 

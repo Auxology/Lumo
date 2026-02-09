@@ -1,6 +1,6 @@
 namespace Main.Application.Abstractions.AI;
 
-public interface IChatCompletionService
+public interface INativeChatCompletionService
 {
     Task StreamCompletionAsync
     (

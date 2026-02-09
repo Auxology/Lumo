@@ -5,7 +5,6 @@ using Amazon.SimpleEmailV2;
 using MassTransit;
 
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
 
 using Notifications.Api.Consumers;
 using Notifications.Api.Data;

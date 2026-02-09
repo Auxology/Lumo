@@ -1,6 +1,4 @@
-using Auth.Application.Abstractions.Authentication;
 using Auth.Application.Abstractions.Data;
-using Auth.Application.Abstractions.Generators;
 using Auth.Application.Faults;
 using Auth.Domain.Aggregates;
 

@@ -15,7 +15,7 @@ namespace Main.Infrastructure.Consumers;
 
 internal sealed class EphemeralChatStartedConsumer(
     IEphemeralChatStore ephemeralChatStore,
-    IChatCompletionService chatCompletionService,
+    INativeChatCompletionService nativeChatCompletionService,
     ILogger<EphemeralChatStartedConsumer> logger) : IConsumer<EphemeralChatStarted>
 {
     public async Task Consume(ConsumeContext<EphemeralChatStarted> context)
@@ -56,7 +56,7 @@ internal sealed class EphemeralChatStartedConsumer(
             ))
             .ToList();
 
-        await chatCompletionService.StreamCompletionAsync
+        await nativeChatCompletionService.StreamCompletionAsync
         (
             chatId: ephemeralChatId,
             streamId: streamId.Value,

@@ -1,5 +1,3 @@
-using Main.Application.Queries.Chats.GetMessages;
-
 namespace Main.Api.Endpoints.Chats.GetMessages;
 
 internal sealed record MessageDto

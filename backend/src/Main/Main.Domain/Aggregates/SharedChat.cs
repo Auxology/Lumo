@@ -1,7 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 
 using Main.Domain.Constants;
-using Main.Domain.Entities;
 using Main.Domain.Faults;
 using Main.Domain.ValueObjects;
 

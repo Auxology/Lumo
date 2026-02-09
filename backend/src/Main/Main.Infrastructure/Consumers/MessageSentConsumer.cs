@@ -16,7 +16,7 @@ namespace Main.Infrastructure.Consumers;
 
 internal sealed class MessageSentConsumer(
     IMainDbContext dbContext,
-    IChatCompletionService chatCompletionService,
+    INativeChatCompletionService nativeChatCompletionService,
     ILogger<MessageSentConsumer> logger) : IConsumer<MessageSent>
 {
     public async Task Consume(ConsumeContext<MessageSent> context)
@@ -60,7 +60,7 @@ internal sealed class MessageSentConsumer(
             ))
             .ToListAsync(cancellationToken);
 
-        await chatCompletionService.StreamCompletionAdvancedAsync
+        await nativeChatCompletionService.StreamCompletionAdvancedAsync
         (
             chatId: chatId.Value,
             streamId: streamId.Value,

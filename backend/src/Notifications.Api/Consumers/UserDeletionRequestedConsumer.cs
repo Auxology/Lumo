@@ -4,7 +4,6 @@ using Contracts.IntegrationEvents.Auth;
 
 using MassTransit;
 
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using Notifications.Api.Models;

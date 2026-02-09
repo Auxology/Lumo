@@ -28,8 +28,6 @@ using SharedKernel.Infrastructure.Messaging;
 using SharedKernel.Infrastructure.Options;
 
 using TickerQ.DependencyInjection;
-using TickerQ.EntityFrameworkCore.Customizer;
-using TickerQ.EntityFrameworkCore.DependencyInjection;
 
 namespace Auth.Infrastructure;
 

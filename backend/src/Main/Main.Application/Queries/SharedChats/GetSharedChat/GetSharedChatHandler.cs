@@ -3,7 +3,6 @@ using System.Data.Common;
 using Dapper;
 
 using Main.Application.Faults;
-using Main.Domain.Faults;
 using Main.Domain.ValueObjects;
 
 using Mediator;

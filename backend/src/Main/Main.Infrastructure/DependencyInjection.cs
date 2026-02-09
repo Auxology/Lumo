@@ -9,7 +9,7 @@ using Main.Application.Abstractions.Instructions;
 using Main.Application.Abstractions.Memory;
 using Main.Application.Abstractions.Stream;
 using Main.Infrastructure.AI;
-using Main.Infrastructure.AI.Tools;
+using Main.Infrastructure.AI.Plugins;
 using Main.Infrastructure.Consumers;
 using Main.Infrastructure.Data;
 using Main.Infrastructure.Ephemeral;
@@ -21,11 +21,11 @@ using Main.Infrastructure.Stream;
 
 using MassTransit;
 
-using Microsoft.AspNetCore.Server.IIS;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.SemanticKernel;
 
 using OpenAI;
 using OpenAI.Embeddings;
@@ -33,7 +33,6 @@ using OpenAI.Embeddings;
 using SharedKernel.Application.Data;
 using SharedKernel.Application.Messaging;
 using SharedKernel.Infrastructure;
-using SharedKernel.Infrastructure.Data;
 using SharedKernel.Infrastructure.Messaging;
 using SharedKernel.Infrastructure.Options;
 
@@ -211,10 +210,22 @@ public static class DependencyInjection
 
         services.AddScoped<IInstructionStore, InstructionStore>();
         services.AddScoped<IMemoryStore, MemoryStore>();
-        services.AddScoped<ToolExecutor>();
+
+        services.AddScoped<PluginUserContext>();
+        services.AddScoped<MemoryPlugin>();
+
+        services.AddScoped<Kernel>(sp =>
+        {
+            var memoryPlugin = sp.GetRequiredService<MemoryPlugin>();
+
+            var builder = Kernel.CreateBuilder();
+            builder.Plugins.AddFromObject(memoryPlugin, "memory");
+
+            return builder.Build();
+        });
 
         services.AddScoped<ITitleGenerator, TitleGenerator>();
-        services.AddScoped<IChatCompletionService, ChatCompletionService>();
+        services.AddScoped<INativeChatCompletionService, NativeChatCompletionService>();
 
         services.AddSingleton<IStreamReader, StreamReader>();
 

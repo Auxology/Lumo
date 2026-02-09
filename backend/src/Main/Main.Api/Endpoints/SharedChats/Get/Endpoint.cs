@@ -2,9 +2,9 @@ using FastEndpoints;
 
 using Main.Application.Queries.SharedChats.GetSharedChat;
 
-using SharedKernel.Api.Constants;
-
 using Mediator;
+
+using SharedKernel.Api.Constants;
 
 namespace Main.Api.Endpoints.SharedChats.Get;
 

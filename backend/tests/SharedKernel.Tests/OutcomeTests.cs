@@ -1,7 +1,5 @@
 using FluentAssertions;
 
-using SharedKernel;
-
 namespace SharedKernel.Tests;
 
 public sealed class OutcomeTests

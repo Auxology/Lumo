@@ -5,8 +5,6 @@ using Main.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-using RabbitMQ.Client;
-
 using SharedKernel.Infrastructure.Data;
 
 namespace Main.Infrastructure.Data.Configuration;
