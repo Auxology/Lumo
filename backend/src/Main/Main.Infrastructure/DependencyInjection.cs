@@ -10,6 +10,7 @@ using Main.Application.Abstractions.Memory;
 using Main.Application.Abstractions.Stream;
 using Main.Infrastructure.AI;
 using Main.Infrastructure.AI.Plugins;
+using Main.Infrastructure.AI.Search;
 using Main.Infrastructure.Consumers;
 using Main.Infrastructure.Data;
 using Main.Infrastructure.Ephemeral;
@@ -175,6 +176,16 @@ public static class DependencyInjection
 
         OpenRouterOptions openRouterOptions = new();
         configuration.GetSection(OpenRouterOptions.SectionName).Bind(openRouterOptions);
+
+        services.AddOptions<TavilyOptions>()
+            .Bind(configuration.GetSection(TavilyOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        TavilyOptions tavilyOptions = new();
+        configuration.GetSection(TavilyOptions.SectionName).Bind(tavilyOptions);
+
+        services.AddHttpClient<IWebSearchService, TavilySearchService>();
 
         services.AddSingleton<OpenAIClient>(_ =>
         {
