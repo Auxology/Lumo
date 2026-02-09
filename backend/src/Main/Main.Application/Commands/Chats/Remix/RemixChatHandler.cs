@@ -132,7 +132,8 @@ internal sealed class RemixChatHandler(
                 UserId = newChat.UserId,
                 StreamId = streamId.Value,
                 ModelId = newChat.ModelId,
-                Message = latestUserMessage
+                Message = latestUserMessage,
+                WebSearchEnabled = request.WebSearchEnabled
             };
 
             await dbContext.Chats.AddAsync(newChat, cancellationToken);

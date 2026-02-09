@@ -44,7 +44,8 @@ internal sealed class Endpoint : BaseEndpoint<Request, Response>
         (
             ChatId: endpointRequest.ChatId,
             MessageId: endpointRequest.MessageId,
-            NewContent: endpointRequest.NewContent
+            NewContent: endpointRequest.NewContent,
+            WebSearchEnabled: endpointRequest.WebSearchEnabled
         );
 
         await SendOutcomeAsync

@@ -5,5 +5,6 @@ namespace Main.Application.Commands.Chats.SendMessage;
 public sealed record SendMessageCommand
 (
     string ChatId,
-    string Message
+    string Message,
+    bool WebSearchEnabled
 ) : ICommand<SendMessageResponse>;

@@ -38,7 +38,8 @@ internal sealed class Endpoint : BaseEndpoint<Request, Response>
         StartChatCommand command = new
         (
             Message: endpointRequest.Message,
-            ModelId: endpointRequest.ModelId
+            ModelId: endpointRequest.ModelId,
+            WebSearchEnabled: endpointRequest.WebSearchEnabled
         );
 
         await SendOutcomeAsync

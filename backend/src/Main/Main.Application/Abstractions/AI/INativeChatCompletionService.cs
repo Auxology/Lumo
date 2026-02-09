@@ -19,6 +19,7 @@ public interface INativeChatCompletionService
         string streamId,
         string modelId,
         string correlationId,
+        bool webSearchEnabled,
         IReadOnlyList<ChatCompletionMessage> messages,
         CancellationToken cancellationToken
     );

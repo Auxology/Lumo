@@ -104,7 +104,8 @@ internal sealed class EditMessageHandler(
                 UserId = user.UserId,
                 StreamId = streamId.Value,
                 ModelId = chat.ModelId,
-                Message = request.NewContent
+                Message = request.NewContent,
+                WebSearchEnabled = request.WebSearchEnabled
             };
 
             await messageBus.PublishAsync(messageSent, cancellationToken);

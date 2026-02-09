@@ -39,7 +39,8 @@ internal sealed class Endpoint : BaseEndpoint<Request, Response>
         RemixChatCommand command = new
         (
             ChatId: endpointRequest.ChatId,
-            NewModelId: endpointRequest.NewModelId
+            NewModelId: endpointRequest.NewModelId,
+            WebSearchEnabled: endpointRequest.WebSearchEnabled
         );
 
         await SendOutcomeAsync

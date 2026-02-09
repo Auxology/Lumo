@@ -224,13 +224,16 @@ public static class DependencyInjection
 
         services.AddScoped<PluginUserContext>();
         services.AddScoped<MemoryPlugin>();
+        services.AddScoped<WebSearchPlugin>();
 
         services.AddScoped<Kernel>(sp =>
         {
             var memoryPlugin = sp.GetRequiredService<MemoryPlugin>();
+            var webSearchPlugin = sp.GetRequiredService<WebSearchPlugin>();
 
             var builder = Kernel.CreateBuilder();
             builder.Plugins.AddFromObject(memoryPlugin, "memory");
+            builder.Plugins.AddFromObject(webSearchPlugin, "search");
 
             return builder.Build();
         });

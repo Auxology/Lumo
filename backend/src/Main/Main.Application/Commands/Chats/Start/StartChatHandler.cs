@@ -98,7 +98,8 @@ internal sealed class StartChatHandler(
                 UserId = user.UserId,
                 StreamId = streamId.Value,
                 ModelId = modelId,
-                InitialMessage = request.Message
+                InitialMessage = request.Message,
+                WebSearchEnabled = request.WebSearchEnabled
             };
 
             await dbContext.Chats.AddAsync(chat, cancellationToken);

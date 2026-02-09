@@ -4,5 +4,6 @@ internal sealed record Request
 (
     string ChatId,
     string MessageId,
-    string NewContent
+    string NewContent,
+    bool WebSearchEnabled = false
 );

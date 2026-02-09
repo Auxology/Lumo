@@ -17,4 +17,6 @@ public sealed record MessageSent
     public required string ModelId { get; init; }
 
     public required string Message { get; init; }
+
+    public required bool WebSearchEnabled { get; init; }
 };

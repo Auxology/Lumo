@@ -42,7 +42,8 @@ internal sealed class Endpoint : BaseEndpoint<Request, Response>
         SendMessageCommand command = new
         (
             ChatId: endpointRequest.ChatId,
-            Message: endpointRequest.Message
+            Message: endpointRequest.Message,
+            WebSearchEnabled: endpointRequest.WebSearchEnabled
         );
 
         await SendOutcomeAsync

@@ -17,4 +17,6 @@ public sealed record ChatStarted
     public required string ModelId { get; init; }
 
     public required string InitialMessage { get; init; }
+
+    public required bool WebSearchEnabled { get; init; }
 }

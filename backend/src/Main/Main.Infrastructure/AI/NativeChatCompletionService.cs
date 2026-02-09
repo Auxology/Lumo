@@ -53,12 +53,22 @@ internal sealed class NativeChatCompletionService(
             messages: messages,
             correlationId: correlationId,
             userId: null,
+            webSearchEnabled: false,
             cancellationToken: cancellationToken
         );
     }
 
-    public Task StreamCompletionAdvancedAsync(Guid userId, string chatId, string streamId, string modelId, string correlationId,
-        IReadOnlyList<ChatCompletionMessage> messages, CancellationToken cancellationToken)
+    public Task StreamCompletionAdvancedAsync
+    (
+        Guid userId,
+        string chatId,
+        string streamId,
+        string modelId,
+        string correlationId,
+        bool webSearchEnabled,
+        IReadOnlyList<ChatCompletionMessage> messages,
+        CancellationToken cancellationToken
+    )
     {
         return ExecuteStreamingAsync
         (
@@ -68,6 +78,7 @@ internal sealed class NativeChatCompletionService(
             messages: messages,
             correlationId: correlationId,
             userId: userId,
+            webSearchEnabled: webSearchEnabled,
             cancellationToken: cancellationToken
         );
     }
@@ -78,6 +89,7 @@ internal sealed class NativeChatCompletionService(
         string streamId,
         string modelId,
         string correlationId,
+        bool webSearchEnabled,
         IReadOnlyList<ChatCompletionMessage> messages,
         Guid? userId,
         CancellationToken cancellationToken
@@ -99,6 +111,7 @@ internal sealed class NativeChatCompletionService(
                     modelId: modelId,
                     messages: messages,
                     userId: userId.Value,
+                    webSearchEnabled: webSearchEnabled,
                     messageContent: messageContent,
                     cancellationToken: cancellationToken
                 );
@@ -139,6 +152,7 @@ internal sealed class NativeChatCompletionService(
     (
         string streamId,
         string modelId,
+        bool webSearchEnabled,
         IReadOnlyList<ChatCompletionMessage> messages,
         Guid userId,
         StringBuilder messageContent,
@@ -155,10 +169,18 @@ internal sealed class NativeChatCompletionService(
 
         string openRouterId = modelRegistry.GetOpenRouterModelId(modelId);
 
+        List<KernelFunction> functions = kernel.Plugins
+            .GetFunctionsMetadata()
+            .Where(f => webSearchEnabled || f.PluginName != "search")
+            .Select(f => kernel.Plugins.GetFunction(f.PluginName, f.Name))
+            .ToList();
+
         OpenAIPromptExecutionSettings settings = new()
         {
             ModelId = openRouterId,
             FunctionChoiceBehavior = FunctionChoiceBehavior.Auto(
+                functions: functions,
+                autoInvoke: true,
                 options: new FunctionChoiceBehaviorOptions
                 {
                     AllowConcurrentInvocation = false,
