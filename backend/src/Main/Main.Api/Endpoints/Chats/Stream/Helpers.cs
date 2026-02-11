@@ -11,6 +11,7 @@ internal static class Helpers
         return message.Type switch
         {
             StreamMessageType.Chunk => FormatTextChunk(message.Content),
+            StreamMessageType.ToolCall => FormatToolCallMessage(message.Content),
             StreamMessageType.Status when message.Content == "done" => FinishMessage,
             StreamMessageType.Status when message.Content == "failed" => FormatErrorMessage("AI Generation Failed"),
             _ => string.Empty
@@ -21,6 +22,12 @@ internal static class Helpers
     {
         string escaped = JsonSerializer.Serialize(text);
         return $"0:{escaped}\n";
+    }
+
+    private static string FormatToolCallMessage(string toolName)
+    {
+        string json = JsonSerializer.Serialize(new { type = "tool_call", tool = toolName });
+        return $"2:[{json}]\n";
     }
 
     private const string FinishMessage = "d:{\"finishReason\":\"stop\"}\n";

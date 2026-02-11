@@ -66,8 +66,9 @@ internal sealed class EphemeralChatStartedConsumer(
             cancellationToken: cancellationToken
         );
 
-        logger.LogInformation(
-            "Started streaming completion for ephemeral chat in {EventType}: {EventId}, CorrelationId: {CorrelationId}, EphemeralChatId: {EphemeralChatId}, StreamId: {StreamId}",
-            nameof(EphemeralChatStarted), message.EventId, message.CorrelationId, ephemeralChatId, streamId.Value);
+        if (logger.IsEnabled(LogLevel.Information))
+            logger.LogInformation(
+                "Started streaming completion for ephemeral chat in {EventType}: {EventId}, CorrelationId: {CorrelationId}, EphemeralChatId: {EphemeralChatId}, StreamId: {StreamId}",
+                nameof(EphemeralChatStarted), message.EventId, message.CorrelationId, ephemeralChatId, streamId.Value);
     }
 }

@@ -28,7 +28,8 @@ internal sealed class ChatAccessValidator(
 
     public async Task<Outcome> ValidateAccessAsync(string chatId, CancellationToken cancellationToken)
     {
-        logger.LogDebug("Validating access to chat {ChatId} for user {UserId}", chatId, userContext.UserId);
+        if (logger.IsEnabled(LogLevel.Debug))
+            logger.LogDebug("Validating access to chat {ChatId} for user {UserId}", chatId, userContext.UserId);
 
         Guid userId = userContext.UserId;
         Outcome<ChatId> chatIdOutcome = ChatId.From(chatId);
@@ -49,7 +50,8 @@ internal sealed class ChatAccessValidator(
         if (!hasAccess)
             return ChatOperationFaults.NotFound;
 
-        logger.LogDebug("Access to chat {ChatId} for user {UserId} validated successfully", chatId, userContext.UserId);
+        if (logger.IsEnabled(LogLevel.Debug))
+            logger.LogDebug("Access to chat {ChatId} for user {UserId} validated successfully", chatId, userContext.UserId);
 
         return Outcome.Success();
     }

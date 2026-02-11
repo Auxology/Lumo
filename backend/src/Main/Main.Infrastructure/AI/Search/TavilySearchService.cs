@@ -55,8 +55,9 @@ internal sealed class TavilySearchService(
             ))
             .ToList();
 
-        logger.LogInformation("Tavily search returned {Count} results for query: {Query}",
-            results.Count, query);
+        if (logger.IsEnabled(LogLevel.Information))
+            logger.LogInformation("Tavily search returned {Count} results for query: {Query}",
+                results.Count, query);
 
         return new WebSearchResponse(results);
     }

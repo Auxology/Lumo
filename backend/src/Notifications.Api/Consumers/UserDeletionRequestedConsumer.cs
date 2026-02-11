@@ -40,8 +40,9 @@ internal sealed class UserDeletionRequestedConsumer(
             cancellationToken: cancellationToken
         );
 
-        logger.LogInformation(
-            "Consumed {EventType}: {EventId}, CorrelationId: {CorrelationId}, OccurredAt: {OccurredAt}, UserId: {UserId}",
-            nameof(UserDeletionRequested), message.EventId, message.CorrelationId, message.OccurredAt, message.UserId);
+        if (logger.IsEnabled(LogLevel.Information))
+            logger.LogInformation(
+                "Consumed {EventType}: {EventId}, CorrelationId: {CorrelationId}, OccurredAt: {OccurredAt}, UserId: {UserId}",
+                nameof(UserDeletionRequested), message.EventId, message.CorrelationId, message.OccurredAt, message.UserId);
     }
 }

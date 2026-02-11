@@ -34,9 +34,10 @@ internal sealed class MemoryPlugin
     {
         Guid userId = userContext.UserId;
 
-        logger.LogInformation(
-            "SaveMemoryAsync called for user {UserId}, content length: {ContentLength}, category: {Category}",
-            userId, content.Length, category);
+        if (logger.IsEnabled(LogLevel.Information))
+            logger.LogInformation(
+                "SaveMemoryAsync called for user {UserId}, content length: {ContentLength}, category: {Category}",
+                userId, content.Length, category);
 
         try
         {
@@ -54,7 +55,8 @@ internal sealed class MemoryPlugin
                 cancellationToken: cancellationToken
             );
 
-            logger.LogInformation("Memory saved successfully: {MemoryId} for user {UserId}", memoryId, userId);
+            if (logger.IsEnabled(LogLevel.Information))
+                logger.LogInformation("Memory saved successfully: {MemoryId} for user {UserId}", memoryId, userId);
             return $"Memory saved with ID: {memoryId}";
         }
         catch (ArgumentException exception)

@@ -36,6 +36,7 @@ internal sealed class NativeChatCompletionService(
     IMemoryStore memoryStore,
     Kernel kernel,
     PluginUserContext pluginUserContext,
+    PluginStreamContext pluginStreamContext,
     IDateTimeProvider dateTimeProvider,
     ILogger<NativeChatCompletionService> logger
 ) : INativeChatCompletionService
@@ -168,6 +169,8 @@ internal sealed class NativeChatCompletionService(
         );
 
         string openRouterId = modelRegistry.GetOpenRouterModelId(modelId);
+
+        pluginStreamContext.StreamId = streamId;
 
         List<KernelFunction> functions = kernel.Plugins
             .GetFunctionsMetadata()

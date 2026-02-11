@@ -35,11 +35,13 @@ internal sealed class ChatLockService(
 
             if (acquired)
             {
-                logger.LogInformation("Acquired lock for chatId: {ChatId}", chatId);
+                if (logger.IsEnabled(LogLevel.Information))
+                    logger.LogInformation("Acquired lock for chatId: {ChatId}", chatId);
             }
             else
             {
-                logger.LogInformation("Failed to acquire lock for chatId: {ChatId}", chatId);
+                if (logger.IsEnabled(LogLevel.Information))
+                    logger.LogInformation("Failed to acquire lock for chatId: {ChatId}", chatId);
             }
 
             return acquired;
@@ -68,7 +70,10 @@ internal sealed class ChatLockService(
             bool committed = await transaction.ExecuteAsync();
 
             if (committed)
-                logger.LogInformation("Released lock for chatId: {ChatId}", chatId);
+            {
+                if (logger.IsEnabled(LogLevel.Information))
+                    logger.LogInformation("Released lock for chatId: {ChatId}", chatId);
+            }
             else
                 logger.LogWarning("Lock not owned by this request for chatId: {ChatId}", chatId);
         }

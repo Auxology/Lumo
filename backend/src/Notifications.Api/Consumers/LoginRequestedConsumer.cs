@@ -41,8 +41,9 @@ internal sealed class LoginRequestedConsumer(
             cancellationToken: cancellationToken
         );
 
-        logger.LogInformation(
-            "Consumed {EventType}: {EventId}, CorrelationId: {CorrelationId}, OccurredAt: {OccurredAt}, Email: {Email}",
-            nameof(LoginRequested), message.EventId, message.CorrelationId, message.OccurredAt, message.EmailAddress);
+        if (logger.IsEnabled(LogLevel.Information))
+            logger.LogInformation(
+                "Consumed {EventType}: {EventId}, CorrelationId: {CorrelationId}, OccurredAt: {OccurredAt}, Email: {Email}",
+                nameof(LoginRequested), message.EventId, message.CorrelationId, message.OccurredAt, message.EmailAddress);
     }
 }

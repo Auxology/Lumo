@@ -66,8 +66,9 @@ internal sealed class EphemeralMessageSentConsumer(
             cancellationToken: cancellationToken
         );
 
-        logger.LogInformation(
-            "Consumed {EventType}: {EventId}, CorrelationId: {CorrelationId}, OccurredAt: {OccurredAt}, EphemeralChatId: {EphemeralChatId}",
-            nameof(EphemeralMessageSent), message.EventId, message.CorrelationId, message.OccurredAt, ephemeralChatId);
+        if (logger.IsEnabled(LogLevel.Information))
+            logger.LogInformation(
+                "Consumed {EventType}: {EventId}, CorrelationId: {CorrelationId}, OccurredAt: {OccurredAt}, EphemeralChatId: {EphemeralChatId}",
+                nameof(EphemeralMessageSent), message.EventId, message.CorrelationId, message.OccurredAt, ephemeralChatId);
     }
 }

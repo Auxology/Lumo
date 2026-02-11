@@ -1,6 +1,6 @@
 namespace Main.Infrastructure.AI.Plugins;
 
-public interface PluginStreamContext
+internal sealed class PluginStreamContext
 {
-    
+    public string? StreamId { get; set; }
 }

@@ -8,4 +8,6 @@ public interface IStreamPublisher
     Task SetStreamExpirationAsync(string streamId, TimeSpan expiration, CancellationToken cancellationToken);
 
     Task PublishChunkAsync(string streamId, string messageContent, CancellationToken cancellationToken);
+
+    Task PublishToolCallAsync(string streamId, string toolName, CancellationToken cancellationToken);
 }

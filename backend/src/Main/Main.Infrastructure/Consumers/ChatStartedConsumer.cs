@@ -72,8 +72,9 @@ internal sealed class ChatStartedConsumer(
             cancellationToken: cancellationToken
         );
 
-        logger.LogInformation(
-            "Consumed {EventType}: {EventId}, CorrelationId: {CorrelationId}, OccurredAt: {OccurredAt}, ChatId: {ChatId}",
-            nameof(ChatStarted), message.EventId, message.CorrelationId, message.OccurredAt, message.ChatId);
+        if (logger.IsEnabled(LogLevel.Information))
+            logger.LogInformation(
+                "Consumed {EventType}: {EventId}, CorrelationId: {CorrelationId}, OccurredAt: {OccurredAt}, ChatId: {ChatId}",
+                nameof(ChatStarted), message.EventId, message.CorrelationId, message.OccurredAt, message.ChatId);
     }
 }

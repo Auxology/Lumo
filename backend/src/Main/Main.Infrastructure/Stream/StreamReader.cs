@@ -134,6 +134,12 @@ internal sealed class StreamReader(IConnectionMultiplexer connectionMultiplexer)
                 (string?)entry["status"] ?? string.Empty,
                 ts
             ),
+            "tool_call" => new StreamMessage
+            (
+                StreamMessageType.ToolCall,
+                (string?)entry["tool_name"] ?? string.Empty,
+                ts
+            ),
             _ => null
         };
     }

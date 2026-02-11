@@ -33,7 +33,8 @@ internal sealed class WebSearchPlugin
         CancellationToken cancellationToken = default
     )
     {
-        logger.LogInformation("WebSearchPlugin.SearchAsync called: Query={Query}, Topic={Topic}", query, topic);
+        if (logger.IsEnabled(LogLevel.Information))
+            logger.LogInformation("WebSearchPlugin.SearchAsync called: Query={Query}, Topic={Topic}", query, topic);
 
         try
         {

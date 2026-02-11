@@ -9,6 +9,7 @@ using Main.Application.Abstractions.Instructions;
 using Main.Application.Abstractions.Memory;
 using Main.Application.Abstractions.Stream;
 using Main.Infrastructure.AI;
+using Main.Infrastructure.AI.Filters;
 using Main.Infrastructure.AI.Plugins;
 using Main.Infrastructure.AI.Search;
 using Main.Infrastructure.Consumers;
@@ -223,17 +224,22 @@ public static class DependencyInjection
         services.AddScoped<IMemoryStore, MemoryStore>();
 
         services.AddScoped<PluginUserContext>();
+        services.AddScoped<PluginStreamContext>();
         services.AddScoped<MemoryPlugin>();
         services.AddScoped<WebSearchPlugin>();
+        services.AddScoped<ToolCallStreamFilter>();
 
         services.AddScoped<Kernel>(sp =>
         {
-            var memoryPlugin = sp.GetRequiredService<MemoryPlugin>();
-            var webSearchPlugin = sp.GetRequiredService<WebSearchPlugin>();
+            MemoryPlugin memoryPlugin = sp.GetRequiredService<MemoryPlugin>();
+            WebSearchPlugin webSearchPlugin = sp.GetRequiredService<WebSearchPlugin>();
+            ToolCallStreamFilter toolCallStreamFilter = sp.GetRequiredService<ToolCallStreamFilter>();
 
-            var builder = Kernel.CreateBuilder();
+            IKernelBuilder builder = Kernel.CreateBuilder();
             builder.Plugins.AddFromObject(memoryPlugin, "memory");
             builder.Plugins.AddFromObject(webSearchPlugin, "search");
+
+            builder.Services.AddSingleton<IAutoFunctionInvocationFilter>(toolCallStreamFilter);
 
             return builder.Build();
         });
