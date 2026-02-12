@@ -9,5 +9,7 @@ public interface IStreamPublisher
 
     Task PublishChunkAsync(string streamId, string messageContent, CancellationToken cancellationToken);
 
-    Task PublishToolCallAsync(string streamId, string toolName, CancellationToken cancellationToken);
+    Task PublishToolCallAsync(string streamId, string toolName, string? query, CancellationToken cancellationToken);
+
+    Task PublishToolCallResultAsync(string streamId, string toolName, string sourcesJson, CancellationToken cancellationToken);
 }
