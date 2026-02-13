@@ -139,7 +139,19 @@ internal sealed class StreamReader(IConnectionMultiplexer connectionMultiplexer)
                 StreamMessageType.ToolCall,
                 (string?)entry["tool_name"] ?? string.Empty,
                 ts
-            ),
+            )
+            {
+                Query = (string?)entry["query"]
+            },
+            "tool_result" => new StreamMessage
+            (
+                StreamMessageType.ToolCallResult,
+                (string?)entry["tool_name"] ?? string.Empty,
+                ts
+            )
+            {
+                Sources = (string?)entry["sources"]
+            },
             _ => null
         };
     }

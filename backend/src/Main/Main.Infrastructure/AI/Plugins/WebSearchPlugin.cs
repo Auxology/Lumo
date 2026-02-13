@@ -12,6 +12,7 @@ namespace Main.Infrastructure.AI.Plugins;
 internal sealed class WebSearchPlugin
 (
     IWebSearchService webSearchService,
+    PluginStreamContext pluginStreamContext,
     ILogger<WebSearchPlugin> logger
 )
 {
@@ -42,6 +43,14 @@ internal sealed class WebSearchPlugin
 
             if (response.Results.Count == 0)
                 return "No search results found.";
+
+            pluginStreamContext.LastSearchSources = response.Results
+                .Select(r => new ToolCallSource
+                (
+                    Title: r.Title,
+                    Url: r.Url
+                ))
+                .ToList();
 
             StringBuilder stringBuilder = new();
             stringBuilder.AppendLine(CultureInfo.InvariantCulture, $"Found {response.Results.Count} results:");
