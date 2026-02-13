@@ -21,7 +21,7 @@ internal sealed class SessionConfiguration : IEntityTypeConfiguration<Session>
                 id => id.Value,
                 s => SessionId.UnsafeFrom(s)
             )
-            .HasColumnType($"varchar({SessionId.Length})");
+            .HasColumnType($"{DataConfigurationConstants.DefaultStringColumnType}({SessionId.Length})");
 
         b.Property(s => s.UserId)
             .IsRequired()
@@ -37,24 +37,24 @@ internal sealed class SessionConfiguration : IEntityTypeConfiguration<Session>
         b.Property(s => s.RefreshTokenKey)
             .IsRequired()
             .HasMaxLength(DataConfigurationConstants.DefaultStringMaxLength)
-            .HasColumnType("varchar");
+            .HasColumnType(DataConfigurationConstants.DefaultStringColumnType);
 
         b.Property(s => s.RefreshTokenHash)
             .IsRequired()
             .HasMaxLength(DataConfigurationConstants.DefaultStringMaxLength)
-            .HasColumnType("varchar");
+            .HasColumnType(DataConfigurationConstants.DefaultStringColumnType);
 
         b.Property(s => s.CreatedAt)
             .IsRequired()
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.Property(s => s.ExpiresAt)
             .IsRequired()
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.Property(s => s.LastRefreshedAt)
             .IsRequired(false)
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.Property(s => s.RevokeReason)
             .IsRequired(false)
@@ -63,7 +63,7 @@ internal sealed class SessionConfiguration : IEntityTypeConfiguration<Session>
 
         b.Property(s => s.RevokedAt)
             .IsRequired(false)
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.Property(s => s.Version)
             .IsRequired()

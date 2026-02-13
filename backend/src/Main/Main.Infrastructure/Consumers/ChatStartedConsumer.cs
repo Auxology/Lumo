@@ -16,7 +16,7 @@ namespace Main.Infrastructure.Consumers;
 
 internal sealed class ChatStartedConsumer(
     IMainDbContext dbContext,
-    IChatCompletionService chatCompletionService,
+    INativeChatCompletionService nativeChatCompletionService,
     ILogger<ChatStartedConsumer> logger) : IConsumer<ChatStarted>
 {
     public async Task Consume(ConsumeContext<ChatStarted> context)
@@ -60,19 +60,21 @@ internal sealed class ChatStartedConsumer(
             ))
             .ToListAsync(cancellationToken);
 
-        await chatCompletionService.StreamCompletionAdvancedAsync
+        await nativeChatCompletionService.StreamCompletionAdvancedAsync
         (
             chatId: chatId.Value,
             streamId: streamId.Value,
             messages: messages,
             modelId: message.ModelId,
             userId: message.UserId,
+            webSearchEnabled: message.WebSearchEnabled,
             correlationId: message.CorrelationId.ToString(),
             cancellationToken: cancellationToken
         );
 
-        logger.LogInformation(
-            "Consumed {EventType}: {EventId}, CorrelationId: {CorrelationId}, OccurredAt: {OccurredAt}, ChatId: {ChatId}",
-            nameof(ChatStarted), message.EventId, message.CorrelationId, message.OccurredAt, message.ChatId);
+        if (logger.IsEnabled(LogLevel.Information))
+            logger.LogInformation(
+                "Consumed {EventType}: {EventId}, CorrelationId: {CorrelationId}, OccurredAt: {OccurredAt}, ChatId: {ChatId}",
+                nameof(ChatStarted), message.EventId, message.CorrelationId, message.OccurredAt, message.ChatId);
     }
 }

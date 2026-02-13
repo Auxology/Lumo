@@ -1,9 +1,7 @@
 namespace Main.Application.Abstractions.AI;
 
-public interface IChatCompletionService
+public interface INativeChatCompletionService
 {
-    Task<string> GetTitleAsync(string message, CancellationToken cancellationToken);
-
     Task StreamCompletionAsync
     (
         string chatId,
@@ -21,6 +19,7 @@ public interface IChatCompletionService
         string streamId,
         string modelId,
         string correlationId,
+        bool webSearchEnabled,
         IReadOnlyList<ChatCompletionMessage> messages,
         CancellationToken cancellationToken
     );

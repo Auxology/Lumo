@@ -5,6 +5,8 @@ using Main.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+using SharedKernel.Infrastructure.Data;
+
 namespace Main.Infrastructure.Data.Configuration;
 
 internal sealed class ChatConfiguration : IEntityTypeConfiguration<Chat>
@@ -20,7 +22,7 @@ internal sealed class ChatConfiguration : IEntityTypeConfiguration<Chat>
                 id => id.Value,
                 s => ChatId.UnsafeFrom(s)
             )
-            .HasColumnType($"varchar({ChatId.Length})");
+            .HasColumnType($"{DataConfigurationConstants.DefaultStringColumnType}({ChatId.Length})");
 
         b.Property(c => c.UserId)
             .IsRequired()
@@ -29,12 +31,12 @@ internal sealed class ChatConfiguration : IEntityTypeConfiguration<Chat>
         b.Property(c => c.Title)
             .IsRequired()
             .HasMaxLength(ChatConstants.MaxTitleLength)
-            .HasColumnType($"varchar({ChatConstants.MaxTitleLength})");
+            .HasColumnType($"{DataConfigurationConstants.DefaultStringColumnType}({ChatConstants.MaxTitleLength})");
 
         b.Property(c => c.ModelId)
             .IsRequired(false)
             .HasMaxLength(ChatConstants.MaxModelIdLength)
-            .HasColumnType($"varchar({ChatConstants.MaxModelIdLength})");
+            .HasColumnType($"{DataConfigurationConstants.DefaultStringColumnType}({ChatConstants.MaxModelIdLength})");
 
         b.Property(c => c.IsArchived)
             .IsRequired()
@@ -46,11 +48,11 @@ internal sealed class ChatConfiguration : IEntityTypeConfiguration<Chat>
 
         b.Property(c => c.CreatedAt)
             .IsRequired()
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.Property(c => c.UpdatedAt)
             .IsRequired(false)
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.HasMany(c => c.Messages)
             .WithOne()

@@ -14,36 +14,36 @@ internal static class FingerprintConfiguration
         fp.Property(f => f.IpAddress)
             .IsRequired()
             .HasMaxLength(DataConfigurationConstants.MaxIpAddressLength)
-            .HasColumnType("varchar");
+            .HasColumnType(DataConfigurationConstants.DefaultStringColumnType);
 
         fp.Property(f => f.UserAgent)
             .IsRequired()
             .HasMaxLength(DataConfigurationConstants.MaxUserAgentLength)
-            .HasColumnType("varchar");
+            .HasColumnType(DataConfigurationConstants.DefaultStringColumnType);
 
         fp.Property(f => f.Timezone)
             .IsRequired()
             .HasMaxLength(DataConfigurationConstants.MaxTimezoneLength)
-            .HasColumnType("varchar");
+            .HasColumnType(DataConfigurationConstants.DefaultStringColumnType);
 
         fp.Property(f => f.Language)
             .IsRequired()
             .HasMaxLength(DataConfigurationConstants.MaxLanguageLength)
-            .HasColumnType("varchar");
+            .HasColumnType(DataConfigurationConstants.DefaultStringColumnType);
 
         fp.Property(f => f.ComputedHash)
             .IsRequired()
             .HasMaxLength(DataConfigurationConstants.DefaultStringMaxLength)
-            .HasColumnType("varchar");
+            .HasColumnType(DataConfigurationConstants.DefaultStringColumnType);
 
         fp.Property(f => f.NormalizedBrowser)
             .IsRequired()
             .HasMaxLength(DataConfigurationConstants.MaxNormalizedBrowserLength)
-            .HasColumnType("varchar");
+            .HasColumnType(DataConfigurationConstants.DefaultStringColumnType);
 
         fp.Property(f => f.NormalizedOs)
             .IsRequired()
             .HasMaxLength(DataConfigurationConstants.MaxNormalizedOsLength)
-            .HasColumnType("varchar");
+            .HasColumnType(DataConfigurationConstants.DefaultStringColumnType);
     }
 }

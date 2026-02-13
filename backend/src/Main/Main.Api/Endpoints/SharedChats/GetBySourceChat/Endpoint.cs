@@ -4,6 +4,8 @@ using Main.Application.Queries.SharedChats.GetSharedChatsByOriginal;
 
 using Mediator;
 
+using SharedKernel.Api.Constants;
+
 namespace Main.Api.Endpoints.SharedChats.GetBySourceChat;
 
 internal sealed class Endpoint : BaseEndpoint<Request, Response>
@@ -26,8 +28,8 @@ internal sealed class Endpoint : BaseEndpoint<Request, Response>
                 .WithDescription(
                     "Retrieves all shared chat snapshots created from a specific source chat. " +
                     "Only returns shared chats owned by the authenticated user.")
-                .Produces<Response>(200, "application/json")
-                .ProducesProblemDetails(400, "application/json")
+                .Produces<Response>(200, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(400, HttpContentTypeConstants.Json)
                 .WithTags(CustomTags.SharedChats);
         });
     }

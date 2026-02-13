@@ -75,7 +75,8 @@ internal sealed class AssistantMessageGeneratedConsumer(
 
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        logger.LogInformation("Consumed {EventType}: {EventId}, CorrelationId: {CorrelationId}, ChatId: {ChatId}",
-            nameof(AssistantMessageGenerated), message.EventId, message.CorrelationId, message.ChatId);
+        if (logger.IsEnabled(LogLevel.Information))
+            logger.LogInformation("Consumed {EventType}: {EventId}, CorrelationId: {CorrelationId}, ChatId: {ChatId}",
+                nameof(AssistantMessageGenerated), message.EventId, message.CorrelationId, message.ChatId);
     }
 }

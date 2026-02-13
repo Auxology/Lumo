@@ -21,17 +21,17 @@ internal sealed class RecoveryKeyConfiguration : IEntityTypeConfiguration<Recove
                 id => id.Value,
                 value => RecoveryKeyChainId.UnsafeFrom(value)
             )
-            .HasColumnType($"varchar({RecoveryKeyChainId.Length})");
+            .HasColumnType($"{DataConfigurationConstants.DefaultStringColumnType}({RecoveryKeyChainId.Length})");
 
         b.Property(rk => rk.Identifier)
             .IsRequired()
             .HasMaxLength(DataConfigurationConstants.DefaultStringMaxLength)
-            .HasColumnType("varchar");
+            .HasColumnType(DataConfigurationConstants.DefaultStringColumnType);
 
         b.Property(rk => rk.VerifierHash)
             .IsRequired()
             .HasMaxLength(DataConfigurationConstants.DefaultStringMaxLength)
-            .HasColumnType("varchar");
+            .HasColumnType(DataConfigurationConstants.DefaultStringColumnType);
 
         b.Property(rk => rk.IsUsed)
             .IsRequired()
@@ -39,7 +39,7 @@ internal sealed class RecoveryKeyConfiguration : IEntityTypeConfiguration<Recove
 
         b.Property(rk => rk.UsedAt)
             .IsRequired(false)
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.ComplexProperty(rk => rk.Fingerprint, fp => fp.ConfigureFingerprint());
 

@@ -11,11 +11,16 @@ namespace Auth.Infrastructure.Data;
 internal sealed class AuthDbContext(DbContextOptions<AuthDbContext> options) : DbContext(options), IAuthDbContext
 {
     public DbSet<User> Users { get; set; }
+
     public DbSet<Session> Sessions { get; set; }
+
     public DbSet<RecoveryKeyChain> RecoveryKeyChains { get; set; }
     public DbSet<RecoveryKey> RecoveryKeys { get; set; }
+
     public DbSet<LoginRequest> LoginRequests { get; set; }
+
     public DbSet<RecoveryRequest> RecoveryRequests { get; set; }
+
     public DbSet<EmailChangeRequest> EmailChangeRequests { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

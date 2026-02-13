@@ -4,6 +4,8 @@ using Main.Application.Commands.SharedChats.ShareChat;
 
 using Mediator;
 
+using SharedKernel.Api.Constants;
+
 namespace Main.Api.Endpoints.SharedChats.Share;
 
 internal sealed class Endpoint : BaseEndpoint<Request, Response>
@@ -24,9 +26,9 @@ internal sealed class Endpoint : BaseEndpoint<Request, Response>
         {
             d.WithSummary("Share Chat")
                 .WithDescription("Creates a public snapshot of a chat that can be viewed without authentication.")
-                .Produces<Response>(201, "application/json")
-                .ProducesProblemDetails(400, "application/json")
-                .ProducesProblemDetails(404, "application/json")
+                .Produces<Response>(201, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(400, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(404, HttpContentTypeConstants.Json)
                 .WithTags(CustomTags.SharedChats);
         });
     }

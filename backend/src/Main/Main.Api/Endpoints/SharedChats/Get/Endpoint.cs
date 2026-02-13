@@ -4,6 +4,8 @@ using Main.Application.Queries.SharedChats.GetSharedChat;
 
 using Mediator;
 
+using SharedKernel.Api.Constants;
+
 namespace Main.Api.Endpoints.SharedChats.Get;
 
 internal sealed class Endpoint : BaseEndpoint<Request, Response>
@@ -27,9 +29,9 @@ internal sealed class Endpoint : BaseEndpoint<Request, Response>
                 .WithDescription(
                     "Retrieves a publicly shared chat snapshot with all its messages. " +
                     "No authentication required.")
-                .Produces<Response>(200, "application/json")
-                .ProducesProblemDetails(400, "application/json")
-                .ProducesProblemDetails(404, "application/json")
+                .Produces<Response>(200, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(400, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(404, HttpContentTypeConstants.Json)
                 .WithTags(CustomTags.SharedChats);
         });
     }

@@ -58,11 +58,12 @@ internal sealed class MemoryStore(
         dbContext.Memories.Add(memoryRecord);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        logger.LogInformation
-        (
-            "Saved memory {MemoryId} for user {UserId} with category {Category}",
-            memoryRecord.Id, userId, memoryRecord.Category
-        );
+        if (logger.IsEnabled(LogLevel.Information))
+            logger.LogInformation
+            (
+                "Saved memory {MemoryId} for user {UserId} with category {Category}",
+                memoryRecord.Id, userId, memoryRecord.Category
+            );
 
         return memoryRecord.Id;
     }
@@ -136,7 +137,8 @@ internal sealed class MemoryStore(
             dbContext.Memories.Remove(memoryRecord);
             await dbContext.SaveChangesAsync(cancellationToken);
 
-            logger.LogInformation("Deleted memory {MemoryId} for user {UserId}", memoryRecord.Id, userId);
+            if (logger.IsEnabled(LogLevel.Information))
+                logger.LogInformation("Deleted memory {MemoryId} for user {UserId}", memoryRecord.Id, userId);
         }
     }
 
@@ -146,7 +148,8 @@ internal sealed class MemoryStore(
             .Where(m => m.UserId == userId)
             .ExecuteDeleteAsync(cancellationToken);
 
-        logger.LogInformation("Deleted all memories for user {UserId}", userId);
+        if (logger.IsEnabled(LogLevel.Information))
+            logger.LogInformation("Deleted all memories for user {UserId}", userId);
     }
 
     private async Task<float[]> GenerateEmbeddingAsync(string content, CancellationToken cancellationToken)

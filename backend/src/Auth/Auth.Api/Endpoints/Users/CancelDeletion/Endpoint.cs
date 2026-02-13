@@ -4,6 +4,8 @@ using FastEndpoints;
 
 using Mediator;
 
+using SharedKernel.Api.Constants;
+
 namespace Auth.Api.Endpoints.Users.CancelDeletion;
 
 internal sealed class Endpoint : BaseEndpoint<EmptyRequest, Response>
@@ -21,7 +23,7 @@ internal sealed class Endpoint : BaseEndpoint<EmptyRequest, Response>
         {
             d.WithSummary("Cancel User Deletion")
                 .WithDescription("Cancels the deletion process of the authenticated user's account.")
-                .Produces<Response>(200, "application/json")
+                .Produces<Response>(200, HttpContentTypeConstants.Json)
                 .ProducesProblemDetails(401)
                 .ProducesProblemDetails(404)
                 .ProducesProblemDetails(409)

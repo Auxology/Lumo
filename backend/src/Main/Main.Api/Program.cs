@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 
 using Scalar.AspNetCore;
 
+using SharedKernel.Api.Constants;
 using SharedKernel.Infrastructure.Observability;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -38,7 +39,7 @@ HealthCheckOptions healthCheckOptions = new()
             ? StatusCodes.Status200OK
             : StatusCodes.Status503ServiceUnavailable;
 
-        context.Response.ContentType = "application/json";
+        context.Response.ContentType = HttpContentTypeConstants.Json;
         string result = JsonSerializer.Serialize(new
         {
             status = report.Status.ToString(),

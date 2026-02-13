@@ -4,7 +4,6 @@ using Auth.Application.Abstractions.Generators;
 using Auth.Application.Faults;
 using Auth.Domain.Aggregates;
 using Auth.Domain.Constants;
-using Auth.Domain.Faults;
 using Auth.Domain.ValueObjects;
 
 using Contracts.IntegrationEvents.Auth;

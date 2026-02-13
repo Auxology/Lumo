@@ -4,6 +4,8 @@ using FastEndpoints;
 
 using Mediator;
 
+using SharedKernel.Api.Constants;
+
 namespace Auth.Api.Endpoints.LoginRequests.Create;
 
 internal sealed class
@@ -26,8 +28,8 @@ internal sealed class
         {
             d.WithSummary("Create Login Request")
                 .WithDescription("Initiates a login request and sends OTP/magic link to the user's email.")
-                .Produces<Response>(201, "application/json")
-                .ProducesProblemDetails(400, "application/json")
+                .Produces<Response>(201, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(400, HttpContentTypeConstants.Json)
                 .WithTags(CustomTags.LoginRequests);
         });
     }

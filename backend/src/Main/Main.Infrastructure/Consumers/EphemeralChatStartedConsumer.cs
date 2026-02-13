@@ -15,7 +15,7 @@ namespace Main.Infrastructure.Consumers;
 
 internal sealed class EphemeralChatStartedConsumer(
     IEphemeralChatStore ephemeralChatStore,
-    IChatCompletionService chatCompletionService,
+    INativeChatCompletionService nativeChatCompletionService,
     ILogger<EphemeralChatStartedConsumer> logger) : IConsumer<EphemeralChatStarted>
 {
     public async Task Consume(ConsumeContext<EphemeralChatStarted> context)
@@ -56,7 +56,7 @@ internal sealed class EphemeralChatStartedConsumer(
             ))
             .ToList();
 
-        await chatCompletionService.StreamCompletionAsync
+        await nativeChatCompletionService.StreamCompletionAsync
         (
             chatId: ephemeralChatId,
             streamId: streamId.Value,
@@ -66,8 +66,9 @@ internal sealed class EphemeralChatStartedConsumer(
             cancellationToken: cancellationToken
         );
 
-        logger.LogInformation(
-            "Started streaming completion for ephemeral chat in {EventType}: {EventId}, CorrelationId: {CorrelationId}, EphemeralChatId: {EphemeralChatId}, StreamId: {StreamId}",
-            nameof(EphemeralChatStarted), message.EventId, message.CorrelationId, ephemeralChatId, streamId.Value);
+        if (logger.IsEnabled(LogLevel.Information))
+            logger.LogInformation(
+                "Started streaming completion for ephemeral chat in {EventType}: {EventId}, CorrelationId: {CorrelationId}, EphemeralChatId: {EphemeralChatId}, StreamId: {StreamId}",
+                nameof(EphemeralChatStarted), message.EventId, message.CorrelationId, ephemeralChatId, streamId.Value);
     }
 }

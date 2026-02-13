@@ -4,6 +4,8 @@ using Main.Application.Commands.Chats.EditMessage;
 
 using Mediator;
 
+using SharedKernel.Api.Constants;
+
 namespace Main.Api.Endpoints.Chats.EditMessage;
 
 internal sealed class Endpoint : BaseEndpoint<Request, Response>
@@ -29,9 +31,9 @@ internal sealed class Endpoint : BaseEndpoint<Request, Response>
                     "Edits an existing user message and removes all subsequent messages. " +
                     "Queues AI response generation for the edited message. " +
                     "The AI response will be streamed via Redis Pub/Sub.")
-                .Produces<Response>(202, "application/json")
-                .ProducesProblemDetails(400, "application/json")
-                .ProducesProblemDetails(404, "application/json")
+                .Produces<Response>(202, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(400, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(404, HttpContentTypeConstants.Json)
                 .WithTags(CustomTags.Chats);
         });
     }
@@ -42,7 +44,8 @@ internal sealed class Endpoint : BaseEndpoint<Request, Response>
         (
             ChatId: endpointRequest.ChatId,
             MessageId: endpointRequest.MessageId,
-            NewContent: endpointRequest.NewContent
+            NewContent: endpointRequest.NewContent,
+            WebSearchEnabled: endpointRequest.WebSearchEnabled
         );
 
         await SendOutcomeAsync

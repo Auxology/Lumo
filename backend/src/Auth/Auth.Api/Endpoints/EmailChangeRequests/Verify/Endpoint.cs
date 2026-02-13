@@ -4,6 +4,8 @@ using FastEndpoints;
 
 using Mediator;
 
+using SharedKernel.Api.Constants;
+
 namespace Auth.Api.Endpoints.EmailChangeRequests.Verify;
 
 internal sealed class Endpoint : BaseEndpoint<Request, Response>
@@ -24,11 +26,11 @@ internal sealed class Endpoint : BaseEndpoint<Request, Response>
         {
             d.WithSummary("Verify Email Change")
                 .WithDescription("Verifies the OTP and completes the email change by updating the request state.")
-                .Produces<Response>(200, "application/json")
-                .ProducesProblemDetails(400, "application/json")
-                .ProducesProblemDetails(401, "application/json")
-                .ProducesProblemDetails(404, "application/json")
-                .ProducesProblemDetails(409, "application/json")
+                .Produces<Response>(200, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(400, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(401, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(404, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(409, HttpContentTypeConstants.Json)
                 .WithTags(CustomTags.EmailChangeRequests);
         });
     }

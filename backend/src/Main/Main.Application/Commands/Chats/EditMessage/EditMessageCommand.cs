@@ -6,5 +6,6 @@ public sealed record EditMessageCommand
 (
     string ChatId,
     string MessageId,
-    string NewContent
+    string NewContent,
+    bool WebSearchEnabled
 ) : ICommand<EditMessageResponse>;

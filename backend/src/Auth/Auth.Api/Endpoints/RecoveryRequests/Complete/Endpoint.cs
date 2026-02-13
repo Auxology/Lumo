@@ -4,6 +4,8 @@ using FastEndpoints;
 
 using Mediator;
 
+using SharedKernel.Api.Constants;
+
 namespace Auth.Api.Endpoints.RecoveryRequests.Complete;
 
 internal sealed class Endpoint : BaseEndpoint<EmptyRequest, Response>
@@ -25,9 +27,9 @@ internal sealed class Endpoint : BaseEndpoint<EmptyRequest, Response>
         {
             d.WithSummary("Complete Account Recovery")
                 .WithDescription("Completes recovery: changes email, revokes sessions.")
-                .Produces<Response>(200, "application/json")
-                .ProducesProblemDetails(400, "application/json")
-                .ProducesProblemDetails(401, "application/json")
+                .Produces<Response>(200, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(400, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(401, HttpContentTypeConstants.Json)
                 .WithTags(CustomTags.Recovery);
         });
     }

@@ -4,6 +4,8 @@ using FastEndpoints;
 
 using Mediator;
 
+using SharedKernel.Api.Constants;
+
 namespace Auth.Api.Endpoints.RecoveryRequests.Verify;
 
 internal sealed class Endpoint : BaseEndpoint<Request>
@@ -26,8 +28,8 @@ internal sealed class Endpoint : BaseEndpoint<Request>
             d.WithSummary("Verify New Email for Recovery")
                 .WithDescription("Verifies ownership of the new email address via OTP or magic link.")
                 .Produces(204)
-                .ProducesProblemDetails(400, "application/json")
-                .ProducesProblemDetails(401, "application/json")
+                .ProducesProblemDetails(400, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(401, HttpContentTypeConstants.Json)
                 .WithTags(CustomTags.Recovery);
         });
     }

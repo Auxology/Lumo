@@ -5,6 +5,7 @@ using Main.Application.Commands.Memories.Delete;
 using Mediator;
 
 using SharedKernel;
+using SharedKernel.Api.Constants;
 using SharedKernel.Api.Infrastructure;
 
 namespace Main.Api.Endpoints.Memories.Delete;
@@ -28,7 +29,7 @@ internal sealed class Endpoint : EndpointWithoutRequest
             d.WithSummary("Delete All Memories")
                 .WithDescription("Permanently deletes all memories for the authenticated user.")
                 .Produces(204)
-                .ProducesProblemDetails(401, "application/json")
+                .ProducesProblemDetails(401, HttpContentTypeConstants.Json)
                 .WithTags(CustomTags.Memories);
         });
     }

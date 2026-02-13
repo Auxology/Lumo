@@ -4,6 +4,8 @@ using Main.Infrastructure.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+using SharedKernel.Infrastructure.Data;
+
 namespace Main.Infrastructure.Data.Configuration;
 
 internal sealed class MemoryRecordConfiguration : IEntityTypeConfiguration<MemoryRecord>
@@ -15,7 +17,7 @@ internal sealed class MemoryRecordConfiguration : IEntityTypeConfiguration<Memor
         b.HasKey(m => m.Id);
 
         b.Property(m => m.Id)
-            .HasColumnType("varchar(30)");
+            .HasColumnType($"{DataConfigurationConstants.DefaultStringColumnType}(30)");
 
         b.Property(m => m.UserId)
             .IsRequired()
@@ -24,13 +26,13 @@ internal sealed class MemoryRecordConfiguration : IEntityTypeConfiguration<Memor
         b.Property(m => m.Content)
             .IsRequired()
             .HasMaxLength(MemoryConstants.MaxContentLength)
-            .HasColumnType($"varchar({MemoryConstants.MaxContentLength})");
+            .HasColumnType($"{DataConfigurationConstants.DefaultStringColumnType}({MemoryConstants.MaxContentLength})");
 
         b.Property(m => m.Category)
             .IsRequired()
             .HasConversion<string>()
             .HasMaxLength(20)
-            .HasColumnType("varchar(20)");
+            .HasColumnType($"{DataConfigurationConstants.DefaultStringColumnType}(20)");
 
         b.Property(m => m.Embedding)
             .IsRequired()
@@ -38,7 +40,7 @@ internal sealed class MemoryRecordConfiguration : IEntityTypeConfiguration<Memor
 
         b.Property(m => m.CreatedAt)
             .IsRequired()
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.HasIndex(m => m.UserId);
         b.HasIndex(m => new { m.UserId, m.CreatedAt });

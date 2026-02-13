@@ -4,6 +4,8 @@ using Main.Application.Commands.Chats.Start;
 
 using Mediator;
 
+using SharedKernel.Api.Constants;
+
 namespace Main.Api.Endpoints.Chats.Start;
 
 internal sealed class Endpoint : BaseEndpoint<Request, Response>
@@ -24,9 +26,9 @@ internal sealed class Endpoint : BaseEndpoint<Request, Response>
         {
             d.WithSummary("Start Chat")
                 .WithDescription("Creates a new chat and queues the initial message for AI processing.")
-                .Produces<Response>(202, "application/json")
-                .ProducesProblemDetails(400, "application/json")
-                .ProducesProblemDetails(404, "application/json")
+                .Produces<Response>(202, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(400, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(404, HttpContentTypeConstants.Json)
                 .WithTags(CustomTags.Chats);
         });
     }
@@ -36,7 +38,8 @@ internal sealed class Endpoint : BaseEndpoint<Request, Response>
         StartChatCommand command = new
         (
             Message: endpointRequest.Message,
-            ModelId: endpointRequest.ModelId
+            ModelId: endpointRequest.ModelId,
+            WebSearchEnabled: endpointRequest.WebSearchEnabled
         );
 
         await SendOutcomeAsync

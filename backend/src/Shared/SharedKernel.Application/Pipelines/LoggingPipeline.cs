@@ -17,7 +17,8 @@ public sealed class LoggingPipeline<TRequest, TResponse>(ILogger<LoggingPipeline
 
         string requestName = typeof(TRequest).Name;
 
-        logger.LogInformation("Handling {RequestName} {@Request}", requestName, message);
+        if (logger.IsEnabled(LogLevel.Information))
+            logger.LogInformation("Handling {RequestName} {@Request}", requestName, message);
 
         Stopwatch stopwatch = Stopwatch.StartNew();
 
@@ -32,8 +33,9 @@ public sealed class LoggingPipeline<TRequest, TResponse>(ILogger<LoggingPipeline
         else
         {
             stopwatch.Stop();
-            logger.LogInformation("Handled {RequestName} in {ElapsedMilliseconds}ms with success {@Response}",
-                requestName, stopwatch.ElapsedMilliseconds, response);
+            if (logger.IsEnabled(LogLevel.Information))
+                logger.LogInformation("Handled {RequestName} in {ElapsedMilliseconds}ms with success {@Response}",
+                    requestName, stopwatch.ElapsedMilliseconds, response);
         }
 
         return response;

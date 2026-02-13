@@ -4,6 +4,7 @@ using Main.Application.Queries.Models;
 
 using Mediator;
 
+using SharedKernel.Api.Constants;
 using SharedKernel.Api.Infrastructure;
 
 namespace Main.Api.Endpoints.Models.GetModels;
@@ -28,7 +29,7 @@ internal sealed class Endpoint : EndpointWithoutRequest<Response>
                 .WithDescription(
                     "Retrieves all available AI models that can be used for chat. " +
                     "Returns model metadata including capabilities and provider information.")
-                .Produces<Response>(200, "application/json")
+                .Produces<Response>(200, HttpContentTypeConstants.Json)
                 .WithTags(CustomTags.Models);
         });
     }

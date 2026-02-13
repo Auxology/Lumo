@@ -4,6 +4,8 @@ using FastEndpoints;
 
 using Mediator;
 
+using SharedKernel.Api.Constants;
+
 namespace Auth.Api.Endpoints.Sessions.RevokeSessions;
 
 internal sealed class Endpoint : BaseEndpoint<Request>
@@ -22,8 +24,8 @@ internal sealed class Endpoint : BaseEndpoint<Request>
             d.WithSummary("Revoke Sessions")
                 .WithDescription("Revokes multiple sessions for the authenticated user. The current session cannot be revoked.")
                 .Produces(204)
-                .ProducesProblemDetails(400, "application/json")
-                .ProducesProblemDetails(401, "application/json")
+                .ProducesProblemDetails(400, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(401, HttpContentTypeConstants.Json)
                 .WithTags(CustomTags.Sessions);
         });
     }

@@ -4,6 +4,8 @@ using Auth.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+using SharedKernel.Infrastructure.Data;
+
 namespace Auth.Infrastructure.Data.Configuration;
 
 internal sealed class RecoveryKeyChainConfiguration : IEntityTypeConfiguration<RecoveryKeyChain>
@@ -19,7 +21,7 @@ internal sealed class RecoveryKeyChainConfiguration : IEntityTypeConfiguration<R
                 id => id.Value,
                 s => RecoveryKeyChainId.UnsafeFrom(s)
             )
-            .HasColumnType($"varchar({RecoveryKeyChainId.Length})");
+            .HasColumnType($"{DataConfigurationConstants.DefaultStringColumnType}({RecoveryKeyChainId.Length})");
 
         b.Property(rkc => rkc.UserId)
             .IsRequired()
@@ -32,11 +34,11 @@ internal sealed class RecoveryKeyChainConfiguration : IEntityTypeConfiguration<R
 
         b.Property(rkc => rkc.CreatedAt)
             .IsRequired()
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.Property(rkc => rkc.LastRotatedAt)
             .IsRequired(false)
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.Property(rkc => rkc.Version)
             .IsRequired()

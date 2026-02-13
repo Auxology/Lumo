@@ -4,6 +4,8 @@ using Main.Application.Commands.Chats.Update;
 
 using Mediator;
 
+using SharedKernel.Api.Constants;
+
 namespace Main.Api.Endpoints.Chats.Update;
 
 internal sealed class Endpoint : BaseEndpoint<Request, Response>
@@ -24,9 +26,9 @@ internal sealed class Endpoint : BaseEndpoint<Request, Response>
         {
             d.WithSummary("Update Chat")
                 .WithDescription("Partially updates a chat. Supports renaming and archiving/unarchiving.")
-                .Produces<Response>(200, "application/json")
-                .ProducesProblemDetails(400, "application/json")
-                .ProducesProblemDetails(404, "application/json")
+                .Produces<Response>(200, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(400, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(404, HttpContentTypeConstants.Json)
                 .WithTags(CustomTags.Chats);
         });
     }

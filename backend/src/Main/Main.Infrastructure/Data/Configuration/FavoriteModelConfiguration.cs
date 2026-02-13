@@ -5,6 +5,8 @@ using Main.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+using SharedKernel.Infrastructure.Data;
+
 namespace Main.Infrastructure.Data.Configuration;
 
 internal sealed class FavoriteModelConfiguration : IEntityTypeConfiguration<FavoriteModel>
@@ -20,7 +22,7 @@ internal sealed class FavoriteModelConfiguration : IEntityTypeConfiguration<Favo
                 id => id.Value,
                 s => FavoriteModelId.UnsafeFrom(s)
             )
-            .HasColumnType($"varchar({FavoriteModelId.Length})");
+            .HasColumnType($"{DataConfigurationConstants.DefaultStringColumnType}({FavoriteModelId.Length})");
 
         b.Property(f => f.PreferenceId)
             .ValueGeneratedNever()
@@ -29,16 +31,16 @@ internal sealed class FavoriteModelConfiguration : IEntityTypeConfiguration<Favo
                 id => id.Value,
                 s => PreferenceId.UnsafeFrom(s)
             )
-            .HasColumnType($"varchar({PreferenceId.Length})");
+            .HasColumnType($"{DataConfigurationConstants.DefaultStringColumnType}({PreferenceId.Length})");
 
         b.Property(f => f.ModelId)
             .IsRequired()
             .HasMaxLength(FavoriteModelConstants.MaxModelIdLength)
-            .HasColumnType($"varchar({FavoriteModelConstants.MaxModelIdLength})");
+            .HasColumnType($"{DataConfigurationConstants.DefaultStringColumnType}({FavoriteModelConstants.MaxModelIdLength})");
 
         b.Property(f => f.CreatedAt)
             .IsRequired()
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.HasIndex(f => f.PreferenceId);
 

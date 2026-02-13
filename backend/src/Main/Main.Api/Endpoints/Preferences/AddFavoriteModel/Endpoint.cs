@@ -4,6 +4,8 @@ using Main.Application.Commands.Preferences.AddFavoriteModel;
 
 using Mediator;
 
+using SharedKernel.Api.Constants;
+
 namespace Main.Api.Endpoints.Preferences.AddFavoriteModel;
 
 internal sealed class Endpoint : BaseEndpoint<Request, Response>
@@ -24,9 +26,9 @@ internal sealed class Endpoint : BaseEndpoint<Request, Response>
         {
             d.WithSummary("Add Favorite Model")
                 .WithDescription("Adds a model to the user's favorites.")
-                .Produces<Response>(201, "application/json")
-                .ProducesProblemDetails(400, "application/json")
-                .ProducesProblemDetails(409, "application/json")
+                .Produces<Response>(201, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(400, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(409, HttpContentTypeConstants.Json)
                 .WithTags(CustomTags.Preferences);
         });
     }

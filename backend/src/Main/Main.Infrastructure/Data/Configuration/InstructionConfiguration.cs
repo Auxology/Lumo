@@ -5,6 +5,8 @@ using Main.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+using SharedKernel.Infrastructure.Data;
+
 namespace Main.Infrastructure.Data.Configuration;
 
 internal sealed class InstructionConfiguration : IEntityTypeConfiguration<Instruction>
@@ -20,7 +22,7 @@ internal sealed class InstructionConfiguration : IEntityTypeConfiguration<Instru
                 id => id.Value,
                 s => InstructionId.UnsafeFrom(s)
             )
-            .HasColumnType($"varchar({InstructionId.Length})");
+            .HasColumnType($"{DataConfigurationConstants.DefaultStringColumnType}({InstructionId.Length})");
 
         b.Property(i => i.PreferenceId)
             .ValueGeneratedNever()
@@ -29,12 +31,12 @@ internal sealed class InstructionConfiguration : IEntityTypeConfiguration<Instru
                 id => id.Value,
                 s => PreferenceId.UnsafeFrom(s)
             )
-            .HasColumnType($"varchar({PreferenceId.Length})");
+            .HasColumnType($"{DataConfigurationConstants.DefaultStringColumnType}({PreferenceId.Length})");
 
         b.Property(i => i.Content)
             .IsRequired()
             .HasMaxLength(InstructionConstants.MaxContentLength)
-            .HasColumnType($"varchar({InstructionConstants.MaxContentLength})");
+            .HasColumnType($"{DataConfigurationConstants.DefaultStringColumnType}({InstructionConstants.MaxContentLength})");
 
         b.Property(i => i.Priority)
             .IsRequired()
@@ -42,11 +44,11 @@ internal sealed class InstructionConfiguration : IEntityTypeConfiguration<Instru
 
         b.Property(i => i.CreatedAt)
             .IsRequired()
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.Property(i => i.UpdatedAt)
             .IsRequired()
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.HasIndex(i => i.PreferenceId);
 

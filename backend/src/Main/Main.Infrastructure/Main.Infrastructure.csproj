@@ -28,6 +28,7 @@
         <PackageReference Include="Ulid" />
         <PackageReference Include="Pgvector" />
         <PackageReference Include="Pgvector.EntityFrameworkCore" />
+        <PackageReference Include="Microsoft.SemanticKernel" />
     </ItemGroup>
 
     <ItemGroup>

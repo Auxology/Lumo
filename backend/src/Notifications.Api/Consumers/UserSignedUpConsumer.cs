@@ -2,7 +2,6 @@ using Contracts.IntegrationEvents.Auth;
 
 using MassTransit;
 
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using Notifications.Api.Models;
@@ -37,8 +36,9 @@ internal sealed class UserSignedUpConsumer(
             cancellationToken: cancellationToken
         );
 
-        logger.LogInformation(
-            "Consumed {EventType}: {EventId}, CorrelationId: {CorrelationId}, OccurredAt: {OccurredAt}, UserId: {UserId}",
-            nameof(UserSignedUp), message.EventId, message.CorrelationId, message.OccurredAt, message.UserId);
+        if (logger.IsEnabled(LogLevel.Information))
+            logger.LogInformation(
+                "Consumed {EventType}: {EventId}, CorrelationId: {CorrelationId}, OccurredAt: {OccurredAt}, UserId: {UserId}",
+                nameof(UserSignedUp), message.EventId, message.CorrelationId, message.OccurredAt, message.UserId);
     }
 }

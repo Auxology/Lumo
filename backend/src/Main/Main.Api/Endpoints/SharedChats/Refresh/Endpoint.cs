@@ -4,6 +4,8 @@ using Main.Application.Commands.SharedChats.RefreshChat;
 
 using Mediator;
 
+using SharedKernel.Api.Constants;
+
 namespace Main.Api.Endpoints.SharedChats.Refresh;
 
 internal sealed class Endpoint : BaseEndpoint<EmptyRequest, Response>
@@ -24,9 +26,9 @@ internal sealed class Endpoint : BaseEndpoint<EmptyRequest, Response>
         {
             d.WithSummary("Refresh Shared Chat")
                 .WithDescription("Re-snapshots a shared chat with the latest messages from the source chat.")
-                .Produces<Response>(200, "application/json")
-                .ProducesProblemDetails(400, "application/json")
-                .ProducesProblemDetails(404, "application/json")
+                .Produces<Response>(200, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(400, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(404, HttpContentTypeConstants.Json)
                 .WithTags(CustomTags.SharedChats);
         });
     }

@@ -21,7 +21,7 @@ internal sealed class RecoveryRequestConfiguration : IEntityTypeConfiguration<Re
                 id => id.Value,
                 s => RecoveryRequestId.UnsafeFrom(s)
             )
-            .HasColumnType($"varchar({RecoveryRequestId.Length})");
+            .HasColumnType($"{DataConfigurationConstants.DefaultStringColumnType}({RecoveryRequestId.Length})");
 
         b.Property(rr => rr.UserId)
             .IsRequired()
@@ -35,7 +35,7 @@ internal sealed class RecoveryRequestConfiguration : IEntityTypeConfiguration<Re
         b.Property(rr => rr.TokenKey)
             .IsRequired()
             .HasMaxLength(DataConfigurationConstants.DefaultStringMaxLength)
-            .HasColumnType("varchar");
+            .HasColumnType(DataConfigurationConstants.DefaultStringColumnType);
 
         b.ComplexProperty(rr => rr.NewEmailAddress, ea =>
         {
@@ -43,36 +43,36 @@ internal sealed class RecoveryRequestConfiguration : IEntityTypeConfiguration<Re
                 .HasColumnName("new_email_address")
                 .IsRequired()
                 .HasMaxLength(254)
-                .HasColumnType("varchar");
+                .HasColumnType(DataConfigurationConstants.DefaultStringColumnType);
         });
 
         b.Property(rr => rr.OtpTokenHash)
             .IsRequired()
             .HasMaxLength(DataConfigurationConstants.DefaultStringMaxLength)
-            .HasColumnType("varchar");
+            .HasColumnType(DataConfigurationConstants.DefaultStringColumnType);
 
         b.Property(rr => rr.MagicLinkTokenHash)
             .IsRequired()
             .HasMaxLength(DataConfigurationConstants.DefaultStringMaxLength)
-            .HasColumnType("varchar");
+            .HasColumnType(DataConfigurationConstants.DefaultStringColumnType);
 
         b.ComplexProperty(rr => rr.Fingerprint, fp => fp.ConfigureFingerprint());
 
         b.Property(rr => rr.CreatedAt)
             .IsRequired()
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.Property(rr => rr.ExpiresAt)
             .IsRequired()
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.Property(rr => rr.NewEmailVerifiedAt)
             .IsRequired(false)
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.Property(rr => rr.CompletedAt)
             .IsRequired(false)
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.HasIndex(rr => rr.TokenKey).IsUnique();
         b.HasIndex(rr => rr.UserId);

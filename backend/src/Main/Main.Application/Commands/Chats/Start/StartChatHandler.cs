@@ -24,7 +24,7 @@ internal sealed class StartChatHandler(
     IModelRegistry modelRegistry,
     IChatLockService chatLockService,
     IIdGenerator idGenerator,
-    IChatCompletionService chatCompletionService,
+    ITitleGenerator titleGenerator,
     IMessageBus messageBus,
     IDateTimeProvider dateTimeProvider) : ICommandHandler<StartChatCommand, StartChatResponse>
 {
@@ -45,7 +45,7 @@ internal sealed class StartChatHandler(
         if (!isAllowed)
             return ChatOperationFaults.InvalidModel;
 
-        string title = await chatCompletionService.GetTitleAsync(request.Message, cancellationToken);
+        string title = await titleGenerator.GetTitleAsync(request.Message, cancellationToken);
 
         ChatId chatId = idGenerator.NewChatId();
 
@@ -98,7 +98,8 @@ internal sealed class StartChatHandler(
                 UserId = user.UserId,
                 StreamId = streamId.Value,
                 ModelId = modelId,
-                InitialMessage = request.Message
+                InitialMessage = request.Message,
+                WebSearchEnabled = request.WebSearchEnabled
             };
 
             await dbContext.Chats.AddAsync(chat, cancellationToken);

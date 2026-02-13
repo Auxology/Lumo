@@ -5,8 +5,6 @@ using Main.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-using RabbitMQ.Client;
-
 using SharedKernel.Infrastructure.Data;
 
 namespace Main.Infrastructure.Data.Configuration;
@@ -24,7 +22,7 @@ internal sealed class SharedChatConfiguration : IEntityTypeConfiguration<SharedC
                 id => id.Value,
                 s => SharedChatId.UnsafeFrom(s)
             )
-            .HasColumnType($"varchar({SharedChatId.Length})");
+            .HasColumnType($"{DataConfigurationConstants.DefaultStringColumnType}({SharedChatId.Length})");
 
         b.Property(s => s.SourceChatId)
             .IsRequired()
@@ -33,7 +31,7 @@ internal sealed class SharedChatConfiguration : IEntityTypeConfiguration<SharedC
                 id => id.Value,
                 s => ChatId.UnsafeFrom(s)
             )
-            .HasColumnType($"varchar({ChatId.Length})");
+            .HasColumnType($"{DataConfigurationConstants.DefaultStringColumnType}({ChatId.Length})");
 
         b.Property(s => s.OwnerId)
             .IsRequired()
@@ -42,12 +40,12 @@ internal sealed class SharedChatConfiguration : IEntityTypeConfiguration<SharedC
         b.Property(s => s.Title)
             .IsRequired()
             .HasMaxLength(ChatConstants.MaxTitleLength)
-            .HasColumnType($"varchar({ChatConstants.MaxTitleLength})");
+            .HasColumnType($"{DataConfigurationConstants.DefaultStringColumnType}({ChatConstants.MaxTitleLength})");
 
         b.Property(s => s.ModelId)
             .IsRequired()
             .HasMaxLength(ChatConstants.MaxModelIdLength)
-            .HasColumnType($"varchar({ChatConstants.MaxModelIdLength})");
+            .HasColumnType($"{DataConfigurationConstants.DefaultStringColumnType}({ChatConstants.MaxModelIdLength})");
 
         b.Property(s => s.ViewCount)
             .IsRequired()
@@ -55,15 +53,15 @@ internal sealed class SharedChatConfiguration : IEntityTypeConfiguration<SharedC
 
         b.Property(s => s.SnapshotAt)
             .IsRequired()
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.Property(s => s.CreatedAt)
             .IsRequired()
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.Property(s => s.UpdatedAt)
             .IsRequired()
-            .HasColumnType("timestamptz");
+            .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
 
         b.OwnsMany(s => s.SharedChatMessages, mb =>
         {
@@ -88,7 +86,7 @@ internal sealed class SharedChatConfiguration : IEntityTypeConfiguration<SharedC
 
             mb.Property(m => m.CreatedAt)
                 .IsRequired()
-                .HasColumnType("timestamptz");
+                .HasColumnType(DataConfigurationConstants.DefaultTimeColumnType);
         });
 
         b.HasIndex(s => s.OwnerId);

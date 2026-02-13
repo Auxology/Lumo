@@ -9,7 +9,9 @@ using Main.Application.Abstractions.Instructions;
 using Main.Application.Abstractions.Memory;
 using Main.Application.Abstractions.Stream;
 using Main.Infrastructure.AI;
-using Main.Infrastructure.AI.Tools;
+using Main.Infrastructure.AI.Filters;
+using Main.Infrastructure.AI.Plugins;
+using Main.Infrastructure.AI.Search;
 using Main.Infrastructure.Consumers;
 using Main.Infrastructure.Data;
 using Main.Infrastructure.Ephemeral;
@@ -21,11 +23,11 @@ using Main.Infrastructure.Stream;
 
 using MassTransit;
 
-using Microsoft.AspNetCore.Server.IIS;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.SemanticKernel;
 
 using OpenAI;
 using OpenAI.Embeddings;
@@ -33,7 +35,6 @@ using OpenAI.Embeddings;
 using SharedKernel.Application.Data;
 using SharedKernel.Application.Messaging;
 using SharedKernel.Infrastructure;
-using SharedKernel.Infrastructure.Data;
 using SharedKernel.Infrastructure.Messaging;
 using SharedKernel.Infrastructure.Options;
 
@@ -177,6 +178,16 @@ public static class DependencyInjection
         OpenRouterOptions openRouterOptions = new();
         configuration.GetSection(OpenRouterOptions.SectionName).Bind(openRouterOptions);
 
+        services.AddOptions<TavilyOptions>()
+            .Bind(configuration.GetSection(TavilyOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        TavilyOptions tavilyOptions = new();
+        configuration.GetSection(TavilyOptions.SectionName).Bind(tavilyOptions);
+
+        services.AddHttpClient<IWebSearchService, TavilySearchService>();
+
         services.AddSingleton<OpenAIClient>(_ =>
         {
             OpenAIClientOptions options = new()
@@ -211,9 +222,30 @@ public static class DependencyInjection
 
         services.AddScoped<IInstructionStore, InstructionStore>();
         services.AddScoped<IMemoryStore, MemoryStore>();
-        services.AddScoped<ToolExecutor>();
 
-        services.AddScoped<IChatCompletionService, ChatCompletionService>();
+        services.AddScoped<PluginUserContext>();
+        services.AddScoped<PluginStreamContext>();
+        services.AddScoped<MemoryPlugin>();
+        services.AddScoped<WebSearchPlugin>();
+        services.AddScoped<ToolCallStreamFilter>();
+
+        services.AddScoped<Kernel>(sp =>
+        {
+            MemoryPlugin memoryPlugin = sp.GetRequiredService<MemoryPlugin>();
+            WebSearchPlugin webSearchPlugin = sp.GetRequiredService<WebSearchPlugin>();
+            ToolCallStreamFilter toolCallStreamFilter = sp.GetRequiredService<ToolCallStreamFilter>();
+
+            IKernelBuilder builder = Kernel.CreateBuilder();
+            builder.Plugins.AddFromObject(memoryPlugin, "memory");
+            builder.Plugins.AddFromObject(webSearchPlugin, "search");
+
+            builder.Services.AddSingleton<IAutoFunctionInvocationFilter>(toolCallStreamFilter);
+
+            return builder.Build();
+        });
+
+        services.AddScoped<ITitleGenerator, TitleGenerator>();
+        services.AddScoped<INativeChatCompletionService, NativeChatCompletionService>();
 
         services.AddSingleton<IStreamReader, StreamReader>();
 

@@ -4,6 +4,8 @@ using Main.Application.Commands.Chats.Delete;
 
 using Mediator;
 
+using SharedKernel.Api.Constants;
+
 namespace Main.Api.Endpoints.Chats.Delete;
 
 internal sealed class Endpoint : BaseEndpoint<Request>
@@ -25,9 +27,9 @@ internal sealed class Endpoint : BaseEndpoint<Request>
             d.WithSummary("Delete Chat")
                 .WithDescription("Permanently deletes a chat and all its messages.")
                 .Produces(204)
-                .ProducesProblemDetails(400, "application/json")
-                .ProducesProblemDetails(403, "application/json")
-                .ProducesProblemDetails(404, "application/json")
+                .ProducesProblemDetails(400, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(403, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(404, HttpContentTypeConstants.Json)
                 .WithTags(CustomTags.Chats);
         });
     }

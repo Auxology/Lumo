@@ -4,6 +4,7 @@ using Main.Application.Queries.Preferences.GetInstructions;
 
 using Mediator;
 
+using SharedKernel.Api.Constants;
 using SharedKernel.Api.Infrastructure;
 
 namespace Main.Api.Endpoints.Preferences.GetInstructions;
@@ -26,7 +27,7 @@ internal sealed class Endpoint : EndpointWithoutRequest<Response>
         {
             d.WithSummary("Get Instructions")
                 .WithDescription("Retrieves all custom instructions for the authenticated user.")
-                .Produces<Response>(200, "application/json")
+                .Produces<Response>(200, HttpContentTypeConstants.Json)
                 .WithTags(CustomTags.Preferences);
         });
     }

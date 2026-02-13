@@ -85,4 +85,66 @@ internal sealed class StreamPublisher(
             throw;
         }
     }
+
+    public async Task PublishToolCallAsync(string streamId, string toolName, string? query,
+        CancellationToken cancellationToken)
+    {
+        string streamKey = $"{StreamConstants.StreamKeyPrefix}{streamId}";
+        string notifyChannel = $"{StreamConstants.NotifyChannelPrefix}{streamId}";
+
+        IDatabase db = connectionMultiplexer.GetDatabase();
+        ISubscriber pub = connectionMultiplexer.GetSubscriber();
+
+        try
+        {
+            List<NameValueEntry> entries =
+            [
+                new NameValueEntry("type", "tool_call"),
+                new NameValueEntry("tool_name", toolName),
+                new NameValueEntry("timestamp",
+                    dateTimeProvider.UtcNow.ToUnixTimeMilliseconds().ToString(CultureInfo.InvariantCulture))
+            ];
+
+            if (!string.IsNullOrWhiteSpace(query))
+                entries.Add(new NameValueEntry("query", query));
+
+            await db.StreamAddAsync(streamKey, [.. entries]);
+            await pub.PublishAsync(RedisChannel.Literal(notifyChannel), "tool_call");
+        }
+        catch (Exception exception)
+        {
+            logger.LogError(exception, "Failed to publish tool call for stream {StreamId}", streamId);
+            throw;
+        }
+    }
+
+    public async Task PublishToolCallResultAsync(string streamId, string toolName, string sourcesJson,
+        CancellationToken cancellationToken)
+    {
+        string streamKey = $"{StreamConstants.StreamKeyPrefix}{streamId}";
+        string notifyChannel = $"{StreamConstants.NotifyChannelPrefix}{streamId}";
+
+        IDatabase db = connectionMultiplexer.GetDatabase();
+        ISubscriber pub = connectionMultiplexer.GetSubscriber();
+
+        try
+        {
+            List<NameValueEntry> entries =
+            [
+                new NameValueEntry("type", "tool_result"),
+                new NameValueEntry("tool_name", toolName),
+                new NameValueEntry("sources", sourcesJson),
+                new NameValueEntry("timestamp",
+                    dateTimeProvider.UtcNow.ToUnixTimeMilliseconds().ToString(CultureInfo.InvariantCulture))
+            ];
+
+            await db.StreamAddAsync(streamKey, [.. entries]);
+            await pub.PublishAsync(RedisChannel.Literal(notifyChannel), "tool_result");
+        }
+        catch (Exception exception)
+        {
+            logger.LogError(exception, "Failed to publish tool call result for stream {StreamId}", streamId);
+            throw;
+        }
+    }
 }

@@ -4,6 +4,8 @@ using Main.Application.Commands.EphemeralChats.Start;
 
 using Mediator;
 
+using SharedKernel.Api.Constants;
+
 namespace Main.Api.Endpoints.EphemeralChats.Start;
 
 internal sealed class Endpoint : BaseEndpoint<Request, Response>
@@ -26,9 +28,9 @@ internal sealed class Endpoint : BaseEndpoint<Request, Response>
                 .WithDescription(
                     "Creates a new ephemeral chat session stored in Redis with automatic expiration. " +
                     "No chat history is persisted to the database.")
-                .Produces<Response>(202, "application/json")
-                .ProducesProblemDetails(400, "application/json")
-                .ProducesProblemDetails(404, "application/json")
+                .Produces<Response>(202, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(400, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(404, HttpContentTypeConstants.Json)
                 .WithTags(CustomTags.EphemeralChats);
         });
     }

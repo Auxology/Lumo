@@ -1,7 +1,5 @@
 using FluentValidation;
 
-using Mediator;
-
 using Microsoft.Extensions.DependencyInjection;
 
 using SharedKernel.Application.Pipelines;

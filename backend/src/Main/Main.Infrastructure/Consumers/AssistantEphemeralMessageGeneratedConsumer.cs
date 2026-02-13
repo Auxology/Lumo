@@ -50,7 +50,8 @@ internal sealed class AssistantEphemeralMessageGeneratedConsumer(IEphemeralChatS
 
         await ephemeralChatStore.SaveAsync(ephemeralChat, cancellationToken);
 
-        logger.LogInformation("Consumed {EventType}: {EventId}, CorrelationId: {CorrelationId}, EphemeralChatId: {EphemeralChatId}",
-            nameof(AssistantEphemeralMessageGenerated), message.EventId, message.CorrelationId, ephemeralChatId);
+        if (logger.IsEnabled(LogLevel.Information))
+            logger.LogInformation("Consumed {EventType}: {EventId}, CorrelationId: {CorrelationId}, EphemeralChatId: {EphemeralChatId}",
+                nameof(AssistantEphemeralMessageGenerated), message.EventId, message.CorrelationId, ephemeralChatId);
     }
 }

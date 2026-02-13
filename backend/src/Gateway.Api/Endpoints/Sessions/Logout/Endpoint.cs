@@ -4,6 +4,7 @@ using Gateway.Api.Authentication;
 using Gateway.Api.Extensions;
 
 using SharedKernel;
+using SharedKernel.Api.Constants;
 using SharedKernel.Api.Infrastructure;
 
 namespace Gateway.Api.Endpoints.Sessions.Logout;
@@ -28,8 +29,8 @@ internal sealed class Endpoint : EndpointWithoutRequest
             d.WithSummary("Logout")
                 .WithDescription("Logs out the current session by invalidating the refresh token cookie.")
                 .Produces(204)
-                .ProducesProblemDetails(400, "application/json")
-                .ProducesProblemDetails(401, "application/json")
+                .ProducesProblemDetails(400, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(401, HttpContentTypeConstants.Json)
                 .WithTags(CustomTags.Sessions);
         });
     }

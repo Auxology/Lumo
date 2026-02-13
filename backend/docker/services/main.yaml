@@ -179,6 +179,12 @@ services:
 
             - OpenRouter__EmbeddingModel=${OPENROUTER_EMBEDDING_MODEL:?OPENROUTER_EMBEDDING_MODEL is required}
 
+            # TavilyOptions
+            - Tavily__ApiKey=${TAVILY_API_KEY:?TAVILY_API_KEY is required}
+            - Tavily__BaseUrl=${TAVILY_BASE_URL:-https://api.tavily.com}
+            - Tavily__MaxResults=${TAVILY_MAX_RESULTS:-5}
+            - Tavily__SearchDepth=${TAVILY_SEARCH_DEPTH:-basic}
+
             # RabbitMqOptions
             - RabbitMq__Host=${RABBITMQ_HOST:?RABBITMQ_HOST is required}
             - RabbitMq__Port=${RABBITMQ_PORT:?RABBITMQ_PORT is required}

@@ -4,6 +4,8 @@ using FastEndpoints;
 
 using Mediator;
 
+using SharedKernel.Api.Constants;
+
 namespace Auth.Api.Endpoints.RecoveryRequests.Create;
 
 internal sealed class Endpoint : BaseEndpoint<Request, Response>
@@ -25,10 +27,10 @@ internal sealed class Endpoint : BaseEndpoint<Request, Response>
         {
             d.WithSummary("Create Recovery Request")
                 .WithDescription("Validates recovery key and sends OTP to new email address.")
-                .Produces<Response>(201, "application/json")
-                .ProducesProblemDetails(400, "application/json")
-                .ProducesProblemDetails(401, "application/json")
-                .ProducesProblemDetails(409, "application/json")
+                .Produces<Response>(201, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(400, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(401, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(409, HttpContentTypeConstants.Json)
                 .WithTags(CustomTags.Recovery);
         });
     }

@@ -4,6 +4,8 @@ using Main.Application.Queries.Chats.GetChats;
 
 using Mediator;
 
+using SharedKernel.Api.Constants;
+
 namespace Main.Api.Endpoints.Chats.GetChats;
 
 internal sealed class Endpoint : BaseEndpoint<Request, Response>
@@ -27,8 +29,8 @@ internal sealed class Endpoint : BaseEndpoint<Request, Response>
                     "Retrieves paginated chats for the authenticated user. " +
                     "Chats are returned in reverse chronological order (newest first). " +
                     "Use the cursor parameter to load older chats.")
-                .Produces<Response>(200, "application/json")
-                .ProducesProblemDetails(400, "application/json")
+                .Produces<Response>(200, HttpContentTypeConstants.Json)
+                .ProducesProblemDetails(400, HttpContentTypeConstants.Json)
                 .WithTags(CustomTags.Chats);
         });
     }
